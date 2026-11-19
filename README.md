@@ -1,2 +1,3 @@
-# ify-not-iffy
-Portfolio site for Ify Not Iffy
+# New repo
+
+This repo was created by a Cursor cloud agent.
