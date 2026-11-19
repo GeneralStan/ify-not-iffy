@@ -103,9 +103,15 @@
   --motion-duration-fast: 150ms;
   --motion-duration-base: 280ms;
   --motion-duration-slow: 480ms;
+  --motion-duration-flap: 300ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-easing-out: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --motion-easing-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --motion-ease-spring: linear(0 0%, 0.067 6.25%, 0.223 12.5%, 0.414 18.75%, 0.602 25%, 0.765 31.25%, 0.893 37.5%, 0.984 43.75%, 1.041 50%, 1.071 56.25%, 1.08 62.5%, 1.076 68.75%, 1.064 75%, 1.049 81.25%, 1.033 87.5%, 1.02 93.75%, 1.009 100%);
+  --motion-easing-spring: linear(0 0%, 0.067 6.25%, 0.223 12.5%, 0.414 18.75%, 0.602 25%, 0.765 31.25%, 0.893 37.5%, 0.984 43.75%, 1.041 50%, 1.071 56.25%, 1.08 62.5%, 1.076 68.75%, 1.064 75%, 1.049 81.25%, 1.033 87.5%, 1.02 93.75%, 1.009 100%);
 
   /* Semantic color. Edit the refs in tokens.json to retune the theme. */
   --color-bg: var(--color-lime-0);
@@ -181,6 +187,14 @@
   --type-caption-line-height: 20px;
   --type-caption-tracking: 0em;
   --type-nav-active-weight: var(--font-weight-medium);
+}
+
+/* linear() spring is the flap easing. Older engines get a cubic overshoot. */
+@supports not (transition-timing-function: linear(0, 1)) {
+  :root {
+    --motion-ease-spring: cubic-bezier(0.22, 1.4, 0.36, 1);
+    --motion-easing-spring: cubic-bezier(0.22, 1.4, 0.36, 1);
+  }
 }
 
 /* Tablet grid. The desktop frame is 1440px wide, so this starts just below it.

@@ -17,36 +17,5 @@
   font-display: swap;
 }
 
-/* Exat CYR is a commercial face. Drop the files in public/fonts/.
-   Until they are there, display roles fall through the stack in --font-display. */
-
-@font-face {
-  font-family: "Exat CYR";
-  src:
-    local("Exat CYR Light"),
-    url("/fonts/ExatCYR-Light.woff2") format("woff2");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Exat CYR";
-  src:
-    local("Exat CYR"),
-    local("Exat CYR Regular"),
-    url("/fonts/ExatCYR-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Exat CYR";
-  src:
-    local("Exat CYR Medium"),
-    url("/fonts/ExatCYR-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
+/* Exat CYR @font-face rules are injected from BaseLayout so the public
+   path includes the GitHub Pages base. Files belong in public/fonts/. */

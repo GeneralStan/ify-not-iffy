@@ -1,20 +1,124 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
+import Button from '../components/Button.astro';
+import FlapNav from '../components/FlapNav.astro';
+import { assetSrc } from '../lib/url';
+import bloom from '../assets/home/hero-work-tab-blob.svg';
+import polaroid from '../assets/home/polaroid-ify-4.png';
+import hedges from '../assets/home/hero-hedges.svg';
+import footerHedges from '../assets/home/footer-hedges.svg';
+import shot from '../assets/home/project-screenshot-2026-11-17.png';
 import '../styles/home.css';
+
+const bloomSrc = assetSrc(bloom);
+const polaroidSrc = assetSrc(polaroid);
+const hedgesSrc = assetSrc(hedges);
+const footerHedgesSrc = assetSrc(footerHedges);
+const shotSrc = assetSrc(shot);
+
+const mail = 'mailto:ify@example.com';
+const linkedin = 'https://www.linkedin.com/in/placeholder';
+const resume = '#resume';
+
+const driverTitle =
+  'Redesigning the Driver App to decrease order fulfilment time and boost  driver retention.';
+
+const projects = [
+  {
+    title:
+      'Rebuilding Leta’s dispatch dashboard as a working prototype ops teams could test before launch.',
+  },
+  { title: driverTitle },
+  { title: driverTitle },
+  { title: driverTitle },
+];
+
+const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
 ---
 
 <BaseLayout
-  title="Ifeanyi Ulasika"
-  description="Product and UX design portfolio of Ifeanyi (Ify) Ulasika. The design system lives on the tokens page while the rest of the site is still being drawn."
+  title="Ifeanyi Ulasika — Product designer"
+  description="Ifeanyi Ulasika designs products and builds systems that deploy. Selected work in enterprise design systems, web, and mobile."
 >
-  <SiteHeader current="home" />
-  <main id="content" class="home container">
-    <p class="text-caption home-kicker">Product and UX design</p>
-    <h1 class="text-display">Ifeanyi Ulasika</h1>
-    <p class="text-body-lg home-lede">
-      Ify designs product systems and the interfaces around them, between Nairobi and Lagos. This site is the foundation: the pages come after the drawings. The type, color, and grid are already set.
-    </p>
-    <a class="text-label home-link" href="/tokens">View the tokens</a>
+  <section class="hero" id="hero" data-hero>
+    <div class="hero-clip">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-blobs"></div>
+        <div class="hero-grain"></div>
+      </div>
+      <div class="hero-copy">
+        <img class="hero-bloom" src={bloomSrc} alt="" width="64" height="64" />
+        <div class="hero-headline">
+          <h1 class="hero-title">
+            <span class="lime">Hi, I’m </span><span class="paper">Ifeanyi Ulasika</span><br />
+            <span class="lime">I design </span><span class="paper">products </span><span class="lime">and</span><span class="paper"> </span><span class="lime">build</span><br />
+            <span class="lime"> </span><span class="paper">systems that deploy.</span>
+          </h1>
+          <img class="polaroid" src={polaroidSrc} width="83" height="97" alt="Ifeanyi Ulasika" />
+        </div>
+        <div class="hero-cta">
+          <Button href={mail} label="Shoot me a message" variant="secondary" />
+          <Button href={resume} label="View resume" variant="primary" icon="trailing" />
+        </div>
+      </div>
+      <img class="hero-hedges" src={hedgesSrc} alt="" />
+      <div class="hero-bar" aria-hidden="true"></div>
+    </div>
+  </section>
+  <span data-flap-sentinel aria-hidden="true"></span>
+  <FlapNav current="work" />
+
+  <main id="content">
+    <section class="projects" id="work" data-section="work">
+      <div class="projects-inner">
+        <header class="projects-head">
+          <h2 class="projects-title">Selected projects</h2>
+          <p class="projects-sub">
+            Enterprise design systems,<br />
+            web and mobile products
+          </p>
+        </header>
+        <div class="card-board">
+          {
+            projects.map((project, index) => (
+              <article class={`project-card project-card--${index + 1}`}>
+                <div class="project-card__media">
+                  <img class="project-card__shot" src={shotSrc} alt="" />
+                </div>
+                <div class="project-card__copy">
+                  <p class="project-card__tags">
+                    {tags.map((tag) => (
+                      <span>{tag}</span>
+                    ))}
+                  </p>
+                  <h3 class="project-card__title">{project.title}</h3>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <div id="playground" class="section-anchor" data-section="playground"></div>
+    <div id="about" class="section-anchor" data-section="about"></div>
+
+    <footer class="site-footer">
+      <div class="footer-bg" aria-hidden="true">
+        <div class="footer-blobs"></div>
+        <div class="footer-grain"></div>
+      </div>
+      <div class="footer-copy">
+        <h2 class="footer-title">Let’s Connect</h2>
+        <p class="footer-body">
+          Thanks for visiting my little corner of the internet. Your presence here means a lot. This was website was made with ❤️
+        </p>
+        <div class="footer-links">
+          <Button href={mail} label="Email" variant="secondary" icon="leading" />
+          <Button href={linkedin} label="Linkedin" variant="secondary" icon="leading" />
+        </div>
+      </div>
+      <img class="footer-hedges" src={footerHedgesSrc} alt="" />
+    </footer>
   </main>
 </BaseLayout>

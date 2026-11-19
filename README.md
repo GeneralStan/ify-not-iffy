@@ -2,7 +2,9 @@
 
 Foundation for Ify’s product and UX design site. Pages beyond a short home placeholder and the token style guide are not built yet. Designs are drawn in Paper and Figma and ported here against the CSS variables below.
 
-Stack: Astro 7, TypeScript, plain CSS, static output. It deploys to Vercel or Netlify as a static site.
+Stack: Astro 7, TypeScript, plain CSS, static output. It deploys to GitHub Pages, and can also go to Vercel or Netlify.
+
+The home page is the Work landing from Figma frames Work (Final)1 and Work (Final)2. `/tokens` is the style guide.
 
 ## Scripts
 
@@ -125,13 +127,34 @@ The story goes here.
 
 The `work` collection in `src/content.config.ts` validates that frontmatter. `draft: true` is for pieces that should stay out of a future index. There is no case-study route yet; the schema is the stub those pages will use.
 
+## Placeholder links
+
+These targets are stand-ins. Replace them before publishing:
+
+- “Shoot me a message” and “Email” → `mailto:ify@example.com`
+- “Linkedin” → `https://www.linkedin.com/in/placeholder`
+- “View resume” → `#resume` (no file yet)
+
+Playground and About in the flap nav are in-page anchors (`#playground`, `#about`) at the footer until those pages exist. Work scrolls to `#work`.
+
 ## Deploy
 
-Output is static (`output: 'static'` in `astro.config.mjs`). No adapter.
+`astro.config.mjs` sets `site: 'https://generalstan.github.io'` and `base: '/ify-not-iffy'`, so the site is served at `https://generalstan.github.io/ify-not-iffy/`. In-site links and the favicon go through that base. Imported images are base-aware via Vite.
 
-**Vercel:** import the repo, framework preset Astro. Build command `npm run build`, output directory `dist`. `prebuild` regenerates tokens during the build.
+Local preview after a build:
 
-**Netlify:** `netlify.toml` sets the same build command and publishes `dist`.
+```sh
+npm run build
+npm run preview
+```
+
+Open `http://127.0.0.1:4477/ify-not-iffy/` (and `/ify-not-iffy/tokens`). `npm run dev` uses the same base.
+
+**GitHub Pages:** `.github/workflows/deploy.yml` builds with `withastro/action` and deploys with `actions/deploy-pages` on every push to `main`. In the GitHub repo settings, set Pages to “GitHub Actions”. The repository this workflow expects is `GeneralStan/ify-not-iffy`.
+
+**Vercel:** framework preset Astro. If the project is not hosted under `/ify-not-iffy`, remove `base` (and keep `site` as the production origin) before deploying.
+
+**Netlify:** `netlify.toml` publishes `dist`. Same note on `base` if the site is served from the domain root.
 
 ## Reduced motion
 
