@@ -1,0 +1,352 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import tokens from '../../tokens/tokens.json';
+import '../styles/tokens-page.css';
+
+const ramps = Object.entries(tokens.primitive.color.ramps);
+const alphas = Object.entries(tokens.primitive.color.alpha);
+const semantics = Object.entries(tokens.semantic.color);
+const radii = Object.entries(tokens.primitive.radius);
+const strokes = Object.entries(tokens.primitive.stroke);
+const grids = Object.entries(tokens.primitive.grid);
+const roles = Object.entries(tokens.typography.roles);
+
+const samples: Record<string, string> = {
+  display: 'Ifeanyi Ulasika',
+  h1: 'Selected work',
+  h2: 'Clarity for messy operations',
+  h3: 'What changed',
+  nav: 'Work',
+  'body-lg':
+    'A product designer working between Nairobi and Lagos, on systems as much as on screens.',
+  body: 'Case studies will be Markdown in the work collection. This page is the system they will sit on.',
+  label: 'View project',
+  meta: 'Logistics · 2024–2026',
+  caption: 'Foundation tokens',
+};
+
+const weightNames: Record<string, string> = {
+  light: 'Light',
+  regular: 'Regular',
+  medium: 'Medium',
+};
+
+const alphaNotes: Record<string, string> = {
+  'shadow-10': 'Soft shadow',
+  'shadow-75': 'Heavy shadow',
+  'highlight-10': 'White at 10%',
+  'lime-300-60': 'Lime 300 at 60%, for hero highlights',
+};
+---
+
+<BaseLayout
+  title="Tokens — Ifeanyi Ulasika"
+  description="Color, type, radius, stroke, and grid tokens for Ifeanyi Ulasika’s portfolio."
+>
+  <SiteHeader current="tokens" />
+  <main id="content" class="tokens-main">
+    <header class="container tokens-hero">
+      <p class="text-caption tokens-kicker">Foundation</p>
+      <h1 class="text-display">Tokens</h1>
+      <p class="text-body-lg tokens-lede">
+        Primitives from the Figma file, plus a thin semantic layer. Every swatch, radius, rule, column, and type role on this page reads a CSS variable generated from tokens.json.
+      </p>
+    </header>
+
+    <nav class="container token-toc" aria-label="On this page">
+      <a class="text-label" href="#color">Color</a>
+      <a class="text-label" href="#semantic">Semantic</a>
+      <a class="text-label" href="#alpha">Alpha</a>
+      <a class="text-label" href="#radius">Radius</a>
+      <a class="text-label" href="#stroke">Stroke</a>
+      <a class="text-label" href="#grid">Grid</a>
+      <a class="text-label" href="#type">Type</a>
+      <a class="text-label" href="#motion">Motion</a>
+    </nav>
+
+    <section id="color" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Color</h2>
+        <p class="text-body section-copy">
+          Lime, neutral, stone, blue, and plum. Steps that exist in the file are the steps shown here. Lime 500 is the accent. Lime 950 is the text color.
+        </p>
+        {
+          ramps.map(([ramp, steps]) => (
+            <div class="ramp">
+              <h3 class="text-h3">{ramp}</h3>
+              <div class="swatches">
+                {Object.entries(steps).map(([step, hex]) => {
+                  const variable = `--color-${ramp}-${step}`;
+                  return (
+                    <figure class="swatch">
+                      <div class="chip" style={`--swatch: var(${variable})`} />
+                      <figcaption>
+                        <span class="swatch-name">{`${ramp}-${step}`}</span>
+                        <span class="swatch-value" data-token={variable}>
+                          {hex}
+                        </span>
+                      </figcaption>
+                    </figure>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="semantic" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Semantic</h2>
+        <p class="text-body section-copy">
+          Six roles, each a pointer at a primitive. Background is the warm lime near-white. Text is lime 950. Muted text is neutral 700. Change a reference in tokens.json and regenerate.
+        </p>
+        <div class="semantic-grid">
+          {
+            semantics.map(([name, ref]) => {
+              const variable = `--color-${name}`;
+              return (
+                <figure class="swatch">
+                  <div class="chip" style={`--swatch: var(${variable})`} />
+                  <figcaption>
+                    <span class="swatch-name text-label">{name}</span>
+                    <span class="ref-value" data-token={variable} data-resolve="ref">
+                      {`var(--color-${ref})`}
+                    </span>
+                  </figcaption>
+                </figure>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="alpha" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Alpha</h2>
+        <p class="text-body section-copy">
+          Shadow and highlight stay as exported. Lime 300 at 60% is the wash behind hero highlight words.
+        </p>
+        <div class="swatches alpha-swatches">
+          {
+            alphas.map(([name, value]) => {
+              const variable = `--color-${name}`;
+              return (
+                <figure class="swatch">
+                  <div
+                    class="chip is-alpha"
+                    data-checker={name.startsWith('highlight') ? 'dark' : undefined}
+                    style={`--swatch: var(${variable})`}
+                  />
+                  <figcaption>
+                    <span class="swatch-name">{name}</span>
+                    <span class="swatch-value" data-token={variable}>
+                      {value}
+                    </span>
+                    <span class="ref-value">{alphaNotes[name]}</span>
+                  </figcaption>
+                </figure>
+              );
+            })
+          }
+        </div>
+        <p class="text-h2 highlight-sample">Products with a <span>point of view</span>.</p>
+      </div>
+    </section>
+
+    <section id="radius" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Radius</h2>
+        <div class="sample-row">
+          {
+            radii.map(([name, value]) => (
+              <div>
+                <div class="radius-sample" style={`border-radius: var(--radius-${name})`} />
+                <p class="sample-label">
+                  <span class="text-label">{name}</span>
+                  <span class="swatch-value" data-token={`--radius-${name}`}>
+                    {value}
+                  </span>
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="stroke" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Stroke</h2>
+        <div class="sample-row">
+          {
+            strokes.map(([name, value]) => (
+              <div>
+                <div class="stroke-sample" style={`border-top-width: var(--stroke-${name})`} />
+                <p class="sample-label">
+                  <span class="text-label">{name}</span>
+                  <span class="swatch-value" data-token={`--stroke-${name}`}>
+                    {value}
+                  </span>
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="grid" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Grid</h2>
+        <p class="text-body section-copy">
+          Twelve columns on the 1440 desktop frame, eight at 768, four at 390. The band below is the live grid: its page margin is the container padding, and the columns follow the viewport.
+        </p>
+        <div class="breakpoint-specs">
+          {
+            grids.map(([name, spec]) => (
+              <article>
+                <h3 class="text-h3">{name}</h3>
+                <p class="text-meta">
+                  <span data-token={`--breakpoint-${name}`}>{tokens.primitive.breakpoint[name as 'mobile' | 'tablet' | 'desktop']}</span>
+                </p>
+                <p class="text-body">
+                  <span data-token={`--grid-columns-${name}`}>{spec.columns}</span> columns
+                </p>
+                <p class="text-body">
+                  Gutter <span data-token={`--grid-gutter-${name}`}>{spec.gutter}</span>
+                </p>
+                <p class="text-body">
+                  Margin <span data-token={`--grid-margin-${name}`}>{spec.margin}</span>
+                </p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+      <div class="grid-stage">
+        <div class="container">
+          <div class="grid" id="live-grid">
+            {
+              Array.from({ length: 12 }, (_, index) => (
+                <div class="grid-cell text-caption">{index + 1}</div>
+              ))
+            }
+          </div>
+          <p class="text-caption grid-note" id="grid-live-note">Active grid</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="type" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Type</h2>
+        <p class="text-body section-copy">
+          Desktop sizes are the default. Below the tablet breakpoint the mobile sizes take over. Tracking is a percentage of the size, written in CSS as em. Nav active is the same role at medium weight.
+        </p>
+        <div class="type-list">
+          {
+            roles.map(([role, spec]) => (
+              <article>
+                {role === 'nav' ? (
+                  <div class="nav-pair">
+                    <p class="text-nav">{samples.nav}</p>
+                    <p class="text-nav nav-active">About</p>
+                  </div>
+                ) : (
+                  <p class={`text-${role}`}>{samples[role]}</p>
+                )}
+                <p class="type-spec text-caption">
+                  <span>{role}</span>
+                  <span>
+                    {spec.family === 'display' ? 'Exat CYR' : spec.family === 'mono' ? 'Geist Mono' : 'Geist'}
+                    {' · '}
+                    {weightNames[spec.weight]}
+                  </span>
+                  <code data-type-spec={role}></code>
+                </p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="motion" class="token-section">
+      <div class="container">
+        <h2 class="text-h2">Motion</h2>
+        <p class="text-body section-copy">
+          A few durations and easings for later hover and animation work. When someone asks for reduced motion, the durations become 0ms.
+        </p>
+        <div class="motion-list text-body">
+          {
+            Object.entries(tokens.primitive.motion.duration).map(([name]) => (
+              <div>
+                <code>{`--motion-duration-${name}`}</code>
+                <span data-token={`--motion-duration-${name}`}>{tokens.primitive.motion.duration[name as 'fast' | 'base' | 'slow']}</span>
+              </div>
+            ))
+          }
+          {
+            Object.entries(tokens.primitive.motion.easing).map(([name]) => (
+              <div>
+                <code>{`--motion-ease-${name}`}</code>
+                <span data-token={`--motion-ease-${name}`}>{tokens.primitive.motion.easing[name as 'standard' | 'out' | 'in-out']}</span>
+              </div>
+            ))
+          }
+        </div>
+        <div class="motion-demos">
+          <button class="motion-demo text-label" type="button" data-speed="fast">Fast</button>
+          <button class="motion-demo text-label" type="button" data-speed="base">Base</button>
+          <button class="motion-demo text-label" type="button" data-speed="slow">Slow</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  const root = getComputedStyle(document.documentElement);
+
+  function specified(name: string) {
+    return root.getPropertyValue(name).trim();
+  }
+
+  function resolved(name: string) {
+    let value = specified(name);
+    for (let i = 0; i < 4; i += 1) {
+      const match = value.match(/^var\((--[\w-]+)\)$/);
+      if (!match) break;
+      value = specified(match[1]);
+    }
+    return value;
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-token]').forEach((node) => {
+    const name = node.dataset.token;
+    if (!name) return;
+    const value = node.dataset.resolve === 'ref' ? specified(name) : resolved(name);
+    if (value) node.textContent = value;
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-type-spec]').forEach((node) => {
+    const role = node.dataset.typeSpec;
+    if (!role) return;
+    const size = resolved(`--type-${role}-size`);
+    const leading = resolved(`--type-${role}-line-height`);
+    const tracking = resolved(`--type-${role}-tracking`);
+    node.textContent = `${size} / ${leading} / ${tracking}`;
+  });
+
+  const note = document.querySelector('#grid-live-note');
+  if (note) {
+    const columns = resolved('--grid-columns');
+    const gutter = resolved('--grid-gutter');
+    const margin = resolved('--grid-margin');
+    note.textContent = `Active · ${columns} columns · gutter ${gutter} · margin ${margin}`;
+  }
+</script>

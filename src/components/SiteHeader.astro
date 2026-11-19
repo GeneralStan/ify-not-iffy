@@ -1,0 +1,20 @@
+---
+interface Props {
+  current?: 'home' | 'tokens';
+}
+
+const { current } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a class="wordmark text-label" href="/" aria-current={current === 'home' ? 'page' : undefined}>
+      Ifeanyi Ulasika
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <a class="text-label" href="/tokens" aria-current={current === 'tokens' ? 'page' : undefined}>
+        Tokens
+      </a>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,233 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const sourcePath = path.join(root, 'tokens', 'tokens.json');
+const outPath = path.join(root, 'src', 'styles', 'tokens.css');
+
+const tokens = JSON.parse(await readFile(sourcePath, 'utf8'));
+
+const lines = [];
+
+function emit(line = '') {
+  lines.push(line);
+}
+
+function block(selector, declarations, indent = '') {
+  emit(`${indent}${selector} {`);
+  for (const [name, value] of declarations) {
+    emit(`${indent}  ${name}: ${value};`);
+  }
+  emit(`${indent}}`);
+}
+
+function percentToEm(percent) {
+  if (typeof percent !== 'number' || Number.isNaN(percent)) {
+    throw new Error(`Tracking must be a percentage number, received ${percent}`);
+  }
+  const em = percent / 100;
+  if (em === 0) return '0em';
+  const raw = em.toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
+  return `${raw}em`;
+}
+
+function pxNumber(value) {
+  const match = String(value).match(/^(-?[\d.]+)px$/);
+  if (!match) throw new Error(`Expected a px length, received ${value}`);
+  return Number(match[1]);
+}
+
+const { primitive, semantic, typography } = tokens;
+const colorVars = new Map();
+
+for (const [ramp, steps] of Object.entries(primitive.color.ramps)) {
+  for (const [step, value] of Object.entries(steps)) {
+    colorVars.set(`--color-${ramp}-${step}`, value);
+  }
+}
+
+for (const [name, value] of Object.entries(primitive.color.alpha)) {
+  colorVars.set(`--color-${name}`, value);
+}
+
+for (const ref of Object.values(semantic.color)) {
+  const variable = `--color-${ref}`;
+  if (!colorVars.has(variable)) {
+    throw new Error(`Semantic color references missing primitive ${variable}`);
+  }
+}
+
+const requiredAlpha = ['shadow-10', 'shadow-75', 'highlight-10', 'lime-300-60'];
+for (const name of requiredAlpha) {
+  if (!primitive.color.alpha[name]) {
+    throw new Error(`Missing alpha color ${name}`);
+  }
+}
+
+emit('/* Generated from tokens/tokens.json by scripts/generate-tokens.mjs.');
+emit('   Do not edit by hand. Regenerate with `npm run tokens`.');
+emit('   Letter-spacing in Figma is stored in px. Tracking in the JSON is a');
+emit('   percentage of font size and is emitted here as em. */');
+emit('');
+
+const rootDecls = [];
+
+rootDecls.push(['/* Color primitives */', null]);
+for (const [name, value] of colorVars) {
+  rootDecls.push([name, value]);
+}
+
+rootDecls.push(['/* Radius, stroke */', null]);
+for (const [name, value] of Object.entries(primitive.radius)) {
+  rootDecls.push([`--radius-${name}`, value]);
+}
+for (const [name, value] of Object.entries(primitive.stroke)) {
+  rootDecls.push([`--stroke-${name}`, value]);
+}
+
+rootDecls.push(['/* Fonts and weights */', null]);
+for (const [name, value] of Object.entries(primitive.font)) {
+  rootDecls.push([`--font-${name}`, value]);
+}
+for (const [name, value] of Object.entries(primitive.fontWeight)) {
+  rootDecls.push([`--font-weight-${name}`, value]);
+}
+
+rootDecls.push(['/* Breakpoints */', null]);
+for (const [name, value] of Object.entries(primitive.breakpoint)) {
+  rootDecls.push([`--breakpoint-${name}`, value]);
+}
+
+rootDecls.push(['/* Motion */', null]);
+for (const [name, value] of Object.entries(primitive.motion.duration)) {
+  rootDecls.push([`--motion-duration-${name}`, value]);
+}
+for (const [name, value] of Object.entries(primitive.motion.easing)) {
+  rootDecls.push([`--motion-ease-${name}`, value]);
+}
+
+rootDecls.push(['/* Semantic color. Edit the refs in tokens.json to retune the theme. */', null]);
+for (const [name, ref] of Object.entries(semantic.color)) {
+  rootDecls.push([`--color-${name}`, `var(--color-${ref})`]);
+}
+
+rootDecls.push(['/* Grid, per breakpoint and the active (desktop) set. */', null]);
+for (const [bp, spec] of Object.entries(primitive.grid)) {
+  rootDecls.push([`--grid-columns-${bp}`, spec.columns]);
+  rootDecls.push([`--grid-gutter-${bp}`, spec.gutter]);
+  rootDecls.push([`--grid-margin-${bp}`, spec.margin]);
+}
+rootDecls.push(['--grid-columns', 'var(--grid-columns-desktop)']);
+rootDecls.push(['--grid-gutter', 'var(--grid-gutter-desktop)']);
+rootDecls.push(['--grid-margin', 'var(--grid-margin-desktop)']);
+
+rootDecls.push(['/* Type roles, desktop. Mobile overrides sit under the tablet breakpoint. */', null]);
+
+function typeDecls(mode) {
+  const decls = [];
+  for (const [role, spec] of Object.entries(typography.roles)) {
+    const values = spec[mode];
+    decls.push([`--type-${role}-family`, `var(--font-${spec.family})`]);
+    decls.push([`--type-${role}-weight`, `var(--font-weight-${spec.weight})`]);
+    decls.push([`--type-${role}-size`, values.size]);
+    decls.push([`--type-${role}-line-height`, values.lineHeight]);
+    decls.push([`--type-${role}-tracking`, percentToEm(values.tracking)]);
+  }
+  return decls;
+}
+
+rootDecls.push(...typeDecls('desktop'));
+rootDecls.push([
+  '--type-nav-active-weight',
+  `var(--font-weight-${typography.navActiveWeight})`,
+]);
+
+emit(':root {');
+for (const [name, value] of rootDecls) {
+  if (value == null) {
+    emit('');
+    emit(`  ${name}`);
+    continue;
+  }
+  emit(`  ${name}: ${value};`);
+}
+emit('}');
+emit('');
+
+const desktopPx = pxNumber(primitive.breakpoint.desktop);
+const tabletPx = pxNumber(primitive.breakpoint.tablet);
+
+emit(`/* Tablet grid. The desktop frame is ${desktopPx}px wide, so this starts just below it.`);
+emit('   Type stays on the desktop values until the tablet breakpoint. */');
+emit(`@media (max-width: ${desktopPx - 1}px) {`);
+block(
+  ':root',
+  [
+    ['--grid-columns', 'var(--grid-columns-tablet)'],
+    ['--grid-gutter', 'var(--grid-gutter-tablet)'],
+    ['--grid-margin', 'var(--grid-margin-tablet)'],
+  ],
+  '  ',
+);
+emit('}');
+emit('');
+
+emit(`/* Mobile grid and mobile type, below the ${tabletPx}px tablet breakpoint. */`);
+emit(`@media (max-width: ${tabletPx - 1}px) {`);
+const mobileDecls = [
+  ['--grid-columns', 'var(--grid-columns-mobile)'],
+  ['--grid-gutter', 'var(--grid-gutter-mobile)'],
+  ['--grid-margin', 'var(--grid-margin-mobile)'],
+  ...typeDecls('mobile'),
+];
+block(':root', mobileDecls, '  ');
+emit('}');
+emit('');
+
+emit('/* Type utilities. Weight and family stay on the role; size, leading, and tracking follow the breakpoint. */');
+for (const role of Object.keys(typography.roles)) {
+  block(`.text-${role}`, [
+    ['font-family', `var(--type-${role}-family)`],
+    ['font-size', `var(--type-${role}-size)`],
+    ['font-weight', `var(--type-${role}-weight)`],
+    ['font-style', 'normal'],
+    ['line-height', `var(--type-${role}-line-height)`],
+    ['letter-spacing', `var(--type-${role}-tracking)`],
+  ]);
+  emit('');
+}
+
+block('.nav-active', [['font-weight', 'var(--type-nav-active-weight)']]);
+emit('');
+
+block('.container', [
+  ['width', '100%'],
+  ['max-width', 'var(--breakpoint-desktop)'],
+  ['margin-inline', 'auto'],
+  ['padding-inline', 'var(--grid-margin)'],
+]);
+emit('');
+
+block('.grid', [
+  ['display', 'grid'],
+  ['grid-template-columns', 'repeat(var(--grid-columns), minmax(0, 1fr))'],
+  ['column-gap', 'var(--grid-gutter)'],
+  ['row-gap', 'var(--grid-gutter)'],
+]);
+emit('');
+
+const css = `${lines.join('\n').replace(/\n{3,}/g, '\n\n')}\n`;
+
+if (css.includes('letter-spacing: -') && !css.includes('em')) {
+  throw new Error('Expected tracking to be emitted in em');
+}
+if (!css.includes('--color-lime-300-60: rgba(191,229,77,0.60);')) {
+  throw new Error('lime-300-60 was not emitted with the expected value');
+}
+if (!css.includes('--color-shadow-10:') || !css.includes('--color-shadow-75:') || !css.includes('--color-highlight-10:')) {
+  throw new Error('Existing alpha colors are missing from the CSS');
+}
+
+await writeFile(outPath, css);
+console.log(`Wrote ${path.relative(root, outPath)} (${colorVars.size} colors, ${Object.keys(typography.roles).length} type roles)`);

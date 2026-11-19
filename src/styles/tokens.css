@@ -1,0 +1,363 @@
+/* Generated from tokens/tokens.json by scripts/generate-tokens.mjs.
+   Do not edit by hand. Regenerate with `npm run tokens`.
+   Letter-spacing in Figma is stored in px. Tracking in the JSON is a
+   percentage of font size and is emitted here as em. */
+
+:root {
+
+  /* Color primitives */
+  --color-lime-0: #FEFFFA;
+  --color-lime-50: #F1FACC;
+  --color-lime-100: #E8F5B8;
+  --color-lime-150: #DDEF9E;
+  --color-lime-200: #D3EB84;
+  --color-lime-300: #BFE54D;
+  --color-lime-400: #A4CA3A;
+  --color-lime-500: #789E12;
+  --color-lime-600: #5B7813;
+  --color-lime-700: #4A5F15;
+  --color-lime-800: #3F5116;
+  --color-lime-900: #0D1202;
+  --color-lime-950: #040501;
+  --color-neutral-0: #FEFEFE;
+  --color-neutral-50: #FAFAFA;
+  --color-neutral-100: #F5F5F5;
+  --color-neutral-150: #ECECEC;
+  --color-neutral-200: #E3E3E3;
+  --color-neutral-300: #D7D7D7;
+  --color-neutral-400: #C5C5C5;
+  --color-neutral-500: #A6A6A6;
+  --color-neutral-600: #808080;
+  --color-neutral-700: #4F4F4F;
+  --color-neutral-800: #3B3B3B;
+  --color-neutral-900: #202020;
+  --color-neutral-950: #0D0D0D;
+  --color-stone-0: #FEFDFB;
+  --color-stone-50: #F6F6F1;
+  --color-stone-100: #EFEFE6;
+  --color-stone-150: #F0EDE5;
+  --color-stone-200: #E5E5DC;
+  --color-stone-300: #D6D6CA;
+  --color-stone-400: #BFBFAF;
+  --color-stone-500: #999982;
+  --color-stone-600: #77775B;
+  --color-stone-700: #5D5D3C;
+  --color-stone-800: #44442B;
+  --color-stone-900: #232314;
+  --color-stone-950: #0C0C05;
+  --color-blue-0: #FCFEFF;
+  --color-blue-50: #F2F8FC;
+  --color-blue-100: #E8F2FA;
+  --color-blue-150: #DBEAF8;
+  --color-blue-200: #CEE3F5;
+  --color-blue-300: #ABCEED;
+  --color-blue-400: #97BADA;
+  --color-blue-500: #7698BB;
+  --color-blue-600: #5A7A9F;
+  --color-blue-700: #446389;
+  --color-blue-800: #2E4C73;
+  --color-blue-900: #122C54;
+  --color-blue-950: #030B1C;
+  --color-plum-0: #FFFDFF;
+  --color-plum-50: #FAF4FB;
+  --color-plum-100: #F7ECF8;
+  --color-plum-150: #F2E1F5;
+  --color-plum-200: #EBD2EF;
+  --color-plum-300: #DFC4E3;
+  --color-plum-400: #CCAFD1;
+  --color-plum-500: #AD8CB2;
+  --color-plum-600: #916C97;
+  --color-plum-700: #7B5481;
+  --color-plum-800: #653C6B;
+  --color-plum-900: #46194D;
+  --color-plum-950: #140417;
+  --color-shadow-10: rgba(10,10,10,0.10);
+  --color-shadow-75: rgba(10,10,10,0.75);
+  --color-highlight-10: rgba(250,250,250,0.10);
+  --color-lime-300-60: rgba(191,229,77,0.60);
+
+  /* Radius, stroke */
+  --radius-none: 0px;
+  --radius-xs: 2px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-full: 9999px;
+  --stroke-none: 0px;
+  --stroke-thin: 1px;
+  --stroke-regular: 1.5px;
+
+  /* Fonts and weights */
+  --font-display: "Exat CYR", "Geist", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+
+  /* Breakpoints */
+  --breakpoint-mobile: 390px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1440px;
+
+  /* Motion */
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 280ms;
+  --motion-duration-slow: 480ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Semantic color. Edit the refs in tokens.json to retune the theme. */
+  --color-bg: var(--color-lime-0);
+  --color-surface: var(--color-neutral-0);
+  --color-text: var(--color-lime-950);
+  --color-text-muted: var(--color-neutral-700);
+  --color-accent: var(--color-lime-500);
+  --color-border: var(--color-neutral-200);
+
+  /* Grid, per breakpoint and the active (desktop) set. */
+  --grid-columns-mobile: 4;
+  --grid-gutter-mobile: 16px;
+  --grid-margin-mobile: 16px;
+  --grid-columns-tablet: 8;
+  --grid-gutter-tablet: 24px;
+  --grid-margin-tablet: 32px;
+  --grid-columns-desktop: 12;
+  --grid-gutter-desktop: 32px;
+  --grid-margin-desktop: 120px;
+  --grid-columns: var(--grid-columns-desktop);
+  --grid-gutter: var(--grid-gutter-desktop);
+  --grid-margin: var(--grid-margin-desktop);
+
+  /* Type roles, desktop. Mobile overrides sit under the tablet breakpoint. */
+  --type-display-family: var(--font-display);
+  --type-display-weight: var(--font-weight-regular);
+  --type-display-size: 56px;
+  --type-display-line-height: 64px;
+  --type-display-tracking: -0.02em;
+  --type-h1-family: var(--font-display);
+  --type-h1-weight: var(--font-weight-regular);
+  --type-h1-size: 40px;
+  --type-h1-line-height: 48px;
+  --type-h1-tracking: -0.02em;
+  --type-h2-family: var(--font-display);
+  --type-h2-weight: var(--font-weight-light);
+  --type-h2-size: 32px;
+  --type-h2-line-height: 40px;
+  --type-h2-tracking: -0.015em;
+  --type-h3-family: var(--font-display);
+  --type-h3-weight: var(--font-weight-regular);
+  --type-h3-size: 24px;
+  --type-h3-line-height: 32px;
+  --type-h3-tracking: -0.01em;
+  --type-nav-family: var(--font-display);
+  --type-nav-weight: var(--font-weight-regular);
+  --type-nav-size: 24px;
+  --type-nav-line-height: 32px;
+  --type-nav-tracking: -0.01em;
+  --type-body-lg-family: var(--font-body);
+  --type-body-lg-weight: var(--font-weight-regular);
+  --type-body-lg-size: 18px;
+  --type-body-lg-line-height: 28px;
+  --type-body-lg-tracking: 0em;
+  --type-body-family: var(--font-body);
+  --type-body-weight: var(--font-weight-regular);
+  --type-body-size: 16px;
+  --type-body-line-height: 24px;
+  --type-body-tracking: 0em;
+  --type-label-family: var(--font-body);
+  --type-label-weight: var(--font-weight-medium);
+  --type-label-size: 16px;
+  --type-label-line-height: 24px;
+  --type-label-tracking: -0.01em;
+  --type-meta-family: var(--font-mono);
+  --type-meta-weight: var(--font-weight-regular);
+  --type-meta-size: 16px;
+  --type-meta-line-height: 24px;
+  --type-meta-tracking: 0em;
+  --type-caption-family: var(--font-body);
+  --type-caption-weight: var(--font-weight-regular);
+  --type-caption-size: 14px;
+  --type-caption-line-height: 20px;
+  --type-caption-tracking: 0em;
+  --type-nav-active-weight: var(--font-weight-medium);
+}
+
+/* Tablet grid. The desktop frame is 1440px wide, so this starts just below it.
+   Type stays on the desktop values until the tablet breakpoint. */
+@media (max-width: 1439px) {
+  :root {
+    --grid-columns: var(--grid-columns-tablet);
+    --grid-gutter: var(--grid-gutter-tablet);
+    --grid-margin: var(--grid-margin-tablet);
+  }
+}
+
+/* Mobile grid and mobile type, below the 768px tablet breakpoint. */
+@media (max-width: 767px) {
+  :root {
+    --grid-columns: var(--grid-columns-mobile);
+    --grid-gutter: var(--grid-gutter-mobile);
+    --grid-margin: var(--grid-margin-mobile);
+    --type-display-family: var(--font-display);
+    --type-display-weight: var(--font-weight-regular);
+    --type-display-size: 40px;
+    --type-display-line-height: 48px;
+    --type-display-tracking: -0.02em;
+    --type-h1-family: var(--font-display);
+    --type-h1-weight: var(--font-weight-regular);
+    --type-h1-size: 32px;
+    --type-h1-line-height: 40px;
+    --type-h1-tracking: -0.02em;
+    --type-h2-family: var(--font-display);
+    --type-h2-weight: var(--font-weight-light);
+    --type-h2-size: 24px;
+    --type-h2-line-height: 32px;
+    --type-h2-tracking: -0.015em;
+    --type-h3-family: var(--font-display);
+    --type-h3-weight: var(--font-weight-regular);
+    --type-h3-size: 20px;
+    --type-h3-line-height: 28px;
+    --type-h3-tracking: -0.01em;
+    --type-nav-family: var(--font-display);
+    --type-nav-weight: var(--font-weight-regular);
+    --type-nav-size: 18px;
+    --type-nav-line-height: 24px;
+    --type-nav-tracking: -0.01em;
+    --type-body-lg-family: var(--font-body);
+    --type-body-lg-weight: var(--font-weight-regular);
+    --type-body-lg-size: 16px;
+    --type-body-lg-line-height: 24px;
+    --type-body-lg-tracking: 0em;
+    --type-body-family: var(--font-body);
+    --type-body-weight: var(--font-weight-regular);
+    --type-body-size: 16px;
+    --type-body-line-height: 24px;
+    --type-body-tracking: 0em;
+    --type-label-family: var(--font-body);
+    --type-label-weight: var(--font-weight-medium);
+    --type-label-size: 16px;
+    --type-label-line-height: 24px;
+    --type-label-tracking: -0.01em;
+    --type-meta-family: var(--font-mono);
+    --type-meta-weight: var(--font-weight-regular);
+    --type-meta-size: 14px;
+    --type-meta-line-height: 20px;
+    --type-meta-tracking: 0em;
+    --type-caption-family: var(--font-body);
+    --type-caption-weight: var(--font-weight-regular);
+    --type-caption-size: 12px;
+    --type-caption-line-height: 16px;
+    --type-caption-tracking: 0em;
+  }
+}
+
+/* Type utilities. Weight and family stay on the role; size, leading, and tracking follow the breakpoint. */
+.text-display {
+  font-family: var(--type-display-family);
+  font-size: var(--type-display-size);
+  font-weight: var(--type-display-weight);
+  font-style: normal;
+  line-height: var(--type-display-line-height);
+  letter-spacing: var(--type-display-tracking);
+}
+
+.text-h1 {
+  font-family: var(--type-h1-family);
+  font-size: var(--type-h1-size);
+  font-weight: var(--type-h1-weight);
+  font-style: normal;
+  line-height: var(--type-h1-line-height);
+  letter-spacing: var(--type-h1-tracking);
+}
+
+.text-h2 {
+  font-family: var(--type-h2-family);
+  font-size: var(--type-h2-size);
+  font-weight: var(--type-h2-weight);
+  font-style: normal;
+  line-height: var(--type-h2-line-height);
+  letter-spacing: var(--type-h2-tracking);
+}
+
+.text-h3 {
+  font-family: var(--type-h3-family);
+  font-size: var(--type-h3-size);
+  font-weight: var(--type-h3-weight);
+  font-style: normal;
+  line-height: var(--type-h3-line-height);
+  letter-spacing: var(--type-h3-tracking);
+}
+
+.text-nav {
+  font-family: var(--type-nav-family);
+  font-size: var(--type-nav-size);
+  font-weight: var(--type-nav-weight);
+  font-style: normal;
+  line-height: var(--type-nav-line-height);
+  letter-spacing: var(--type-nav-tracking);
+}
+
+.text-body-lg {
+  font-family: var(--type-body-lg-family);
+  font-size: var(--type-body-lg-size);
+  font-weight: var(--type-body-lg-weight);
+  font-style: normal;
+  line-height: var(--type-body-lg-line-height);
+  letter-spacing: var(--type-body-lg-tracking);
+}
+
+.text-body {
+  font-family: var(--type-body-family);
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
+  font-style: normal;
+  line-height: var(--type-body-line-height);
+  letter-spacing: var(--type-body-tracking);
+}
+
+.text-label {
+  font-family: var(--type-label-family);
+  font-size: var(--type-label-size);
+  font-weight: var(--type-label-weight);
+  font-style: normal;
+  line-height: var(--type-label-line-height);
+  letter-spacing: var(--type-label-tracking);
+}
+
+.text-meta {
+  font-family: var(--type-meta-family);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-meta-weight);
+  font-style: normal;
+  line-height: var(--type-meta-line-height);
+  letter-spacing: var(--type-meta-tracking);
+}
+
+.text-caption {
+  font-family: var(--type-caption-family);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-caption-weight);
+  font-style: normal;
+  line-height: var(--type-caption-line-height);
+  letter-spacing: var(--type-caption-tracking);
+}
+
+.nav-active {
+  font-weight: var(--type-nav-active-weight);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--breakpoint-desktop);
+  margin-inline: auto;
+  padding-inline: var(--grid-margin);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+  row-gap: var(--grid-gutter);
+}
+

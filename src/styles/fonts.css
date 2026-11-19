@@ -1,0 +1,52 @@
+/* Geist and Geist Mono ship with the official `geist` package.
+   Paths are resolved by Vite from this file. */
+
+@font-face {
+  font-family: "Geist";
+  src: url("../../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Exat CYR is a commercial face. Drop the files in public/fonts/.
+   Until they are there, display roles fall through the stack in --font-display. */
+
+@font-face {
+  font-family: "Exat CYR";
+  src:
+    local("Exat CYR Light"),
+    url("/fonts/ExatCYR-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Exat CYR";
+  src:
+    local("Exat CYR"),
+    local("Exat CYR Regular"),
+    url("/fonts/ExatCYR-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Exat CYR";
+  src:
+    local("Exat CYR Medium"),
+    url("/fonts/ExatCYR-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
