@@ -60,11 +60,10 @@
 }
 
 /* ===== Shared scale =====
-   The flap nav is 720px wide (Figma 4026:607) and shrinks with the viewport below that.
-   Hedges are sized from the same value so their relation to the flaps matches the frame at every width. */
+   Hedges are laid out against a 720px reference (the hero flap row, Figma 4029:2505) that shrinks
+   with the viewport, so their spacing matches the frame at every width. */
 :root {
-  --flap-w: min(720px, 100vw);
-  --flap-h: calc(80 / 720 * var(--flap-w));
+  --hedge-base: min(720px, 100vw);
   /* Hedges keep Figma's spacing; on phones they are drawn larger so they still read. */
   --hedge-scale: 1;
 }
@@ -90,7 +89,9 @@
   display: block;
   width: 64px;
   height: 64px;
-  transform-origin: 50% 50%;
+  /* The seven petals are not centred in the 64 box: their hub is at (32, 33.22).
+     Spinning around the box middle made the logo bob up and down. */
+  transform-origin: 50% 51.9%;
 }
 
 /* ===== Hero headline ===== */
@@ -118,77 +119,23 @@
   color: var(--color-neutral-0);
 }
 
-/* ===== Polaroid (Figma 4026:593: 83x97, -14.52deg, two drop shadows) =====
+/* ===== Hero polaroid (Figma 4033:3415 "Polaroid-at-sea") =====
+   Figma shows the middle 64.5% of the 512x576 PNG in an 85x96 frame, so the whole PNG box is
+   131.8x148.3 (2.353em x 2.648em at 56px), rotated 14deg, with two drop shadows.
    hero-intro.ts measures where the headline's first line ends and sets --pol-x / --pol-y,
    so the photo sits off the last word of that line ("Ulasika" on desktop, "Ifeanyi" on phones). */
 .hero-title {
   position: relative;
 }
 
-.polaroid {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  top: 0;
-  translate: var(--pol-x, 75%) var(--pol-y, -0.62em);
-  width: 1.48em;
-  height: 1.73em;
-  transform: rotate(14.52deg);
-  transform-origin: 50% 50%;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.polaroid.is-popping {
-  z-index: 5;
-}
-
-.polaroid__card {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
+.hero-polaroid {
+  --pol-w: 2.353em;
+  --pol-h: 2.648em;
+  --pol-rotate: 14deg;
+  translate: var(--pol-x, 75%) var(--pol-y, -0.9em);
   filter:
-    drop-shadow(0 2px 1px rgba(10, 10, 10, 0.75))
-    drop-shadow(0 2px 25px rgba(250, 250, 250, 0.1));
-}
-
-.polaroid__img,
-.polaroid picture {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.polaroid__img {
-  object-fit: contain;
-}
-
-/* The card inside the PNG sits inset from the transparent edge; the shine is clipped to it. */
-.polaroid__shine {
-  position: absolute;
-  inset: 0.5% 4.3% 7% 4.3%;
-  overflow: hidden;
-  border-radius: 4%;
-  pointer-events: none;
-}
-
-.polaroid__shine::before {
-  content: '';
-  position: absolute;
-  inset: -10% 0;
-  background: linear-gradient(
-    100deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.15) 42%,
-    rgba(255, 255, 255, 0.75) 50%,
-    rgba(255, 255, 255, 0.15) 58%,
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-  opacity: 0;
-  transform: translateX(-130%) skewX(-18deg);
+    drop-shadow(0 2px 1px var(--color-shadow-25))
+    drop-shadow(0 2px 25px var(--color-highlight-10));
 }
 
 /* ===== Hero load-in =====
@@ -197,10 +144,10 @@
    so the polaroid above line 1 is never cut. */
 .intro-wait .hero-logo,
 .intro-wait .hero-line__inner,
-.intro-wait .polaroid,
+.intro-wait .hero-polaroid,
 .intro-wait .hero-cta,
 .intro-wait .hedge-row--hero .hedge,
-.intro-wait .flap-nav__list {
+.intro-wait .flap {
   opacity: 0;
 }
 
@@ -210,6 +157,7 @@
 }
 
 .intro-play .hero-logo {
+  transform-origin: 50% 51.9%;
   animation: intro-pop 500ms var(--motion-ease-enter) both;
 }
 
@@ -221,7 +169,7 @@
 .intro-play .hero-line:nth-child(2) .hero-line__inner { animation-delay: 240ms; }
 .intro-play .hero-line:nth-child(3) .hero-line__inner { animation-delay: 330ms; }
 
-.intro-play .polaroid {
+.intro-play .hero-polaroid {
   animation: intro-polaroid 760ms var(--motion-ease-enter) 1000ms both;
 }
 
@@ -229,8 +177,9 @@
   animation: intro-rise 700ms var(--motion-ease-enter) 650ms both;
 }
 
-.intro-play .flap-nav__list {
-  animation: intro-rise 700ms var(--motion-ease-enter) 1050ms both;
+.intro-play .flap {
+  animation: intro-rise 700ms var(--motion-ease-enter) both;
+  animation-delay: calc(1050ms + var(--i) * 70ms);
 }
 
 .intro-play .hedge-row--hero .hedge {
@@ -257,8 +206,8 @@
 }
 
 @keyframes intro-polaroid {
-  from { opacity: 0; transform: translateY(-0.5em) rotate(26deg) scale(1.12); }
-  to { opacity: 1; transform: rotate(14.52deg); }
+  from { opacity: 0; transform: translateY(-0.5em) rotate(12deg) scale(1.12); }
+  to { opacity: 1; transform: none; }
 }
 
 @keyframes intro-rise {
@@ -299,15 +248,15 @@
 /* Figma 4026:599: 1104 wide, left edge 198px left of the nav's left edge, cut by the hero bottom. */
 .hedge-row--hero {
   bottom: 0;
-  left: calc(50% - (552 * var(--hedge-scale) + 6) / 720 * var(--flap-w));
-  width: calc(1104 / 720 * var(--flap-w) * var(--hedge-scale));
+  left: calc(50% - (552 * var(--hedge-scale) + 6) / 720 * var(--hedge-base));
+  width: calc(1104 / 720 * var(--hedge-base) * var(--hedge-scale));
 }
 
 /* Figma 4026:1167: same scale as the hero row, cut by the footer bottom. */
 .hedge-row--footer {
   bottom: 0;
-  left: calc(50% - (604.5 * var(--hedge-scale) - 8.5) / 720 * var(--flap-w));
-  width: calc(1209 / 720 * var(--flap-w) * var(--hedge-scale));
+  left: calc(50% - (604.5 * var(--hedge-scale) - 8.5) / 720 * var(--hedge-base));
+  width: calc(1209 / 720 * var(--hedge-base) * var(--hedge-scale));
 }
 
 .hedge {
@@ -383,6 +332,31 @@
   40% { opacity: 0.72; }
 }
 
+/* ===== Footer hedges pop out of the bottom edge =====
+   Each bush rises from below with a ~4% overshoot, middle first, 70ms apart. Plays once. */
+.hedge-row--footer.is-armed .hedge {
+  translate: 0 105%;
+}
+
+.hedge-row--footer.is-popped .hedge {
+  animation: hedge-pop 820ms both;
+  animation-delay: calc(var(--from-middle) * 70ms);
+}
+
+@keyframes hedge-pop {
+  0% {
+    translate: 0 105%;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  62% {
+    translate: 0 -4%;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hedge__plant.is-shaking,
   .hedge__plant.is-rustling {
@@ -392,7 +366,7 @@
 
 .page {
   min-height: 100svh;
-  padding: calc(72 / 720 * min(720px, 100vw) + 48px + env(safe-area-inset-top, 0px)) 16px 64px;
+  padding: calc(var(--flap-h-tall) + 48px + env(safe-area-inset-top, 0px)) 16px 64px;
 }
 
 .page-title,
@@ -465,6 +439,16 @@
   background: var(--color-neutral-0);
   border: 1.5px solid rgba(227, 227, 227, 0.8);
   border-radius: var(--radius-md);
+  transition: box-shadow var(--motion-duration-base) var(--motion-ease-fade);
+}
+
+/* Figma "Case Study Card" (4033:3512), State=Hover: two soft shadows, nothing moves. */
+@media (hover: hover) and (pointer: fine) {
+  .project-card:hover {
+    box-shadow:
+      0 0 12px var(--color-shadow-10),
+      0 4px 4px var(--color-highlight-10);
+  }
 }
 
 .project-card__media {
@@ -500,16 +484,17 @@
   gap: 8px;
   margin: 0;
   color: var(--color-neutral-700);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: var(--font-weight-regular);
-  line-height: 20px;
-  letter-spacing: -0.32px;
 }
 
+/* Figma: Geist Regular 24/32, -2%, at the h3 size. */
 .project-card__title {
   margin: 0;
   color: var(--color-neutral-950);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--type-h3-size);
+  line-height: var(--type-h3-line-height);
+  letter-spacing: var(--type-h3-tracking);
 }
 
 .section-anchor {
@@ -540,6 +525,22 @@
 .footer-title {
   margin: 0;
   color: var(--color-neutral-0);
+}
+
+/* Figma 4033:3417 "Polaroid-cat-mooncake": a 67x75 crop (65.8%) of the PNG, so the whole box is
+   102x114.7 (1.821em x 2.048em at 56px), tilted 24.3deg left. Its centre sits 0.93em left of the "L"
+   and 0.64em below the top of the line. */
+.footer-title__text {
+  position: relative;
+  display: inline-block;
+}
+
+.footer-polaroid {
+  --pol-w: 1.821em;
+  --pol-h: 2.048em;
+  --pol-rotate: -24.3deg;
+  left: -1.838em;
+  top: -0.38em;
 }
 
 .footer-body {
@@ -579,11 +580,6 @@
 
   .project-card__media {
     height: 280px;
-  }
-
-  .project-card__tags {
-    font-size: 16px;
-    line-height: 24px;
   }
 
   .site-footer {
@@ -644,12 +640,6 @@
     flex: 0 0 400px;
   }
 
-  .project-card__tags {
-    font-size: 18px;
-    line-height: 24px;
-    letter-spacing: -0.32px;
-  }
-
   .site-footer {
     height: 680px;
     min-height: 680px;
@@ -669,7 +659,7 @@
 
   .hero-copy {
     margin: auto;
-    padding: 56px 0 calc(176 / 720 * var(--flap-w) * var(--hedge-scale) + 32px);
+    padding: 56px 0 calc(176 / 720 * var(--hedge-base) * var(--hedge-scale) + 32px);
     gap: 24px;
   }
 
@@ -679,16 +669,7 @@
     height: 48px;
   }
 
-  .polaroid {
-    width: 1.3em;
-    height: 1.52em;
-  }
 
-  .projects {
-    position: relative;
-    z-index: 1;
-    margin-top: -2px;
-  }
 
   .site-footer {
     min-height: 520px;

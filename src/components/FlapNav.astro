@@ -1,56 +1,92 @@
 ---
-import { assetSrc, withBase } from '../lib/url';
-import workHero from '../assets/home/nav-flap-work-hero.svg';
-import workDocked from '../assets/home/nav-flap-work-docked.svg';
-import playHero from '../assets/home/nav-flap-playground-hero.svg';
-import playDocked from '../assets/home/nav-flap-playground-docked.svg';
-import aboutHero from '../assets/home/nav-flap-about-hero.svg';
-import aboutDocked from '../assets/home/nav-flap-about-docked.svg';
+/**
+ * Flap navigation, built from the Figma component set "Flaps" (4031:2832),
+ * "Hero Navigation" (4029:2506) and "Docked Navigation" (4031:3203).
+ *
+ * Geometry (desktop, 1 unit = 1px):
+ *  - Each flap is 240 wide. Idle is 66 tall, Hover / Pressed are 80, Active is 80 in the hero and 66 docked.
+ *  - Hero flaps stand on the hero's bottom edge, chamfer top-left, and grow upward.
+ *  - Docked flaps are the same shape flipped vertically (Figma: matrix(1,0,0,-1)), hang from the
+ *    top of the viewport, chamfer bottom-left, and grow downward.
+ *  - The label is centred in the 66 shape and moves 7 away from the edge when the flap is 80 tall.
+ *  - Docked bar: 1240 wide, logo 48px on the left, flaps right-aligned, no background plate.
+ *
+ * Motion: the hero → docked change is a real hinge. Each flap is a two-sided card that rotates 180°
+ * around the edge it stands on, so the hero face (above the line) turns into the docked face (below
+ * the line), one flap after another. See .claude/skills/site-motion/SKILL.md.
+ */
+import { withBase } from '../lib/url';
+import IffyLogo from '../assets/home/iffy-logo.svg';
 
 interface Props {
   current?: 'work' | 'playground' | 'about';
-  /** Hero pages dock on scroll. Other pages start in the docked shape. */
+  /** Hero pages dock on scroll. Other pages start docked. */
   mode?: 'hero' | 'docked';
 }
 
 const { current = 'work', mode = 'hero' } = Astro.props;
 
-const plates = {
+// Page colour behind the docked bar, used by the scroll-edge blur.
+const edges = {
   work: 'var(--color-stone-0)',
   playground: 'var(--color-plum-200)',
   about: 'var(--color-blue-300)',
 } as const;
 
 const items = [
-  { id: 'work', href: withBase('/'), label: 'Work', hero: workHero, docked: workDocked },
-  { id: 'playground', href: withBase('/playground/'), label: 'Playground', hero: playHero, docked: playDocked },
-  { id: 'about', href: withBase('/about/'), label: 'About', hero: aboutHero, docked: aboutDocked },
+  { id: 'work', href: withBase('/'), label: 'Work' },
+  { id: 'playground', href: withBase('/playground/'), label: 'Playground' },
+  { id: 'about', href: withBase('/about/'), label: 'About' },
 ] as const;
+
+// Figma flap background, 240x66, chamfer top-left (rounded corners as drawn in the component).
+const shape =
+  'M0 24.8551C0 22.89 0.723273 20.9936 2.03189 19.5276L17.0776 2.67255C18.5954 0.972199 20.7665 0 23.0457 0H232C236.418 0 240 3.58172 240 8V66H0V24.8551Z';
+const docked = mode === 'docked';
 ---
 
-<div class="flap-slot" data-flap-slot data-flap-mode={mode}>
-  <nav
-    class="flap-nav"
-    data-flap-nav
-    data-docked={mode === 'docked' ? 'true' : 'false'}
-    style={`--flap-plate: ${plates[current]}`}
-    aria-label="Primary"
-  >
-    <div class="flap-nav__plate" aria-hidden="true"></div>
-    <ul class="flap-nav__list">
+<div
+  class="flap-slot"
+  data-flap-slot
+  data-flap-mode={mode}
+  data-docked={docked ? 'true' : 'false'}
+  data-stuck={docked ? 'true' : 'false'}
+  style={`--edge-bg: ${edges[current]}`}
+>
+  <div class="flap-edge" aria-hidden="true">
+    <span class="flap-edge__blur flap-edge__blur--1"></span>
+    <span class="flap-edge__blur flap-edge__blur--2"></span>
+    <span class="flap-edge__blur flap-edge__blur--3"></span>
+  </div>
+  <nav class="flap-nav" aria-label="Primary">
+    <a class="flap-logo" href={withBase('/')} data-flap-logo aria-label="Ifeanyi Ulasika, home" tabindex={docked ? undefined : -1}>
+      <span class="flap-logo__spin" data-spin>
+        <IffyLogo class="flap-logo__mark" width="48" height="48" />
+      </span>
+    </a>
+    <ul class="flap-list">
       {
-        items.map((item) => (
-          <li class={`flap-nav__item flap-nav__item--${item.id}`}>
+        items.map((item, index) => (
+          <li class={`flap flap--${item.id}`} style={`--i: ${index}`}>
             <a
-              class="flap-nav__link"
+              class="flap__card"
               href={item.href}
+              data-flap-link
               aria-current={current === item.id ? 'page' : undefined}
             >
-              <span class="flap-nav__flap" aria-hidden="true">
-                <img class="flap-nav__shape flap-nav__shape--hero" src={assetSrc(item.hero)} alt="" />
-                <img class="flap-nav__shape flap-nav__shape--docked" src={assetSrc(item.docked)} alt="" />
+              <span class="flap__sr">{item.label}</span>
+              <span class="flap__face flap__face--hero" aria-hidden="true">
+                <svg class="flap__shape" viewBox="0 0 240 66" preserveAspectRatio="none" focusable="false">
+                  <path d={shape} />
+                </svg>
+                <span class="flap__label">{item.label}</span>
               </span>
-              <span class="flap-nav__label">{item.label}</span>
+              <span class="flap__face flap__face--docked" aria-hidden="true">
+                <svg class="flap__shape" viewBox="0 0 240 66" preserveAspectRatio="none" focusable="false">
+                  <path d={shape} transform="matrix(1 0 0 -1 0 66)" />
+                </svg>
+                <span class="flap__label">{item.label}</span>
+              </span>
             </a>
           </li>
         ))
@@ -60,51 +96,102 @@ const items = [
 </div>
 
 <script>
-  // Docking: the slot is `position: sticky`, so the flaps never leave the screen.
-  // A sentinel at the bottom of the hero says when the flaps have reached the top;
-  // then only the shapes and the plate change (opacity + transform, no layout jump).
   const slot = document.querySelector<HTMLElement>('[data-flap-slot]');
-  const nav = document.querySelector<HTMLElement>('[data-flap-nav]');
-  const sentinel = document.querySelector<HTMLElement>('[data-flap-sentinel]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  if (slot && nav && sentinel && slot.dataset.flapMode === 'hero') {
-    let observer: IntersectionObserver | null = null;
+  /* ---------- Dock on scroll (hero pages) ----------
+     The slot is sticky at top: 0 and sits right under the hero, so its top edge *is* the line between
+     the hero and the page. The flaps hinge over that line once it has risen into the top 30% of the
+     screen, then ride up with it and stay when it sticks. 48px of hysteresis stops flicker. */
+  if (slot && slot.dataset.flapMode === 'hero') {
+    const logo = slot.querySelector<HTMLElement>('[data-flap-logo]');
+    let frame = 0;
 
-    const setDocked = (docked: boolean) => {
-      const next = docked ? 'true' : 'false';
-      if (nav.dataset.docked !== next) nav.dataset.docked = next;
+    const update = () => {
+      frame = 0;
+      const line = slot.getBoundingClientRect().top;
+      const threshold = Math.max(window.innerHeight * 0.3, 160);
+      const docked = slot.dataset.docked === 'true';
+      if (!docked && line < threshold) {
+        slot.dataset.docked = 'true';
+        logo?.removeAttribute('tabindex');
+      } else if (docked && line > threshold + 48) {
+        slot.dataset.docked = 'false';
+        logo?.setAttribute('tabindex', '-1');
+      }
+      const stuck = line <= 0.5 ? 'true' : 'false';
+      if (slot.dataset.stuck !== stuck) slot.dataset.stuck = stuck;
     };
 
-    const watch = () => {
-      observer?.disconnect();
-      // The sentinel sits at the hero's bottom edge. It is "visible" while it is below the
-      // flaps' height from the top of the viewport; above that, the flaps are stuck.
-      const top = Math.round(nav.getBoundingClientRect().height);
-      observer = new IntersectionObserver(
-        ([entry]) => {
-          const above = entry.boundingClientRect.top < (entry.rootBounds?.top ?? top);
-          setDocked(!entry.isIntersecting && above);
-        },
-        { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 },
-      );
-      observer.observe(sentinel);
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
     };
 
-    watch();
-    let resizeFrame = 0;
-    window.addEventListener('resize', () => {
-      cancelAnimationFrame(resizeFrame);
-      resizeFrame = requestAnimationFrame(watch);
-    });
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
   }
+
+  /* ---------- Press and release ----------
+     Press: the flap darkens to its Pressed colour, stands 80 tall and shrinks to 96%.
+     Release: it springs back to full size, then the page navigates. */
+  const PRESS_RELEASE_MS = 220;
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-flap-link]').forEach((link) => {
+    const release = () => link.removeAttribute('data-pressed');
+
+    link.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      link.setAttribute('data-pressed', '');
+    });
+    link.addEventListener('pointerup', release);
+    link.addEventListener('pointercancel', release);
+    link.addEventListener('pointerleave', release);
+
+    link.addEventListener('click', (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      release();
+      if (link.getAttribute('aria-current') === 'page') {
+        window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
+        return;
+      }
+      window.setTimeout(() => window.location.assign(link.href), reduced.matches ? 0 : PRESS_RELEASE_MS);
+    });
+  });
 </script>
 
-<style>
-  /* Height 0 and sticky: the nav hangs above the slot's top edge, so before docking it overlaps the
-     hero's bottom (Figma 4026:607, y 720 of 800) and once stuck it fills the top of the viewport. */
+<style is:global>
+  /* ===== Flap nav sizes =====
+     One flap is 240 wide at desktop and shrinks so logo + gap + three flaps fit the docked bar.
+     Height follows width (66/240) but never drops below 48px, so it stays tappable on phones. */
+  :root {
+    --dock-margin: 16px;
+    --dock-bar: min(1240px, 100vw - 2 * var(--dock-margin));
+    --flap-unit: min(240px, (var(--dock-bar) - 56px) / 3);
+    --flap-row: calc(3 * var(--flap-unit));
+    --flap-h: clamp(48px, var(--flap-unit) * 0.275, 66px);
+    --flap-h-tall: calc(var(--flap-h) * 80 / 66);
+    --flap-lift: calc(var(--flap-h) * 7 / 66);
+    --flap-grow: calc(80 / 66);
+    --dock-shift: calc((var(--dock-bar) - var(--flap-row)) / 2);
+    --dock-logo: calc(var(--flap-h) * 48 / 66);
+    --flap-hinge-ms: 760ms;
+    --flap-stagger-ms: 80ms;
+    --ease-hinge: cubic-bezier(0.55, 0, 0.15, 1);
+    --ease-release: cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --dock-margin: 32px;
+    }
+  }
+
+  /* ===== Slot: a zero-height sticky line between the hero and the page ===== */
   .flap-slot {
     position: sticky;
-    top: calc(var(--flap-h) + env(safe-area-inset-top, 0px));
+    top: env(safe-area-inset-top, 0px);
     z-index: 50;
     width: 100%;
     height: 0;
@@ -112,155 +199,322 @@ const items = [
 
   .flap-nav {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: calc(var(--flap-h) + env(safe-area-inset-top, 0px));
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    pointer-events: none;
+    inset: 0 0 auto;
+    height: 0;
   }
 
-  /* Full-width plate behind the docked flaps (Figma 4026:1010). It fades, never pops. */
-  .flap-nav__plate {
-    position: absolute;
-    inset: 0 0 calc(var(--flap-h) - 72 / 720 * var(--flap-w)) 0;
-    background: var(--flap-plate, var(--color-stone-0));
+  /* ===== Scroll-edge blur: content softens as it slides under the docked flaps ===== */
+  .flap-edge {
+    position: fixed;
+    inset: 0 0 auto;
+    height: calc(var(--flap-h) + 40px + env(safe-area-inset-top, 0px));
+    pointer-events: none;
     opacity: 0;
     transition: opacity var(--motion-duration-base) var(--motion-ease-fade);
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--edge-bg) 72%, transparent) 0%,
+      color-mix(in srgb, var(--edge-bg) 40%, transparent) 45%,
+      transparent 100%
+    );
   }
 
-  .flap-nav__list {
-    position: relative;
-    z-index: 1;
-    pointer-events: auto;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    width: var(--flap-w);
-    height: var(--flap-h);
-    margin: 0 auto;
-    padding: 0;
-    list-style: none;
+  .flap-edge__blur {
+    position: absolute;
+    inset: 0;
   }
 
-  .flap-nav__item {
-    position: relative;
-    flex: 1 1 0;
-    min-width: 0;
+  .flap-edge__blur--1 {
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%);
+  }
+
+  .flap-edge__blur--2 {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 75%);
+  }
+
+  .flap-edge__blur--3 {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 50%);
+  }
+
+  .flap-slot[data-stuck='true'] .flap-edge {
+    opacity: 1;
+  }
+
+  /* ===== Docked logo (Figma Logo/Size=Docked, 48px, centred on the 66 bar) ===== */
+  .flap-logo {
+    position: absolute;
+    top: calc((var(--flap-h) - var(--dock-logo)) / 2);
+    left: calc(50% - var(--dock-bar) / 2);
+    width: var(--dock-logo);
+    height: var(--dock-logo);
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    scale: 0.6;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity var(--motion-duration-base) var(--motion-ease-fade),
+      scale var(--motion-duration-slow) var(--motion-ease-enter),
+      visibility 0ms linear var(--motion-duration-base);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .flap-logo__spin,
+  .flap-logo__mark {
+    display: block;
+    width: 100%;
     height: 100%;
   }
 
-  .flap-nav__link {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    color: inherit;
+  .flap-logo__mark {
+    /* The seven petals turn around (32, 33.22) of the 64 box, not its middle. */
+    transform-origin: 50% 51.9%;
   }
 
-  /* Hero: Work is 80 tall, the others 66 and sit on the bottom edge (y 14).
-     Docked: all three are 66 tall and hang from the top. The label moves with its flap. */
-  .flap-nav__label {
+  .flap-slot[data-docked='true'] .flap-logo {
+    opacity: 1;
+    scale: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: calc(3 * var(--flap-stagger-ms)), calc(3 * var(--flap-stagger-ms)), 0ms;
+  }
+
+  .flap-logo:focus-visible {
+    outline: 2px solid var(--color-lime-500);
+    outline-offset: 4px;
+    border-radius: 50%;
+  }
+
+  /* ===== Flap row ===== */
+  .flap-list {
+    position: absolute;
+    top: 0;
+    left: calc(50% - var(--flap-row) / 2);
+    width: var(--flap-row);
+    height: 0;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    translate: 0 0;
+    transition: translate var(--flap-hinge-ms) var(--motion-ease-enter);
+  }
+
+  .flap-slot[data-docked='true'] .flap-list {
+    translate: var(--dock-shift) 0;
+  }
+
+  .flap {
     position: relative;
-    z-index: 1;
+    flex: 0 0 var(--flap-unit);
+    height: 0;
+    perspective: 900px;
+    perspective-origin: 50% 0;
+
+    /* Colours per state come from the Figma variables. */
+    --fill: var(--fill-idle);
+    --ink: var(--ink-idle);
+    --grow: 1;
+    --lift: 0px;
+  }
+
+  .flap--work {
+    --fill-idle: var(--color-stone-0);
+    --ink-idle: var(--color-lime-900);
+    --fill-hover: var(--color-stone-200);
+    --ink-hover: var(--color-lime-800);
+    --fill-press: var(--color-stone-700);
+    --ink-press: var(--color-lime-100);
+  }
+
+  .flap--playground {
+    --fill-idle: var(--color-plum-200);
+    --ink-idle: var(--color-plum-900);
+    --fill-hover: var(--color-plum-500);
+    --ink-hover: var(--color-plum-100);
+    --fill-press: var(--color-plum-700);
+    --ink-press: var(--color-plum-50);
+  }
+
+  .flap--about {
+    --fill-idle: var(--color-blue-300);
+    --ink-idle: var(--color-blue-900);
+    --fill-hover: var(--color-blue-500);
+    --ink-hover: var(--color-blue-100);
+    --fill-press: var(--color-blue-700);
+    --ink-press: var(--color-blue-50);
+  }
+
+  /* The card is the link. Its box stands on the line (bottom: 0 of a zero-height parent) and it
+     hinges around that bottom edge: 0deg = hero face up, 180deg = docked face hanging below.
+     Docking runs Work → About; undocking runs About → Work. */
+  .flap__card {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--flap-h-tall);
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    transform-origin: 50% 100%;
+    transform-style: preserve-3d;
+    rotate: x 0deg;
+    scale: 1;
+    transition:
+      rotate var(--flap-hinge-ms) var(--ease-hinge) calc((2 - var(--i)) * var(--flap-stagger-ms)),
+      scale 420ms var(--ease-release);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .flap-slot[data-docked='true'] .flap__card {
+    rotate: x 180deg;
+    transition:
+      rotate var(--flap-hinge-ms) var(--ease-hinge) calc(var(--i) * var(--flap-stagger-ms)),
+      scale 420ms var(--ease-release);
+  }
+
+  .flap__face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Authored exactly as the docked flap looks, then turned over once so the hinge turns it back. */
+  .flap__face--docked {
+    transform: rotateX(180deg);
+  }
+
+  .flap__shape {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: var(--flap-h);
+    display: block;
+    overflow: visible;
+    scale: 1 var(--grow);
+    transition: scale var(--motion-duration-flap) var(--motion-ease-enter);
+  }
+
+  .flap__shape path {
+    fill: var(--fill);
+    transition: fill var(--motion-duration-flap) var(--motion-ease-fade);
+  }
+
+  .flap__face--hero .flap__shape {
+    bottom: 0;
+    transform-origin: 50% 100%;
+  }
+
+  .flap__face--docked .flap__shape {
+    top: 0;
+    transform-origin: 50% 0;
+  }
+
+  .flap__label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--flap-h);
+    display: grid;
+    place-items: center;
+    color: var(--ink);
     font-family: var(--type-nav-family);
     font-weight: var(--type-nav-weight);
     font-size: var(--type-nav-size);
     line-height: var(--type-nav-line-height);
     letter-spacing: var(--type-nav-tracking);
-    transform: translateY(calc(7 / 80 * var(--flap-h)));
-    transition: transform var(--motion-duration-slow) var(--motion-ease-enter);
-  }
-
-  .flap-nav__item--work .flap-nav__label {
-    font-weight: var(--font-weight-medium);
-    color: var(--color-lime-900);
-    transform: none;
-  }
-
-  .flap-nav__item--playground .flap-nav__label {
-    color: var(--color-plum-900);
-  }
-
-  .flap-nav__item--about .flap-nav__label {
-    color: var(--color-blue-900);
-  }
-
-  .flap-nav__flap {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .flap-nav__shape {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    display: block;
-    object-fit: fill;
+    white-space: nowrap;
     transition:
-      opacity var(--motion-duration-base) var(--motion-ease-fade),
-      transform var(--motion-duration-slow) var(--motion-ease-enter);
+      translate var(--motion-duration-flap) var(--motion-ease-enter),
+      color var(--motion-duration-flap) var(--motion-ease-fade);
   }
 
-  .flap-nav__shape--hero {
+  .flap__face--hero .flap__label {
     bottom: 0;
-    height: calc(66 / 80 * 100%);
+    translate: 0 calc(-1 * var(--lift));
   }
 
-  .flap-nav__item--work .flap-nav__shape--hero {
-    height: 100%;
-  }
-
-  .flap-nav__shape--docked {
+  .flap__face--docked .flap__label {
     top: 0;
-    height: calc(66 / 80 * 100%);
-    opacity: 0;
-    transform: translateY(calc(14 / 80 * var(--flap-h)));
+    translate: 0 var(--lift);
   }
 
-  .flap-nav[data-docked='true'] {
-    pointer-events: auto;
+  .flap__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
-  .flap-nav[data-docked='true'] .flap-nav__plate {
-    opacity: 1;
+  /* ===== States ===== */
+  @media (hover: hover) and (pointer: fine) {
+    .flap__card:hover {
+      --fill: var(--fill-hover);
+      --ink: var(--ink-hover);
+      --grow: var(--flap-grow);
+      --lift: var(--flap-lift);
+    }
   }
 
-  .flap-nav[data-docked='true'] .flap-nav__shape--hero {
-    opacity: 0;
-    transform: translateY(calc(-14 / 80 * var(--flap-h)));
+  .flap__card[data-pressed] {
+    --fill: var(--fill-press);
+    --ink: var(--ink-press);
+    --grow: var(--flap-grow);
+    --lift: var(--flap-lift);
+    scale: 0.96;
+    transition:
+      rotate 0ms,
+      scale 140ms var(--motion-ease-out);
   }
 
-  .flap-nav[data-docked='true'] .flap-nav__shape--docked {
-    opacity: 1;
-    transform: none;
+  /* Current page keeps its idle colours with a Medium label. In the hero it stands 80 tall. */
+  .flap__card[aria-current='page'] {
+    --fill: var(--fill-idle);
+    --ink: var(--ink-idle);
   }
 
-  .flap-nav[data-docked='true'] .flap-nav__label {
-    transform: translateY(calc(-7 / 80 * var(--flap-h)));
+  .flap__card[aria-current='page'] .flap__label {
+    font-weight: var(--font-weight-medium);
   }
 
-  .flap-nav__link:focus-visible {
-    outline: 2px solid var(--color-lime-300);
-    outline-offset: -4px;
+  .flap__card[aria-current='page'] .flap__face--hero {
+    --grow: var(--flap-grow);
+    --lift: var(--flap-lift);
   }
 
-  .flap-nav__link:hover .flap-nav__label {
+  .flap__card:focus-visible {
+    outline: none;
+  }
+
+  .flap__card:focus-visible .flap__label {
     text-decoration: underline;
     text-underline-offset: 0.2em;
-    text-decoration-thickness: 1px;
+    text-decoration-thickness: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flap-nav__shape,
-    .flap-nav__label {
-      transition-property: opacity;
+    .flap-list,
+    .flap__card,
+    .flap-slot[data-docked='true'] .flap__card,
+    .flap-logo {
+      transition-duration: 0ms !important;
+      transition-delay: 0ms !important;
+    }
+
+    .flap__card[data-pressed] {
+      scale: 1;
     }
   }
 </style>

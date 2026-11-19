@@ -58,7 +58,7 @@ for (const ref of Object.values(semantic.color)) {
   }
 }
 
-const requiredAlpha = ['shadow-10', 'shadow-75', 'highlight-10', 'lime-300-60'];
+const requiredAlpha = ['shadow-10', 'shadow-25', 'highlight-10', 'lime-300-60'];
 for (const name of requiredAlpha) {
   if (!primitive.color.alpha[name]) {
     throw new Error(`Missing alpha color ${name}`);
@@ -285,7 +285,7 @@ if (css.includes('letter-spacing: -') && !css.includes('em')) {
 if (!css.includes('--color-lime-300-60: rgba(191,229,77,0.60);')) {
   throw new Error('lime-300-60 was not emitted with the expected value');
 }
-if (!css.includes('--color-shadow-10:') || !css.includes('--color-shadow-75:') || !css.includes('--color-highlight-10:')) {
+if (!css.includes('--color-shadow-10:') || !css.includes('--color-shadow-25:') || !css.includes('--color-highlight-10:')) {
   throw new Error('Existing alpha colors are missing from the CSS');
 }
 

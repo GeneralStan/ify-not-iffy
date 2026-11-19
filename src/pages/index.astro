@@ -4,9 +4,8 @@ import Button from '../components/Button.astro';
 import FlapNav from '../components/FlapNav.astro';
 import HedgeRow from '../components/HedgeRow.astro';
 import { assetSrc, withBase } from '../lib/url';
-import { Picture } from 'astro:assets';
+import Polaroid from '../components/Polaroid.astro';
 import IffyLogo from '../assets/home/iffy-logo.svg';
-import polaroid from '../assets/home/polaroid-ify-4.png';
 import shot from '../assets/home/project-screenshot-2026-11-17.png';
 import '../styles/home.css';
 
@@ -51,16 +50,7 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
           <span class="hero-line" data-line><span class="hero-line__inner"><span class="lime">Hi, I’m </span><span class="paper">Ifeanyi Ulasika</span></span></span>
           <span class="hero-line" data-line><span class="hero-line__inner"><span class="lime">I design </span><span class="paper">products </span><span class="lime">and build</span></span></span>
           <span class="hero-line" data-line><span class="hero-line__inner"><span class="paper">systems that deploy.</span></span></span>
-          <span class="polaroid" data-polaroid aria-hidden="true"><span class="polaroid__card"><Picture
-            class="polaroid__img"
-            src={polaroid}
-            formats={['avif', 'webp']}
-            widths={[120, 180, 250, 340, 512]}
-            sizes="(max-width: 767px) 64px, 84px"
-            alt=""
-            loading="eager"
-            decoding="async"
-          /><span class="polaroid__shine"></span></span></span>
+          <Polaroid photo="at-sea" class="hero-polaroid" displayWidth={132} eager />
         </h1>
         <div class="hero-cta">
           <Button href={mail} label="Shoot me a message" variant="secondary" />
@@ -91,7 +81,7 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
                   <img class="project-card__shot" src={shotSrc} alt="" />
                 </div>
                 <div class="project-card__copy">
-                  <p class="project-card__tags">
+                  <p class="project-card__tags text-meta">
                     {tags.map((tag) => (
                       <span>{tag}</span>
                     ))}
@@ -111,7 +101,12 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
         <div class="footer-grain"></div>
       </div>
       <div class="footer-copy">
-        <h2 class="footer-title text-display">Let’s Connect</h2>
+        <h2 class="footer-title text-display">
+          <span class="footer-title__text">
+            <Polaroid photo="cat-mooncake" class="footer-polaroid" displayWidth={102} />
+            Let’s Connect
+          </span>
+        </h2>
         <p class="footer-body text-body">
           Thanks for visiting my little corner of the internet. Your presence here means a lot. This website was made with ❤️
         </p>
