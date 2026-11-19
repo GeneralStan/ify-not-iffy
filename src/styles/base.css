@@ -1,0 +1,103 @@
+html {
+  background: var(--color-bg);
+  color: var(--color-text);
+  color-scheme: light;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--type-body-family);
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-body-line-height);
+  letter-spacing: var(--type-body-tracking);
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--color-lime-300-60);
+  color: var(--color-text);
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: var(--stroke-thin);
+  text-underline-offset: 0.18em;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+:focus-visible {
+  outline: var(--stroke-regular) solid var(--color-text);
+  outline-offset: 3px;
+}
+
+.skip {
+  position: absolute;
+  left: var(--grid-margin);
+  top: 0.75rem;
+  z-index: 2;
+  padding: 0.4rem 0.7rem;
+  background: var(--color-text);
+  color: var(--color-bg);
+  transform: translateY(-160%);
+}
+
+.skip:focus {
+  transform: none;
+}
+
+.site-header {
+  border-bottom: var(--stroke-thin) solid var(--color-border);
+}
+
+.site-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-block: 1.25rem;
+}
+
+.site-header a {
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.wordmark {
+  font-weight: var(--font-weight-medium);
+}
+
+.site-header a[aria-current="page"],
+.mark {
+  box-shadow: inset 0 -0.42em 0 var(--color-lime-300-60);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  :root {
+    --motion-duration-fast: 0ms;
+    --motion-duration-base: 0ms;
+    --motion-duration-slow: 0ms;
+  }
+}

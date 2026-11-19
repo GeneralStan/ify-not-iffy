@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import '../styles/home.css';
+---
+
+<BaseLayout
+  title="Ifeanyi Ulasika"
+  description="Product and UX design portfolio of Ifeanyi (Ify) Ulasika. The design system lives on the tokens page while the rest of the site is still being drawn."
+>
+  <SiteHeader current="home" />
+  <main id="content" class="home container">
+    <p class="text-caption home-kicker">Product and UX design</p>
+    <h1 class="text-display">Ifeanyi Ulasika</h1>
+    <p class="text-body-lg home-lede">
+      Ify designs product systems and the interfaces around them, between Nairobi and Lagos. This site is the foundation: the pages come after the drawings. The type, color, and grid are already set.
+    </p>
+    <a class="text-label home-link" href="/tokens">View the tokens</a>
+  </main>
+</BaseLayout>

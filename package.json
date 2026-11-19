@@ -1,0 +1,22 @@
+{
+  "name": "ify-portfolio",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "tokens": "node scripts/generate-tokens.mjs",
+    "predev": "npm run tokens",
+    "prebuild": "npm run tokens",
+    "dev": "astro dev --host 0.0.0.0 --port 4477",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0 --port 4477",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.1.6",
+    "astro": "^7.4.13",
+    "geist": "^1.9.2"
+  }
+}
