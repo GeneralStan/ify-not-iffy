@@ -1,42 +1,47 @@
 ---
 name: site-motion
-description: Use before adding or changing any animation, transition, hover state or scroll effect on the Nnamdi Akajiobi site. It is the index for this project's motion rules: which engine to use, the shared timing values, and which installed motion skill to consult for which kind of work.
+description: Use before adding or changing any animation, transition, hover state or scroll effect on Ify's portfolio (ify-not-iffy). It is the index for this project's motion rules: which engine to use, the shared timing values, and which installed motion skill to consult for which kind of work.
 ---
 
 # Site motion: index and house rules
 
-This project keeps its motion knowledge in `.claude/skills/`. Start here, then open the specific skill for the job.
+This project keeps its motion knowledge in `.claude/skills/`. Start here, then open the specific skill for the job. The rules are carried over from the Nnamdi Akajiobi site and adapted to this stack (Astro, plain CSS, no framework).
 
 ## Engine
 
-- **Motion** (`motion`, imported from `motion/react` and `motion/react-m`) drives load-in and scroll-triggered animation.
-- Features are lazy-loaded: use `m.*` components from `motion/react-m`, never `motion.*`. `src/components/Providers.tsx` supplies `LazyMotion` (strict) and `MotionConfig reducedMotion="user"`.
-- **Plain CSS** stays for hover, focus and press states, the fixed nav's scroll state, and the horizontal rails (native scrolling with snap; do not replace with Motion drag).
-- Do not add GSAP, Lenis, Lottie or Three.js without asking the owner.
+- **CSS keyframes and transitions** for load-in, hover, focus and state changes (docked nav, hedges).
+- **Web Animations API** (`element.animate()`) in small vanilla scripts for anything replayable on input: the logo spin and the polaroid pop (`src/scripts/hero-intro.ts`).
+- Do not add GSAP, Motion/React, Lenis, Lottie or Three.js without asking the owner.
 
-## Shared values (`src/lib/motion.ts`)
+## Shared values (`tokens/tokens.json` → `src/styles/tokens.css`)
 
-- `EASE_ENTER` `[0.16, 1, 0.3, 1]` for anything entering; `EASE_FADE` `[0.33, 0, 0.2, 1]` for opacity.
-- `revealVariants` + `revealTransition`: `rise`, `soft` (text), `scale` (photos, cards), `right` (section illustrations), `up` (footer house).
-- `HERO`: the hero load-in timings. Layers enter one at a time: the man first (solid by 0.45s), then the banner behind him (from 0.3s, growing up from the bottom), then the name. The name reveals letter by letter on `EASE_LETTER`; each letter takes 0.335s and the next starts 15.4% into it, so a letter is 50% of the way into the frame when the next is 15% in, and the 14 letters take about 1.0s. This overlap rule is the owner's and overrides the "cap reveals near 800ms" guidance in `kinetic-typography`.
+- `--motion-ease-enter` `cubic-bezier(0.16, 1, 0.3, 1)` for anything entering; `--motion-ease-fade` `cubic-bezier(0.33, 0, 0.2, 1)` for opacity.
+- `--motion-ease-spin` `cubic-bezier(0.3, 0, 0.1, 1)`: short ease-in, long settle. Used by the logo.
+- Durations: `--motion-duration-reveal` 900ms (text lines), `--motion-duration-spin` 2000ms, `--motion-duration-pop` 720ms, plus `fast/base/slow/flap/hedge`.
 
-Use `<Reveal>` (`src/components/Reveal.tsx`) for scroll reveals rather than writing new observers. Sizes and distances follow the fluid scale in `src/app/globals.css` and `fluid(mobile, desktop)` in `src/lib/fluid.ts`: the first value comes from the Figma mobile frame (393px, `22:968`), the second from the desktop frame (1440px, `6:987`).
+## Hero load-in (home only)
 
-## Edge effects
+`BaseLayout intro` adds `html.intro-wait` before paint (motion allowed only). `hero-intro.ts` waits for the fonts and the polaroid (capped at 1.8s), then swaps to `html.intro-play`:
 
-- **Top scroll edge** (`.nav-edge`): a plain paper-colour fade (no blur) under the nav bar once the page scrolls, 24→32px, smoothstep ramp, fades in with opacity.
-- **Progressive blur** (`src/components/ProgressiveBlur.tsx`, `.pblur` in globals.css): four stacked backdrop blurs, each masked to a band. Used as a fixed strip at the bottom of the viewport (`.viewport-edge`, 32–42px tall, 6px max). Desktop: always on except at the end of the page. Touch devices: only while scrolling down and never while the hero is on screen; when hidden it is removed (`data-gone`, `display: none`), because iOS Safari tints the area behind its toolbar from any fixed element at the bottom edge. Fade it with `--pb-on`, never an ancestor's `opacity` (that cuts the backdrop off).
-- **Rails**: no edge fades (the owner found them noisy). Project photos drift inside their cards against the rail's scroll (`ParallaxPhoto`: Motion `useScroll` on the rail via `useRail()`, a damped spring, ±5%); off for reduced motion.
-- **Mobile menu**: panel height animates to `auto` with Motion, links stagger in 60ms apart; a dim, blurred scrim (`.menu-scrim`) covers the page and closes the menu on tap; page scroll is locked while open.
+1. Logo pops in (500ms) and spins one turn over 2s on `--motion-ease-spin`.
+2. The three headline lines rise from a bottom-edge mask with a blur-to-sharp, 900ms, starting 150 / 240 / 330ms.
+3. CTAs at 650ms, hedges from 700ms (45ms apart), polaroid at 1000ms, flaps at 1050ms.
+
+A 3s inline timeout always removes `intro-wait`, so the page can never stay hidden.
+
+## Interactions
+
+- **Logo**: hover (fine pointer) or tap replays one 1.6s spin; a running spin is never restarted.
+- **Polaroid**: click/tap scales the card 1 → 1.2 → 1 (720ms, enter ease up, in-out down) while a white sheen sweeps across once (`::before`, 760ms). Its position is measured at runtime from the end of the headline's first line.
+- **Hedges**: tap shakes the bush and rustles its neighbours.
+- **Flap nav**: the slot is `position: sticky`; an IntersectionObserver on the hero's bottom sentinel flips `data-docked`. Docking only cross-fades shapes, fades the plate and slides labels 7/80 of the flap height. Nothing changes `position`, so there is no jump.
 
 ## House rules
 
-- The hero waits for the backdrop, the portrait and the display font before anything moves. Keep that gate; it is what prevents flashes.
-- The name always sits behind the portrait, and the portrait must be fully opaque before the first letter appears.
-- Animate `transform` and `opacity` only. No permanent `will-change`.
-- No overshoot or bounce: the tone is calm and premium.
-- Reduced motion: movement is removed and fades are kept. Check both Motion and CSS paths.
-- Server-rendered hidden states need a `<noscript>` override (see `src/app/layout.tsx`).
+- Animate `transform` and `opacity` only (the line blur is the one exception, and it ends at `filter: none`). No permanent `will-change`.
+- No overshoot or bounce: calm and premium.
+- Reduced motion: no intro and no spin; the polaroid keeps its sheen but does not scale; flaps fade without sliding.
+- Sizes follow the Figma frames in section "Main Pages" (`4026:1139`). Hedges and flaps scale from `--flap-w` (the 720px nav), so their relationship matches the frame at every width.
 
 ## Which skill for what
 
@@ -48,8 +53,6 @@ Use `<Reveal>` (`src/components/Reveal.tsx`) for scroll reveals rather than writ
 | Hover, press, focus, input feedback | `micro-interaction` |
 | Jank, layout thrash, compositing problems | `60fps-animation` |
 | Reduced-motion and accessibility | `accessible-animation` |
-| Animating the line illustrations (draw-on etc.) | `svg-animation` |
+| Animating SVG (hedges, logo) | `svg-animation` |
 
-## Using the third-party skills here
-
-They were installed from `iart-ai/*` (see `skills-lock.json`). Each ends with a "Deliver & verify (standalone HTML)" section that tells you to write a single demo `.html` file, load libraries from a CDN and run Playwright screenshots. **Ignore those sections in this repo.** Work in the Next.js app and verify in the running preview instead.
+The third-party skills end with a "Deliver & verify (standalone HTML)" section. Ignore it here: work in the Astro app and verify in `npm run dev`.

@@ -4,13 +4,12 @@ import Button from '../components/Button.astro';
 import FlapNav from '../components/FlapNav.astro';
 import HedgeRow from '../components/HedgeRow.astro';
 import { assetSrc, withBase } from '../lib/url';
-import bloom from '../assets/home/hero-work-tab-blob.svg';
+import { Picture } from 'astro:assets';
+import IffyLogo from '../assets/home/iffy-logo.svg';
 import polaroid from '../assets/home/polaroid-ify-4.png';
 import shot from '../assets/home/project-screenshot-2026-11-17.png';
 import '../styles/home.css';
 
-const bloomSrc = assetSrc(bloom);
-const polaroidSrc = assetSrc(polaroid);
 const shotSrc = assetSrc(shot);
 
 const mail = 'mailto:ify@example.com';
@@ -18,7 +17,7 @@ const linkedin = 'https://www.linkedin.com/in/placeholder';
 const resume = withBase('/resume/ifeanyi-ulasika-resume.pdf');
 
 const driverTitle =
-  'Redesigning the Driver App to decrease order fulfilment time and boost  driver retention.';
+  'Redesigning the Driver App to decrease order fulfilment time and boost driver retention.';
 
 const projects = [
   {
@@ -34,6 +33,7 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
 ---
 
 <BaseLayout
+  intro
   title="Ifeanyi Ulasika — Product designer"
   description="Ifeanyi Ulasika designs products and builds systems that deploy. Selected work in enterprise design systems, web, and mobile."
 >
@@ -44,22 +44,31 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
         <div class="hero-grain"></div>
       </div>
       <div class="hero-copy">
-        <img class="hero-bloom" src={bloomSrc} alt="" width="64" height="64" />
-        <div class="hero-headline">
-          <h1 class="hero-title text-display">
-            <span class="lime">Hi, I’m </span><span class="paper">Ifeanyi Ulasika</span><br />
-            <span class="lime">I design </span><span class="paper">products </span><span class="lime">and</span><span class="paper"> </span><span class="lime">build</span><br />
-            <span class="lime"> </span><span class="paper">systems that deploy.</span>
-          </h1>
-          <img class="polaroid" src={polaroidSrc} width="83" height="97" alt="Ifeanyi Ulasika" />
-        </div>
+        <span class="hero-logo" data-spin aria-hidden="true">
+          <IffyLogo class="hero-logo__mark" width="64" height="64" />
+        </span>
+        <h1 class="hero-title text-display" data-headline>
+          <span class="hero-line" data-line><span class="hero-line__inner"><span class="lime">Hi, I’m </span><span class="paper">Ifeanyi Ulasika</span></span></span>
+          <span class="hero-line" data-line><span class="hero-line__inner"><span class="lime">I design </span><span class="paper">products </span><span class="lime">and build</span></span></span>
+          <span class="hero-line" data-line><span class="hero-line__inner"><span class="paper">systems that deploy.</span></span></span>
+          <span class="polaroid" data-polaroid aria-hidden="true"><span class="polaroid__card"><Picture
+            class="polaroid__img"
+            src={polaroid}
+            formats={['avif', 'webp']}
+            widths={[120, 180, 250, 340, 512]}
+            sizes="(max-width: 767px) 64px, 84px"
+            alt=""
+            loading="eager"
+            decoding="async"
+          /><span class="polaroid__shine"></span></span></span>
+        </h1>
         <div class="hero-cta">
           <Button href={mail} label="Shoot me a message" variant="secondary" />
           <Button href={resume} label="View resume" variant="primary" icon="trailing" newTab />
         </div>
       </div>
       <HedgeRow place="hero" />
-      <div class="hero-bar" aria-hidden="true"></div>
+      <span class="flap-sentinel" data-flap-sentinel aria-hidden="true"></span>
     </div>
   </section>
   <FlapNav current="work" mode="hero" />
@@ -104,7 +113,7 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
       <div class="footer-copy">
         <h2 class="footer-title text-display">Let’s Connect</h2>
         <p class="footer-body text-body">
-          Thanks for visiting my little corner of the internet. Your presence here means a lot. This was website was made with ❤️
+          Thanks for visiting my little corner of the internet. Your presence here means a lot. This website was made with ❤️
         </p>
         <div class="footer-links">
           <Button href={mail} label="Email" variant="secondary" icon="leading" />
@@ -115,3 +124,7 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
     </footer>
   </main>
 </BaseLayout>
+
+<script>
+  import '../scripts/hero-intro';
+</script>

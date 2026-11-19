@@ -60,48 +60,51 @@ const items = [
 </div>
 
 <script>
-  const slot = document.querySelector('[data-flap-slot]');
-  const nav = document.querySelector('[data-flap-nav]');
+  // Docking: the slot is `position: sticky`, so the flaps never leave the screen.
+  // A sentinel at the bottom of the hero says when the flaps have reached the top;
+  // then only the shapes and the plate change (opacity + transform, no layout jump).
+  const slot = document.querySelector<HTMLElement>('[data-flap-slot]');
+  const nav = document.querySelector<HTMLElement>('[data-flap-nav]');
+  const sentinel = document.querySelector<HTMLElement>('[data-flap-sentinel]');
 
-  if (slot instanceof HTMLElement && nav instanceof HTMLElement && slot.dataset.flapMode === 'hero') {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let docked = slot.getBoundingClientRect().top <= 0;
-    nav.dataset.docked = docked ? 'true' : 'false';
+  if (slot && nav && sentinel && slot.dataset.flapMode === 'hero') {
+    let observer: IntersectionObserver | null = null;
 
-    const apply = (next: boolean) => {
-      if (next === docked) return;
-      docked = next;
-      nav.dataset.docked = docked ? 'true' : 'false';
-      nav.removeAttribute('data-motion');
-      if (docked && !reduced.matches) {
-        void nav.offsetWidth;
-        nav.dataset.motion = 'dock';
-      }
+    const setDocked = (docked: boolean) => {
+      const next = docked ? 'true' : 'false';
+      if (nav.dataset.docked !== next) nav.dataset.docked = next;
     };
 
-    let frame = 0;
-    const read = () => {
-      frame = 0;
-      const top = slot.getBoundingClientRect().top;
-      // 12px of hysteresis so iOS rubber-banding does not flicker the shape.
-      apply(docked ? top <= 12 : top <= 0);
+    const watch = () => {
+      observer?.disconnect();
+      // The sentinel sits at the hero's bottom edge. It is "visible" while it is below the
+      // flaps' height from the top of the viewport; above that, the flaps are stuck.
+      const top = Math.round(nav.getBoundingClientRect().height);
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          const above = entry.boundingClientRect.top < (entry.rootBounds?.top ?? top);
+          setDocked(!entry.isIntersecting && above);
+        },
+        { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 },
+      );
+      observer.observe(sentinel);
     };
 
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(read);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.visualViewport?.addEventListener('resize', onScroll);
-    window.visualViewport?.addEventListener('scroll', onScroll);
-    read();
+    watch();
+    let resizeFrame = 0;
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(watch);
+    });
   }
 </script>
 
 <style>
+  /* Height 0 and sticky: the nav hangs above the slot's top edge, so before docking it overlaps the
+     hero's bottom (Figma 4026:607, y 720 of 800) and once stuck it fills the top of the viewport. */
   .flap-slot {
-    position: relative;
+    position: sticky;
+    top: calc(var(--flap-h) + env(safe-area-inset-top, 0px));
     z-index: 50;
     width: 100%;
     height: 0;
@@ -112,17 +115,20 @@ const items = [
     left: 0;
     right: 0;
     bottom: 0;
+    height: calc(var(--flap-h) + env(safe-area-inset-top, 0px));
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    height: calc(80 / 720 * min(720px, 100vw));
-    container-type: inline-size;
     pointer-events: none;
-    background: transparent;
   }
 
+  /* Full-width plate behind the docked flaps (Figma 4026:1010). It fades, never pops. */
   .flap-nav__plate {
-    display: none;
+    position: absolute;
+    inset: 0 0 calc(var(--flap-h) - 72 / 720 * var(--flap-w)) 0;
+    background: var(--flap-plate, var(--color-stone-0));
+    opacity: 0;
+    transition: opacity var(--motion-duration-base) var(--motion-ease-fade);
   }
 
   .flap-nav__list {
@@ -132,47 +138,32 @@ const items = [
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    width: min(720px, 100%);
-    height: 100%;
+    width: var(--flap-w);
+    height: var(--flap-h);
     margin: 0 auto;
     padding: 0;
     list-style: none;
   }
 
-  .flap-nav[data-motion='dock'] .flap-nav__list {
-    animation: flap-settle var(--motion-duration-flap) var(--motion-ease-out) both;
-  }
-
-  @keyframes flap-settle {
-    from {
-      transform: translateY(-10px);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
-
   .flap-nav__item {
+    position: relative;
     flex: 1 1 0;
-    height: calc(66 / 80 * 100%);
     min-width: 0;
-  }
-
-  .flap-nav__item--work {
     height: 100%;
   }
 
   .flap-nav__link {
-    position: relative;
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
     text-decoration: none;
     color: inherit;
   }
 
+  /* Hero: Work is 80 tall, the others 66 and sit on the bottom edge (y 14).
+     Docked: all three are 66 tall and hang from the top. The label moves with its flap. */
   .flap-nav__label {
     position: relative;
     z-index: 1;
@@ -181,11 +172,14 @@ const items = [
     font-size: var(--type-nav-size);
     line-height: var(--type-nav-line-height);
     letter-spacing: var(--type-nav-tracking);
+    transform: translateY(calc(7 / 80 * var(--flap-h)));
+    transition: transform var(--motion-duration-slow) var(--motion-ease-enter);
   }
 
   .flap-nav__item--work .flap-nav__label {
     font-weight: var(--font-weight-medium);
     color: var(--color-lime-900);
+    transform: none;
   }
 
   .flap-nav__item--playground .flap-nav__label {
@@ -205,69 +199,68 @@ const items = [
 
   .flap-nav__shape {
     position: absolute;
-    inset: 0;
-    display: block;
+    left: 0;
     width: 100%;
-    height: 100%;
+    display: block;
     object-fit: fill;
+    transition:
+      opacity var(--motion-duration-base) var(--motion-ease-fade),
+      transform var(--motion-duration-slow) var(--motion-ease-enter);
+  }
+
+  .flap-nav__shape--hero {
+    bottom: 0;
+    height: calc(66 / 80 * 100%);
+  }
+
+  .flap-nav__item--work .flap-nav__shape--hero {
+    height: 100%;
   }
 
   .flap-nav__shape--docked {
+    top: 0;
+    height: calc(66 / 80 * 100%);
     opacity: 0;
+    transform: translateY(calc(14 / 80 * var(--flap-h)));
   }
 
   .flap-nav[data-docked='true'] {
-    position: fixed;
-    top: 0;
-    bottom: auto;
-    justify-content: flex-start;
-    height: auto;
     pointer-events: auto;
-    background: var(--flap-plate, var(--color-stone-0));
   }
 
   .flap-nav[data-docked='true'] .flap-nav__plate {
-    display: block;
-    flex: none;
-    height: env(safe-area-inset-top, 0px);
-    background: var(--flap-plate, var(--color-stone-0));
-  }
-
-  .flap-nav[data-docked='true'] .flap-nav__list {
-    align-items: flex-start;
-    height: calc(66 / 720 * min(720px, 100cqw, 100vw));
-    flex: none;
-  }
-
-  .flap-nav[data-docked='true']::after {
-    content: '';
-    display: block;
-    flex: none;
-    height: calc(6 / 720 * min(720px, 100cqw, 100vw));
-    background: var(--flap-plate, var(--color-stone-0));
-  }
-
-  .flap-nav[data-docked='true'] .flap-nav__item,
-  .flap-nav[data-docked='true'] .flap-nav__item--work {
-    height: 100%;
+    opacity: 1;
   }
 
   .flap-nav[data-docked='true'] .flap-nav__shape--hero {
     opacity: 0;
+    transform: translateY(calc(-14 / 80 * var(--flap-h)));
   }
 
   .flap-nav[data-docked='true'] .flap-nav__shape--docked {
     opacity: 1;
+    transform: none;
+  }
+
+  .flap-nav[data-docked='true'] .flap-nav__label {
+    transform: translateY(calc(-7 / 80 * var(--flap-h)));
   }
 
   .flap-nav__link:focus-visible {
     outline: 2px solid var(--color-lime-300);
-    outline-offset: 3px;
+    outline-offset: -4px;
+  }
+
+  .flap-nav__link:hover .flap-nav__label {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flap-nav[data-motion='dock'] .flap-nav__list {
-      animation: none;
+    .flap-nav__shape,
+    .flap-nav__label {
+      transition-property: opacity;
     }
   }
 </style>

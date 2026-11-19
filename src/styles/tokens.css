@@ -105,6 +105,9 @@
   --motion-duration-slow: 480ms;
   --motion-duration-flap: 240ms;
   --motion-duration-hedge: 640ms;
+  --motion-duration-reveal: 900ms;
+  --motion-duration-spin: 2000ms;
+  --motion-duration-pop: 720ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -113,6 +116,12 @@
   --motion-easing-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --motion-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-easing-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-fade: cubic-bezier(0.33, 0, 0.2, 1);
+  --motion-easing-fade: cubic-bezier(0.33, 0, 0.2, 1);
+  --motion-ease-spin: cubic-bezier(0.3, 0, 0.1, 1);
+  --motion-easing-spin: cubic-bezier(0.3, 0, 0.1, 1);
 
   /* Semantic color. Edit the refs in tokens.json to retune the theme. */
   --color-bg: var(--color-lime-0);

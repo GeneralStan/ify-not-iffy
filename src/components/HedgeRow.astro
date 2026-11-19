@@ -7,6 +7,8 @@ interface Props {
 
 const { place } = Astro.props;
 const set = place === 'hero' ? heroHedges : footerHedges;
+// Stacking from Figma (4026:599, 4026:1167): the N bush is the bottom layer, the rest stack left to right.
+const stack = [1, 2, 3, 4, 0, 5, 6];
 ---
 
 <div
@@ -15,13 +17,13 @@ const set = place === 'hero' ? heroHedges : footerHedges;
   style={`--canvas-w: ${set.width}; --canvas-h: ${set.height};`}
 >
   {
-    set.bushes.map((bush) => (
+    set.bushes.map((bush, index) => (
       <button
         type="button"
         class="hedge"
         data-hedge
         aria-label={`Hedge letter ${bush.letter}`}
-        style={`--x: ${bush.x}; --y: ${bush.y}; --w: ${bush.w}; --h: ${bush.h};`}
+        style={`--x: ${bush.x}; --y: ${bush.y}; --w: ${bush.w}; --h: ${bush.h}; --z: ${stack[index] ?? index};`}
       >
         <span class="hedge__plant">
           <svg viewBox={`${bush.x} ${bush.y} ${bush.w} ${bush.h}`} aria-hidden="true" focusable="false">

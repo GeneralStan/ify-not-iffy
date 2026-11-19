@@ -5,9 +5,11 @@ import { withBase } from '../lib/url';
 interface Props {
   title: string;
   description: string;
+  /** Pages with the animated hero hide it until hero-intro.ts plays the load-in. */
+  intro?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, intro = false } = Astro.props;
 const exatExtraLight = withBase('/fonts/exatcyr-extralight.otf');
 const exatLight = withBase('/fonts/exatcyr-light.otf');
 const exatRegular = withBase('/fonts/exatcyr-regular.otf');
@@ -35,6 +37,14 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
       @font-face { font-family: "Exat CYR"; src: local("Exat CYR Extra Bold"), url("${exatExtraBold}") format("opentype"); font-weight: 800; font-style: normal; font-display: swap; }
       @font-face { font-family: "Exat CYR"; src: local("Exat CYR Black"), url("${exatBlack}") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
     `}></style>
+    {intro && <script is:inline>
+      // Hide the hero for its load-in only when motion is allowed and JS runs.
+      // hero-intro.ts removes the class; the timeout is a safety net.
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('intro-wait');
+        setTimeout(function () { document.documentElement.classList.remove('intro-wait'); }, 3000);
+      }
+    </script>}
     <title>{title}</title>
   </head>
   <body>
