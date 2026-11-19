@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { withBase } from '../lib/url';
 
 interface Props {
   title: string;
@@ -7,6 +8,9 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+const exatLight = withBase('/fonts/ExatCYR-Light.woff2');
+const exatRegular = withBase('/fonts/ExatCYR-Regular.woff2');
+const exatMedium = withBase('/fonts/ExatCYR-Medium.woff2');
 ---
 
 <!doctype html>
@@ -17,7 +21,12 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#FEFFFA" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <style is:inline set:html={`
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Light"), url("${exatLight}") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR"), local("Exat CYR Regular"), url("${exatRegular}") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Medium"), url("${exatMedium}") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+    `}></style>
     <title>{title}</title>
   </head>
   <body>

@@ -105,6 +105,7 @@ for (const [name, value] of Object.entries(primitive.motion.duration)) {
 }
 for (const [name, value] of Object.entries(primitive.motion.easing)) {
   rootDecls.push([`--motion-ease-${name}`, value]);
+  rootDecls.push([`--motion-easing-${name}`, value]);
 }
 
 rootDecls.push(['/* Semantic color. Edit the refs in tokens.json to retune the theme. */', null]);
@@ -154,6 +155,21 @@ for (const [name, value] of rootDecls) {
 }
 emit('}');
 emit('');
+
+if (primitive.motion.easing.spring) {
+  emit('/* linear() spring is the flap easing. Older engines get a cubic overshoot. */');
+  emit('@supports not (transition-timing-function: linear(0, 1)) {');
+  block(
+    ':root',
+    [
+      ['--motion-ease-spring', 'cubic-bezier(0.22, 1.4, 0.36, 1)'],
+      ['--motion-easing-spring', 'cubic-bezier(0.22, 1.4, 0.36, 1)'],
+    ],
+    '  ',
+  );
+  emit('}');
+  emit('');
+}
 
 const desktopPx = pxNumber(primitive.breakpoint.desktop);
 const tabletPx = pxNumber(primitive.breakpoint.tablet);
