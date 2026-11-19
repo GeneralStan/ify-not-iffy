@@ -137,7 +137,8 @@ These targets are stand-ins. Replace them before publishing:
 
 - “Shoot me a message” and “Email” → `mailto:ify@example.com`
 - “Linkedin” → `https://www.linkedin.com/in/placeholder`
-- “View resume” → `#resume` (no file yet)
+
+“View resume” opens `/resume/ifeanyi-ulasika-resume.pdf` in a new tab. The link is prefixed with the site base.
 
 Playground and About in the flap nav are in-page anchors (`#playground`, `#about`) at the footer until those pages exist. Work scrolls to `#work`.
 

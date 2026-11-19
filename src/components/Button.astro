@@ -6,12 +6,18 @@ interface Props {
   label: string;
   variant?: 'primary' | 'secondary';
   icon?: 'none' | 'leading' | 'trailing';
+  newTab?: boolean;
 }
 
-const { href, label, variant = 'primary', icon = 'none' } = Astro.props;
+const { href, label, variant = 'primary', icon = 'none', newTab = false } = Astro.props;
 ---
 
-<a class:list={['btn', `btn--${variant}`, icon !== 'none' && `btn--${icon}`]} href={href}>
+<a
+  class:list={['btn', `btn--${variant}`, icon !== 'none' && `btn--${icon}`]}
+  href={href}
+  target={newTab ? '_blank' : undefined}
+  rel={newTab ? 'noopener' : undefined}
+>
   {icon === 'leading' && <ArrowIcon />}
   <span>{label}</span>
   {icon === 'trailing' && <ArrowIcon />}
