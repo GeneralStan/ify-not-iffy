@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FlapNav from '../../components/FlapNav.astro';
+import '../../styles/home.css';
+---
+
+<BaseLayout
+  title="About — Ifeanyi Ulasika"
+  description="About Ifeanyi Ulasika, product designer. Coming soon."
+>
+  <FlapNav current="about" mode="docked" />
+  <main class="page page--about" id="content">
+    <h1 class="page-title text-h1">About</h1>
+    <p class="page-lead text-body">Coming soon</p>
+  </main>
+</BaseLayout>

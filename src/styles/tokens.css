@@ -103,7 +103,7 @@
   --motion-duration-fast: 150ms;
   --motion-duration-base: 280ms;
   --motion-duration-slow: 480ms;
-  --motion-duration-flap: 300ms;
+  --motion-duration-flap: 240ms;
   --motion-duration-hedge: 640ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
