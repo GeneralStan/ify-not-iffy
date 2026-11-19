@@ -17,7 +17,10 @@ const EASE_SPIN = 'cubic-bezier(0.3, 0, 0.1, 1)';
 
 const INTRO_SPIN_MS = 2000;
 const REPLAY_SPIN_MS = 1600;
-const INTRO_TOTAL_MS = 1900;
+/* Matches the timeline in home.css (intro-play). Flaps start at 1200ms, 60ms apart, 700ms each, so
+   90% through the flap sequence is 1200 + 0.9 * (2 * 60 + 700) ≈ 1940ms: the hedges pop then. */
+const HEDGE_POP_AT = 1940;
+const INTRO_TOTAL_MS = 2700;
 
 /* ---------- Logo spin (hero logo and docked logo) ----------
    The SVG turns around the petals' hub (transform-origin set in CSS), so it never drifts. */
@@ -47,13 +50,6 @@ document.querySelectorAll('[data-spin]').forEach((host) => {
   });
 });
 
-// The docked logo links home; on the home page it scrolls back to the hero instead of reloading.
-document.querySelector<HTMLAnchorElement>('[data-flap-logo]')?.addEventListener('click', (event) => {
-  if (!document.querySelector('[data-hero]')) return;
-  event.preventDefault();
-  window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
-});
-
 /* ---------- Hero polaroid placement ----------
    Figma 4033:3415: the photo's centre sits 0.69em right of the end of "Ulasika"
    and 0.43em below the top of the first line (56px display type). */
@@ -67,9 +63,11 @@ const POL_DY = 0.43;
 
 function placePolaroid() {
   if (!headline || !firstLine || !heroPolaroid) return;
-  const range = document.createRange();
-  range.selectNodeContents(firstLine);
-  const rects = [...range.getClientRects()].filter((r) => r.width > 0);
+  // Measure the word wrappers, which never move: the intro animates the inner spans, and measuring
+  // those mid-rise put the photo on top of "Ulasika".
+  const rects = [...firstLine.querySelectorAll('.hero-word')]
+    .map((word) => word.getBoundingClientRect())
+    .filter((r) => r.width > 0);
   if (!rects.length) return;
   const top = Math.min(...rects.map((r) => r.top));
   const lineEnd = Math.max(...rects.filter((r) => Math.abs(r.top - top) < 2).map((r) => r.right));
@@ -124,8 +122,12 @@ async function intro() {
   root.classList.add('intro-play');
   root.classList.remove('intro-wait');
   spinLogo(document.querySelector('.hero-logo[data-spin]'), INTRO_SPIN_MS, 120);
+  window.setTimeout(
+    () => document.querySelector('[data-hedges="hero"]')?.classList.add('is-popped'),
+    HEDGE_POP_AT,
+  );
 
-  window.setTimeout(() => root.classList.remove('intro-play'), INTRO_TOTAL_MS + 400);
+  window.setTimeout(() => root.classList.remove('intro-play'), INTRO_TOTAL_MS + 300);
 }
 
 intro();

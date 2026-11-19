@@ -45,7 +45,8 @@ const { href, label, variant = 'primary', icon = 'none', newTab = false } = Astr
     transition:
       background-color var(--motion-duration-fast) var(--motion-ease-out),
       color var(--motion-duration-fast) var(--motion-ease-out),
-      border-color var(--motion-duration-fast) var(--motion-ease-out);
+      border-color var(--motion-duration-fast) var(--motion-ease-out),
+      box-shadow var(--motion-duration-fast) var(--motion-ease-out);
   }
 
   .btn--trailing {
@@ -61,14 +62,17 @@ const { href, label, variant = 'primary', icon = 'none', newTab = false } = Astr
     color: var(--color-lime-950);
   }
 
+  /* Figma Button, Type=Primary: Hover and Pressed carry a soft lime inner shadow from the top. */
   .btn--primary:hover {
     background: var(--color-lime-600);
     color: var(--color-lime-0);
+    box-shadow: var(--shadow-button-primary-hover);
   }
 
   .btn--primary:active {
     background: var(--color-lime-800);
     color: var(--color-lime-0);
+    box-shadow: var(--shadow-button-primary-pressed);
   }
 
   .btn--secondary {
@@ -86,7 +90,7 @@ const { href, label, variant = 'primary', icon = 'none', newTab = false } = Astr
   .btn--secondary:active {
     background: var(--color-lime-50);
     color: var(--color-lime-900);
-    border-color: var(--color-lime-900);
+    border-color: rgba(13, 18, 2, 0.6);
   }
 
   .btn:focus-visible {

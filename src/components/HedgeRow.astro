@@ -1,40 +1,64 @@
 ---
-import { footerHedges, heroHedges } from '../data/hedges';
+/**
+ * Hedge row from the Figma component set "Hedges" (4029:2552).
+ * Both breakpoints are rendered; CSS shows the Desktop variant from 768px up and the Mobile one below.
+ * Bushes keep Figma's layer order (the N bush is the bottom layer), so DOM order = stacking.
+ * Motion: the whole row pops up from behind the flaps / bottom edge at once (see home.css, hedge-pop).
+ */
+import {
+  footerHedges,
+  footerHedgesMobile,
+  heroHedges,
+  heroHedgesMobile,
+  type HedgeSet,
+} from '../data/hedges';
 
 interface Props {
   place: 'hero' | 'footer';
 }
 
 const { place } = Astro.props;
-const set = place === 'hero' ? heroHedges : footerHedges;
-// Stacking from Figma (4026:599, 4026:1167): the N bush is the bottom layer, the rest stack left to right.
-const stack = [1, 2, 3, 4, 0, 5, 6];
+const variants: Array<[string, HedgeSet]> =
+  place === 'hero'
+    ? [['desktop', heroHedges], ['mobile', heroHedgesMobile]]
+    : [['desktop', footerHedges], ['mobile', footerHedgesMobile]];
+
+// Left-to-right position of each bush, for the tap ripple to its neighbours.
+const orderOf = (set: HedgeSet) => {
+  const byX = set.bushes.map((bush, index) => ({ x: bush.x, index })).sort((a, b) => a.x - b.x);
+  const order: number[] = [];
+  byX.forEach((entry, rank) => (order[entry.index] = rank));
+  return order;
+};
 ---
 
-<div
-  class:list={['hedge-row', `hedge-row--${place}`]}
-  data-hedge-row
-  data-hedge-place={place}
-  style={`--canvas-w: ${set.width}; --canvas-h: ${set.height};`}
->
+<div class:list={['hedges', `hedges--${place}`]} data-hedges={place}>
   {
-    set.bushes.map((bush, index) => (
-      <button
-        type="button"
-        class="hedge"
-        data-hedge
-        aria-label={`Hedge letter ${bush.letter}`}
-        style={`--x: ${bush.x}; --y: ${bush.y}; --w: ${bush.w}; --h: ${bush.h}; --z: ${stack[index] ?? index}; --from-middle: ${Math.abs(index - (set.bushes.length - 1) / 2)};`}
-      >
-        <span class="hedge__plant">
-          <svg viewBox={`${bush.x} ${bush.y} ${bush.w} ${bush.h}`} aria-hidden="true" focusable="false">
-            {bush.paths.map((path) => (
-              <path d={path.d} fill={path.fill} />
-            ))}
-          </svg>
-        </span>
-      </button>
-    ))
+    variants.map(([breakpoint, set]) => {
+      const order = orderOf(set);
+      return (
+        <div
+          class:list={['hedge-row', `hedge-row--${breakpoint}`]}
+          data-hedge-row
+          style={`--canvas-w: ${set.width}; --canvas-h: ${set.height};`}
+        >
+          {set.bushes.map((bush, index) => (
+            <button
+              type="button"
+              class="hedge"
+              data-hedge
+              data-order={order[index]}
+              aria-label={`Hedge letter ${bush.letter}`}
+              style={`--x: ${bush.x}; --y: ${bush.y}; --w: ${bush.w}; --h: ${bush.h};`}
+            >
+              <span class="hedge__plant">
+                <svg viewBox={bush.vb} preserveAspectRatio="none" aria-hidden="true" focusable="false" set:html={bush.inner} />
+              </span>
+            </button>
+          ))}
+        </div>
+      );
+    })
   }
 </div>
 
@@ -54,35 +78,32 @@ const stack = [1, 2, 3, 4, 0, 5, 6];
   document.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
-    const button = target.closest('[data-hedge]');
-    if (!(button instanceof HTMLButtonElement)) return;
-    const row = button.closest('[data-hedge-row]');
-    if (!row) return;
-    const hedges = [...row.querySelectorAll('[data-hedge]')];
-    const index = hedges.indexOf(button);
-    hedges.forEach((hedge, hedgeIndex) => {
-      const distance = Math.abs(hedgeIndex - index);
+    const button = target.closest<HTMLElement>('[data-hedge]');
+    const row = button?.closest('[data-hedge-row]');
+    if (!button || !row) return;
+    const at = Number(button.dataset.order);
+    row.querySelectorAll<HTMLElement>('[data-hedge]').forEach((hedge) => {
+      const distance = Math.abs(Number(hedge.dataset.order) - at);
       if (distance > 1) return;
-      const plant = hedge.querySelector('.hedge__plant');
-      if (!(plant instanceof HTMLElement)) return;
-      play(plant, distance === 0 ? 'shake' : 'rustle');
+      const plant = hedge.querySelector<HTMLElement>('.hedge__plant');
+      if (plant) play(plant, distance === 0 ? 'shake' : 'rustle');
     });
   });
 
-  /* Footer: the bushes pop up out of the bottom edge, middle first, the first time the footer shows.
-     Hidden only once JS has armed them, so without JS (or with reduced motion) they simply sit there. */
-  const footerRow = document.querySelector<HTMLElement>('[data-hedge-place="footer"]');
-  if (footerRow && !reducedQuery.matches && 'IntersectionObserver' in window) {
-    footerRow.classList.add('is-armed');
+  /* Footer: the row pops up out of the bottom edge the first time the footer shows.
+     Hidden only once JS has armed it, so without JS (or with reduced motion) the hedges simply sit there. */
+  const footer = document.querySelector<HTMLElement>('[data-hedges="footer"]');
+  if (footer && !reducedQuery.matches && 'IntersectionObserver' in window) {
+    footer.classList.add('is-armed');
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
-        footerRow.classList.add('is-popped');
+        footer.classList.add('is-popped');
         observer.disconnect();
       },
-      { threshold: 0.35 },
+      { threshold: 0.3 },
     );
-    observer.observe(footerRow);
+    footer.querySelectorAll('[data-hedge-row]').forEach((row) => observer.observe(row));
   }
 
   document.addEventListener('animationend', (event) => {

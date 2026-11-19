@@ -1,0 +1,30 @@
+---
+/** Footer shared by every page (Figma 4026:680). Persisted across page changes. */
+import Button from './Button.astro';
+import HedgeRow from './HedgeRow.astro';
+import Polaroid from './Polaroid.astro';
+import { contact } from '../data/site';
+---
+
+<footer class="site-footer" transition:persist="footer">
+  <div class="footer-bg" aria-hidden="true">
+    <div class="footer-blobs"></div>
+    <div class="footer-grain"></div>
+  </div>
+  <div class="footer-copy">
+    <h2 class="footer-title text-display">
+      <span class="footer-title__text">
+        <Polaroid photo="cat-mooncake" class="footer-polaroid" displayWidth={102} />
+        Let’s Connect
+      </span>
+    </h2>
+    <p class="footer-body text-body">
+      Thanks for visiting my little corner of the internet. Your presence here means a lot. This website was made with ❤️
+    </p>
+    <div class="footer-links">
+      <Button href={contact.mail} label="Email" variant="secondary" icon="leading" />
+      <Button href={contact.linkedin} label="Linkedin" variant="secondary" icon="leading" />
+    </div>
+  </div>
+  <HedgeRow place="footer" />
+</footer>

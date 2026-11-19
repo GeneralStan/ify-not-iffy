@@ -1,125 +1,73 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Button from '../components/Button.astro';
-import FlapNav from '../components/FlapNav.astro';
-import HedgeRow from '../components/HedgeRow.astro';
-import { assetSrc, withBase } from '../lib/url';
-import Polaroid from '../components/Polaroid.astro';
-import IffyLogo from '../assets/home/iffy-logo.svg';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { assetSrc } from '../lib/url';
 import shot from '../assets/home/project-screenshot-2026-11-17.png';
-import '../styles/home.css';
 
 const shotSrc = assetSrc(shot);
 
-const mail = 'mailto:ify@example.com';
-const linkedin = 'https://www.linkedin.com/in/placeholder';
-const resume = withBase('/resume/ifeanyi-ulasika-resume.pdf');
-
-const driverTitle =
-  'Redesigning the Driver App to decrease order fulfilment time and boost driver retention.';
-
+// Figma "Work (Final)" 4026:619. Cards 1 and 3 sit in the left column; 2 and 4 in the right, 124px lower.
 const projects = [
   {
-    title:
-      'Rebuilding Leta’s dispatch dashboard as a working prototype ops teams could test before launch.',
+    tags: ['Leta Technologies', 'Web', 'B2B'],
+    title: 'Rebuilding Leta’s dispatch dashboard as a working prototype ops teams could test before launch.',
   },
-  { title: driverTitle },
-  { title: driverTitle },
-  { title: driverTitle },
-];
+  {
+    tags: ['Leta Technologies', 'Web', 'B2B'],
+    title: 'Redesigning the Driver App to decrease order fulfilment time and boost driver retention.',
+  },
+  {
+    tags: ['Leta Technologies', 'Mobile', 'B2B'],
+    title: 'Redesigning the Driver App to decrease order fulfilment time and boost driver retention.',
+  },
+  {
+    tags: ['Leta Technologies', 'Mobile', 'B2C'],
+    title: 'Enabling users to purchase everyday essentials within 30 minutes.',
+  },
+].map((project, index) => ({ ...project, n: index + 1 }));
 
-const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
+const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p.n % 2 === 0)];
 ---
 
-<BaseLayout
-  intro
+<SiteLayout
+  page="work"
   title="Ifeanyi Ulasika — Product designer"
   description="Ifeanyi Ulasika designs products and builds systems that deploy. Selected work in enterprise design systems, web, and mobile."
 >
-  <section class="hero" id="hero" data-hero>
-    <div class="hero-clip">
-      <div class="hero-bg" aria-hidden="true">
-        <div class="hero-blobs"></div>
-        <div class="hero-grain"></div>
+  <section class="projects" id="work" data-section="work">
+    <div class="projects-inner">
+      <header class="projects-head">
+        <h2 class="projects-title text-h1">Selected projects</h2>
+        <p class="projects-sub text-h2">
+          Enterprise design systems,<br />
+          web and mobile products
+        </p>
+      </header>
+      <div class="card-board">
+        {
+          columns.map((column, c) => (
+            <div class={`card-column card-column--${c + 1}`}>
+              {column.map((project) => (
+                <article class="project-card" style={`--order: ${project.n}`}>
+                  <div class="project-card__media">
+                    <img class="project-card__shot" src={shotSrc} alt="" />
+                  </div>
+                  <div class="project-card__copy">
+                    <p class="project-card__tags text-meta">
+                      {project.tags.map((tag, i) => (
+                        <>
+                          {i > 0 && <span aria-hidden="true">·</span>}
+                          <span>{tag}</span>
+                        </>
+                      ))}
+                    </p>
+                    <h3 class="project-card__title">{project.title}</h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ))
+        }
       </div>
-      <div class="hero-copy">
-        <span class="hero-logo" data-spin aria-hidden="true">
-          <IffyLogo class="hero-logo__mark" width="64" height="64" />
-        </span>
-        <h1 class="hero-title text-display" data-headline>
-          <span class="hero-line" data-line><span class="hero-line__inner"><span class="lime">Hi, I’m </span><span class="paper">Ifeanyi Ulasika</span></span></span>
-          <span class="hero-line" data-line><span class="hero-line__inner"><span class="lime">I design </span><span class="paper">products </span><span class="lime">and build</span></span></span>
-          <span class="hero-line" data-line><span class="hero-line__inner"><span class="paper">systems that deploy.</span></span></span>
-          <Polaroid photo="at-sea" class="hero-polaroid" displayWidth={132} eager />
-        </h1>
-        <div class="hero-cta">
-          <Button href={mail} label="Shoot me a message" variant="secondary" />
-          <Button href={resume} label="View resume" variant="primary" icon="trailing" newTab />
-        </div>
-      </div>
-      <HedgeRow place="hero" />
-      <span class="flap-sentinel" data-flap-sentinel aria-hidden="true"></span>
     </div>
   </section>
-  <FlapNav current="work" mode="hero" />
-
-  <main id="content">
-    <section class="projects" id="work" data-section="work">
-      <div class="projects-inner">
-        <header class="projects-head">
-          <h2 class="projects-title text-h1">Selected projects</h2>
-          <p class="projects-sub text-h2">
-            Enterprise design systems,<br />
-            web and mobile products
-          </p>
-        </header>
-        <div class="card-board">
-          {
-            projects.map((project, index) => (
-              <article class={`project-card project-card--${index + 1}`}>
-                <div class="project-card__media">
-                  <img class="project-card__shot" src={shotSrc} alt="" />
-                </div>
-                <div class="project-card__copy">
-                  <p class="project-card__tags text-meta">
-                    {tags.map((tag) => (
-                      <span>{tag}</span>
-                    ))}
-                  </p>
-                  <h3 class="project-card__title text-h3">{project.title}</h3>
-                </div>
-              </article>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <footer class="site-footer">
-      <div class="footer-bg" aria-hidden="true">
-        <div class="footer-blobs"></div>
-        <div class="footer-grain"></div>
-      </div>
-      <div class="footer-copy">
-        <h2 class="footer-title text-display">
-          <span class="footer-title__text">
-            <Polaroid photo="cat-mooncake" class="footer-polaroid" displayWidth={102} />
-            Let’s Connect
-          </span>
-        </h2>
-        <p class="footer-body text-body">
-          Thanks for visiting my little corner of the internet. Your presence here means a lot. This website was made with ❤️
-        </p>
-        <div class="footer-links">
-          <Button href={mail} label="Email" variant="secondary" icon="leading" />
-          <Button href={linkedin} label="Linkedin" variant="secondary" icon="leading" />
-        </div>
-      </div>
-      <HedgeRow place="footer" />
-    </footer>
-  </main>
-</BaseLayout>
-
-<script>
-  import '../scripts/hero-intro';
-</script>
+</SiteLayout>

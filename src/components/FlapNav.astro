@@ -17,21 +17,13 @@
  */
 import { withBase } from '../lib/url';
 import IffyLogo from '../assets/home/iffy-logo.svg';
+import type { PageId } from '../data/site';
 
 interface Props {
-  current?: 'work' | 'playground' | 'about';
-  /** Hero pages dock on scroll. Other pages start docked. */
-  mode?: 'hero' | 'docked';
+  current?: PageId;
 }
 
-const { current = 'work', mode = 'hero' } = Astro.props;
-
-// Page colour behind the docked bar, used by the scroll-edge blur.
-const edges = {
-  work: 'var(--color-stone-0)',
-  playground: 'var(--color-plum-200)',
-  about: 'var(--color-blue-300)',
-} as const;
+const { current = 'work' } = Astro.props;
 
 const items = [
   { id: 'work', href: withBase('/'), label: 'Work' },
@@ -42,24 +34,16 @@ const items = [
 // Figma flap background, 240x66, chamfer top-left (rounded corners as drawn in the component).
 const shape =
   'M0 24.8551C0 22.89 0.723273 20.9936 2.03189 19.5276L17.0776 2.67255C18.5954 0.972199 20.7665 0 23.0457 0H232C236.418 0 240 3.58172 240 8V66H0V24.8551Z';
-const docked = mode === 'docked';
 ---
 
-<div
-  class="flap-slot"
-  data-flap-slot
-  data-flap-mode={mode}
-  data-docked={docked ? 'true' : 'false'}
-  data-stuck={docked ? 'true' : 'false'}
-  style={`--edge-bg: ${edges[current]}`}
->
+<div class="flap-slot" data-flap-slot data-docked="false" data-stuck="false" transition:persist="flaps">
   <div class="flap-edge" aria-hidden="true">
     <span class="flap-edge__blur flap-edge__blur--1"></span>
     <span class="flap-edge__blur flap-edge__blur--2"></span>
     <span class="flap-edge__blur flap-edge__blur--3"></span>
   </div>
   <nav class="flap-nav" aria-label="Primary">
-    <a class="flap-logo" href={withBase('/')} data-flap-logo aria-label="Ifeanyi Ulasika, home" tabindex={docked ? undefined : -1}>
+    <a class="flap-logo" href={withBase('/')} data-flap-logo data-page-link="work" aria-label="Ifeanyi Ulasika, Work" tabindex="-1">
       <span class="flap-logo__spin" data-spin>
         <IffyLogo class="flap-logo__mark" width="48" height="48" />
       </span>
@@ -72,6 +56,7 @@ const docked = mode === 'docked';
               class="flap__card"
               href={item.href}
               data-flap-link
+              data-page-link={item.id}
               aria-current={current === item.id ? 'page' : undefined}
             >
               <span class="flap__sr">{item.label}</span>
@@ -96,26 +81,27 @@ const docked = mode === 'docked';
 </div>
 
 <script>
+  import { navigate } from 'astro:transitions/client';
+
   const slot = document.querySelector<HTMLElement>('[data-flap-slot]');
+  const logo = slot?.querySelector<HTMLElement>('[data-flap-logo]') ?? null;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* ---------- Dock on scroll (hero pages) ----------
-     The slot is sticky at top: 0 and sits right under the hero, so its top edge *is* the line between
-     the hero and the page. The flaps hinge over that line once it has risen into the top 30% of the
-     screen, then ride up with it and stay when it sticks. 48px of hysteresis stops flicker. */
-  if (slot && slot.dataset.flapMode === 'hero') {
-    const logo = slot.querySelector<HTMLElement>('[data-flap-logo]');
+  /* ---------- Dock on scroll ----------
+     The slot is a zero-height sticky line right under the hero. The flaps only hinge into the docked
+     shape once that line has reached the top of the screen, i.e. the hero is completely gone; they
+     hinge back as soon as it comes down again (24px of hysteresis stops flicker). */
+  if (slot) {
     let frame = 0;
 
     const update = () => {
       frame = 0;
       const line = slot.getBoundingClientRect().top;
-      const threshold = Math.max(window.innerHeight * 0.3, 160);
       const docked = slot.dataset.docked === 'true';
-      if (!docked && line < threshold) {
+      if (!docked && line <= 0.5) {
         slot.dataset.docked = 'true';
         logo?.removeAttribute('tabindex');
-      } else if (docked && line > threshold + 48) {
+      } else if (docked && line > 24) {
         slot.dataset.docked = 'false';
         logo?.setAttribute('tabindex', '-1');
       }
@@ -130,11 +116,45 @@ const docked = mode === 'docked';
     update();
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
+    document.addEventListener('astro:after-swap', update);
+  }
+
+  /* ---------- Page changes ----------
+     Hero, flaps and footer persist, so only the page body swaps. The current flap follows
+     <html data-page> (its colours and height transition), and if you left from the docked view you
+     land in the docked view of the new page, with the hero just above you. */
+  const currentPage = () => document.documentElement.dataset.page;
+
+  const syncCurrent = () => {
+    document.querySelectorAll<HTMLAnchorElement>('[data-flap-link]').forEach((link) => {
+      if (link.dataset.pageLink === currentPage()) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  };
+
+  let landDocked = false;
+  document.addEventListener('astro:after-swap', () => {
+    syncCurrent();
+    if (landDocked && slot) {
+      const line = slot.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: line, behavior: 'instant' });
+    }
+    landDocked = false;
+  });
+
+  function go(link: HTMLAnchorElement) {
+    if (link.dataset.pageLink === currentPage()) {
+      // Already here: back to the top of this page.
+      window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
+      return;
+    }
+    landDocked = slot?.dataset.docked === 'true';
+    navigate(link.href);
   }
 
   /* ---------- Press and release ----------
      Press: the flap darkens to its Pressed colour, stands 80 tall and shrinks to 96%.
-     Release: it springs back to full size, then the page navigates. */
+     Release: it springs back to full size, then the page changes. */
   const PRESS_RELEASE_MS = 220;
 
   document.querySelectorAll<HTMLAnchorElement>('[data-flap-link]').forEach((link) => {
@@ -152,12 +172,14 @@ const docked = mode === 'docked';
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
       release();
-      if (link.getAttribute('aria-current') === 'page') {
-        window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
-        return;
-      }
-      window.setTimeout(() => window.location.assign(link.href), reduced.matches ? 0 : PRESS_RELEASE_MS);
+      window.setTimeout(() => go(link), reduced.matches ? 0 : PRESS_RELEASE_MS);
     });
+  });
+
+  logo?.addEventListener('click', (event) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    go(logo as HTMLAnchorElement);
   });
 </script>
 
@@ -204,17 +226,20 @@ const docked = mode === 'docked';
   }
 
   /* ===== Scroll-edge blur: content softens as it slides under the docked flaps ===== */
+  /* The page colour fills the band behind the flaps, so content disappears under them, then fades
+     out over the 48px just below their bottom edge, where the blur also eases off. */
   .flap-edge {
     position: fixed;
     inset: 0 0 auto;
-    height: calc(var(--flap-h) + 40px + env(safe-area-inset-top, 0px));
+    height: calc(var(--flap-h) + 48px + env(safe-area-inset-top, 0px));
     pointer-events: none;
     opacity: 0;
     transition: opacity var(--motion-duration-base) var(--motion-ease-fade);
     background: linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--edge-bg) 72%, transparent) 0%,
-      color-mix(in srgb, var(--edge-bg) 40%, transparent) 45%,
+      var(--page-bg) 0,
+      var(--page-bg) calc(var(--flap-h) + env(safe-area-inset-top, 0px)),
+      color-mix(in srgb, var(--page-bg) 55%, transparent) calc(var(--flap-h) + 16px),
       transparent 100%
     );
   }
@@ -227,19 +252,19 @@ const docked = mode === 'docked';
   .flap-edge__blur--1 {
     backdrop-filter: blur(1px);
     -webkit-backdrop-filter: blur(1px);
-    mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), transparent 100%);
   }
 
   .flap-edge__blur--2 {
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-    mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 75%);
+    mask-image: linear-gradient(to bottom, #000 calc(var(--flap-h) + 12px), transparent calc(var(--flap-h) + 32px));
   }
 
   .flap-edge__blur--3 {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 50%);
+    mask-image: linear-gradient(to bottom, #000 var(--flap-h), transparent calc(var(--flap-h) + 16px));
   }
 
   .flap-slot[data-stuck='true'] .flap-edge {

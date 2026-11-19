@@ -77,6 +77,9 @@
   --color-lime-300-60: rgba(191,229,77,0.60);
 
   /* Radius, stroke */
+  --shadow-button-primary-hover: inset 0 8px 20px 0 rgba(141,166,59,0.50);
+  --shadow-button-primary-pressed: inset 0 8px 20px 0 rgba(121,143,51,0.50);
+  --shadow-card-hover: 0 0 12px 0 rgba(10,10,10,0.10), 0 4px 4px 0 rgba(250,250,250,0.10);
   --radius-none: 0px;
   --radius-xs: 2px;
   --radius-sm: 8px;
@@ -230,19 +233,19 @@
   }
 }
 
-/* Compact buttons from the mobile frame down through 360px. */
-@media (max-width: 390px) {
+/* Mobile buttons (Figma Button, Breakpoint=Mobile) below the tablet breakpoint. */
+@media (max-width: 767px) {
   :root {
     --button-height: 40px;
-    --button-font-size: 16px;
-    --button-line-height: 20px;
+    --button-font-size: 14px;
+    --button-line-height: 24px;
     --button-padding-y: 8px;
-    --button-padding-x: 8px;
-    --button-padding-icon: 8px;
-    --button-padding-end: 12px;
+    --button-padding-x: 12px;
+    --button-padding-icon: 12px;
+    --button-padding-end: 16px;
     --button-gap: 8px;
-    --button-icon: 16px;
-    --button-tracking: -0.32px;
+    --button-icon: 20px;
+    --button-tracking: -0.16px;
   }
 }
 

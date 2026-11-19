@@ -79,6 +79,9 @@ for (const [name, value] of colorVars) {
 }
 
 rootDecls.push(['/* Radius, stroke */', null]);
+for (const [name, value] of Object.entries(primitive.shadow ?? {})) {
+  rootDecls.push([`--shadow-${name}`, value]);
+}
 for (const [name, value] of Object.entries(primitive.radius)) {
   rootDecls.push([`--radius-${name}`, value]);
 }
@@ -239,8 +242,8 @@ block(
 emit('}');
 emit('');
 
-emit('/* Compact buttons from the mobile frame down through 360px. */');
-emit('@media (max-width: 390px) {');
+emit('/* Mobile buttons (Figma Button, Breakpoint=Mobile) below the tablet breakpoint. */');
+emit('@media (max-width: 767px) {');
 block(':root', buttonDecls('mobile'), '  ');
 emit('}');
 emit('');

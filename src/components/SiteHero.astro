@@ -1,0 +1,62 @@
+---
+/**
+ * Hero shared by Work, Playground and About (Figma "WORK" 4033:3766, frame 4026:584).
+ * It is persisted across page changes (transition:persist), so it never reloads or replays.
+ * The headline is split into words so the load-in can reveal them one by one.
+ */
+import Button from './Button.astro';
+import HedgeRow from './HedgeRow.astro';
+import Polaroid from './Polaroid.astro';
+import IffyLogo from '../assets/home/iffy-logo.svg';
+import { contact } from '../data/site';
+
+// [colour, text] runs per line, as in Figma 2116:787 (Lime/300 at 60% vs Neutral/0).
+const lines: Array<Array<['lime' | 'paper', string]>> = [
+  [['lime', 'Hi, I’m'], ['paper', 'Ifeanyi Ulasika']],
+  [['lime', 'I design'], ['paper', 'products'], ['lime', 'and build']],
+  [['paper', 'systems that deploy.']],
+];
+
+let wordIndex = 0;
+const words = lines.map((runs) =>
+  runs.flatMap(([tone, text]) => text.split(' ').map((word) => ({ tone, word, index: wordIndex++ }))),
+);
+---
+
+<section class="hero" id="hero" data-hero transition:persist="hero">
+  <div class="hero-clip">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-blobs"></div>
+      <div class="hero-grain"></div>
+    </div>
+    <div class="hero-copy">
+      <span class="hero-logo" data-spin aria-hidden="true">
+        <IffyLogo class="hero-logo__mark" width="64" height="64" />
+      </span>
+      <h1 class="hero-title text-display" data-headline>
+        {
+          words.map((line) => (
+            <span class="hero-line" data-line>
+              <span class="hero-line__inner">
+                {line.map(({ tone, word, index }, i) => (
+                  <>
+                    <span class={`hero-word ${tone}`} style={`--w: ${index}`}>
+                      <span class="hero-word__inner">{word}</span>
+                    </span>
+                    {i < line.length - 1 ? ' ' : ''}
+                  </>
+                ))}
+              </span>
+            </span>
+          ))
+        }
+        <Polaroid photo="at-sea" class="hero-polaroid" displayWidth={132} eager />
+      </h1>
+      <div class="hero-cta">
+        <Button href={contact.mail} label="Shoot me a message" variant="secondary" />
+        <Button href={contact.resume} label="View resume" variant="primary" icon="trailing" newTab />
+      </div>
+    </div>
+    <HedgeRow place="hero" />
+  </div>
+</section>

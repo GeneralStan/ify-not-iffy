@@ -60,18 +60,11 @@
 }
 
 /* ===== Shared scale =====
-   Hedges are laid out against a 720px reference (the hero flap row, Figma 4029:2505) that shrinks
-   with the viewport, so their spacing matches the frame at every width. */
+   Desktop hedges are laid out against a 720px reference (the hero flap row, Figma 4029:2505) that
+   shrinks with the viewport, so their spacing matches the frame at every width. Below 768px the
+   Figma Mobile variants are used instead, sized to the 390 frame. */
 :root {
   --hedge-base: min(720px, 100vw);
-  /* Hedges keep Figma's spacing; on phones they are drawn larger so they still read. */
-  --hedge-scale: 1;
-}
-
-@media (max-width: 767px) {
-  :root {
-    --hedge-scale: 1.45;
-  }
 }
 
 /* ===== Hero logo (Figma 4026:590) ===== */
@@ -140,20 +133,48 @@
 
 /* ===== Hero load-in =====
    html.intro-wait: hidden until the font and polaroid are ready (BaseLayout + hero-intro.ts).
-   html.intro-play: the sequence below. Lines rise from behind a mask that only clips their bottom edge,
-   so the polaroid above line 1 is never cut. */
+   html.intro-play: the sequence below, timed from the moment the fonts are ready.
+     0      logo pops in and spins (2s)
+     200    headline words rise one by one from a bottom-edge mask, 70ms apart
+     600    polaroid grows from 0 to 120% and settles to 100% where it sits
+     1050   CTA buttons rise, one after the other
+     1200   flaps slide up from behind the hero's bottom edge (no fade), 60ms apart
+     ~1940  at 90% of the flap sequence the hedges pop up from behind the flaps, all at once
+   The hedge pop is triggered from hero-intro.ts (HEDGE_POP_AT) by adding .is-popped. */
 .intro-wait .hero-logo,
-.intro-wait .hero-line__inner,
+.intro-wait .hero-word__inner,
 .intro-wait .hero-polaroid,
-.intro-wait .hero-cta,
-.intro-wait .hedge-row--hero .hedge,
-.intro-wait .flap {
+.intro-wait .hero-cta > * {
   opacity: 0;
 }
 
-.intro-wait .hero-line,
-.intro-play .hero-line {
-  clip-path: inset(-3em -100vw -0.2em -100vw);
+.intro-wait .flap,
+.intro-play .flap {
+  translate: 0 var(--flap-h-tall);
+}
+
+.intro-wait .flap-list,
+.intro-play .flap-list {
+  /* The list is zero-height and its top edge is the line, so this hides anything below the line. */
+  clip-path: inset(-400px -100vw 0 -100vw);
+}
+
+.intro-wait .hedges--hero .hedge,
+.intro-play .hedges--hero:not(.is-popped) .hedge {
+  scale: 0;
+}
+
+.hero-word {
+  display: inline-block;
+}
+
+.hero-word__inner {
+  display: inline-block;
+}
+
+.intro-wait .hero-word,
+.intro-play .hero-word {
+  clip-path: inset(-1.5em -0.5em 0 -0.5em);
 }
 
 .intro-play .hero-logo {
@@ -161,53 +182,43 @@
   animation: intro-pop 500ms var(--motion-ease-enter) both;
 }
 
-.intro-play .hero-line__inner {
-  animation: intro-line var(--motion-duration-reveal) var(--motion-ease-enter) both;
+.intro-play .hero-word__inner {
+  animation: intro-word 760ms var(--motion-ease-enter) both;
+  animation-delay: calc(200ms + var(--w) * 70ms);
 }
-
-.intro-play .hero-line:nth-child(1) .hero-line__inner { animation-delay: 150ms; }
-.intro-play .hero-line:nth-child(2) .hero-line__inner { animation-delay: 240ms; }
-.intro-play .hero-line:nth-child(3) .hero-line__inner { animation-delay: 330ms; }
 
 .intro-play .hero-polaroid {
-  animation: intro-polaroid 760ms var(--motion-ease-enter) 1000ms both;
+  animation: intro-polaroid 760ms 600ms both;
 }
 
-.intro-play .hero-cta {
-  animation: intro-rise 700ms var(--motion-ease-enter) 650ms both;
+.intro-play .hero-cta > * {
+  animation: intro-rise 700ms var(--motion-ease-enter) both;
 }
+
+.intro-play .hero-cta > :nth-child(1) { animation-delay: 1050ms; }
+.intro-play .hero-cta > :nth-child(2) { animation-delay: 1130ms; }
 
 .intro-play .flap {
-  animation: intro-rise 700ms var(--motion-ease-enter) both;
-  animation-delay: calc(1050ms + var(--i) * 70ms);
+  animation: intro-flap 700ms var(--motion-ease-enter) both;
+  animation-delay: calc(1200ms + var(--i) * 60ms);
 }
-
-.intro-play .hedge-row--hero .hedge {
-  animation: intro-hedge 1000ms var(--motion-ease-enter) both;
-}
-
-.intro-play .hedge-row--hero .hedge:nth-child(1) { animation-delay: 700ms; }
-.intro-play .hedge-row--hero .hedge:nth-child(2) { animation-delay: 745ms; }
-.intro-play .hedge-row--hero .hedge:nth-child(3) { animation-delay: 790ms; }
-.intro-play .hedge-row--hero .hedge:nth-child(4) { animation-delay: 835ms; }
-.intro-play .hedge-row--hero .hedge:nth-child(5) { animation-delay: 880ms; }
-.intro-play .hedge-row--hero .hedge:nth-child(6) { animation-delay: 925ms; }
-.intro-play .hedge-row--hero .hedge:nth-child(7) { animation-delay: 970ms; }
 
 @keyframes intro-pop {
   from { opacity: 0; transform: scale(0.6); }
   to { opacity: 1; transform: none; }
 }
 
-@keyframes intro-line {
-  from { opacity: 0; transform: translateY(130%); filter: blur(6px); }
-  60% { filter: blur(0); }
-  to { opacity: 1; transform: none; filter: none; }
+@keyframes intro-word {
+  from { opacity: 0; transform: translateY(110%); }
+  30% { opacity: 1; }
+  to { opacity: 1; transform: none; }
 }
 
+/* Grows out of its own spot: 0 → 120% → 100%. */
 @keyframes intro-polaroid {
-  from { opacity: 0; transform: translateY(-0.5em) rotate(12deg) scale(1.12); }
-  to { opacity: 1; transform: none; }
+  0% { opacity: 1; transform: scale(0); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  62% { transform: scale(1.2); animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes intro-rise {
@@ -215,9 +226,9 @@
   to { opacity: 1; transform: none; }
 }
 
-@keyframes intro-hedge {
-  from { opacity: 0; transform: translateY(38%); }
-  to { opacity: 1; transform: none; }
+@keyframes intro-flap {
+  from { translate: 0 var(--flap-h-tall); }
+  to { translate: 0 0; }
 }
 
 .hero-cta,
@@ -237,26 +248,54 @@
   pointer-events: none;
 }
 
+/* ===== Hedges (Figma 4029:2552) ===== */
 .hedge-row {
   position: absolute;
   z-index: 2;
-  overflow: hidden;
   aspect-ratio: var(--canvas-w) / var(--canvas-h);
   pointer-events: none;
 }
 
-/* Figma 4026:599: 1104 wide, left edge 198px left of the nav's left edge, cut by the hero bottom. */
-.hedge-row--hero {
-  bottom: 0;
-  left: calc(50% - (552 * var(--hedge-scale) + 6) / 720 * var(--hedge-base));
-  width: calc(1104 / 720 * var(--hedge-base) * var(--hedge-scale));
+.hedge-row--mobile {
+  display: none;
 }
 
-/* Figma 4026:1167: same scale as the hero row, cut by the footer bottom. */
-.hedge-row--footer {
-  bottom: 0;
-  left: calc(50% - (604.5 * var(--hedge-scale) - 8.5) / 720 * var(--hedge-base));
-  width: calc(1209 / 720 * var(--hedge-base) * var(--hedge-scale));
+/* Hero, Desktop: 1104x289 at x162 y624 of the 1440x800 frame, so it is cut 113px by the hero bottom. */
+.hedges--hero .hedge-row--desktop {
+  bottom: calc(-113.47 / 720 * var(--hedge-base));
+  left: calc(50% - (551.9 + 6.1) / 720 * var(--hedge-base));
+  width: calc(1103.81 / 720 * var(--hedge-base));
+}
+
+/* Footer, Desktop: 1200x322 at x124 y466 of the 1440x680 footer, cut 108px by its bottom. */
+.hedges--footer .hedge-row--desktop {
+  bottom: calc(-108 / 720 * var(--hedge-base));
+  left: calc(50% - (600 - 4) / 720 * var(--hedge-base));
+  width: calc(1200 / 720 * var(--hedge-base));
+}
+
+@media (max-width: 767px) {
+  .hedge-row--desktop {
+    display: none;
+  }
+
+  .hedge-row--mobile {
+    display: block;
+  }
+
+  /* Hero, Mobile: 334x74 for a 390 frame. The bushes tuck 14px behind the flaps so the letters show. */
+  .hedges--hero .hedge-row--mobile {
+    bottom: calc(var(--flap-h) - 14px);
+    left: calc(50% - 167 / 390 * 100vw);
+    width: calc(334 / 390 * 100vw);
+  }
+
+  /* Footer, Mobile: 435x105, wider than the screen, centred and cut by the bottom edge like desktop. */
+  .hedges--footer .hedge-row--mobile {
+    bottom: calc(-35 / 390 * 100vw);
+    left: calc(50% - 217.5 / 390 * 100vw);
+    width: calc(435 / 390 * 100vw);
+  }
 }
 
 .hedge {
@@ -272,6 +311,7 @@
   background: none;
   color: inherit;
   pointer-events: auto;
+  transform-origin: 50% 100%;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -332,29 +372,22 @@
   40% { opacity: 0.72; }
 }
 
-/* ===== Footer hedges pop out of the bottom edge =====
-   Each bush rises from below with a ~4% overshoot, middle first, 70ms apart. Plays once. */
-.hedge-row--footer.is-armed .hedge {
-  translate: 0 105%;
+/* ===== Hedge pop (hero intro and footer) =====
+   The whole row at once: each bush grows from its base behind the flaps / bottom edge, overshoots
+   to 110%, dips a touch under, and settles at 100%. */
+.hedges--footer.is-armed:not(.is-popped) .hedge {
+  scale: 0;
 }
 
-.hedge-row--footer.is-popped .hedge {
-  animation: hedge-pop 820ms both;
-  animation-delay: calc(var(--from-middle) * 70ms);
+.hedges.is-popped .hedge {
+  animation: hedge-pop 680ms both;
 }
 
 @keyframes hedge-pop {
-  0% {
-    translate: 0 105%;
-    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
-  }
-  62% {
-    translate: 0 -4%;
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  100% {
-    translate: 0 0;
-  }
+  0% { scale: 0; animation-timing-function: cubic-bezier(0.2, 0.8, 0.35, 1); }
+  58% { scale: 1.1; animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  80% { scale: 0.98; animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  100% { scale: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -364,9 +397,33 @@
   }
 }
 
-.page {
+/* ===== Page body =====
+   Each page has its own body colour (Figma: Work Stone/0, Playground #F7ECF8, About #D5E6F6),
+   set on <html data-page> so the docked flaps' edge fade can use it too. */
+:root[data-page='work'] {
+  --page-bg: var(--color-stone-0);
+  --page-ink: var(--color-neutral-950);
+}
+
+:root[data-page='playground'] {
+  --page-bg: var(--color-plum-100);
+  --page-ink: var(--color-plum-900);
+}
+
+:root[data-page='about'] {
+  --page-bg: #d5e6f6;
+  --page-ink: var(--color-blue-900);
+}
+
+.page-body {
   min-height: 100svh;
-  padding: calc(var(--flap-h-tall) + 48px + env(safe-area-inset-top, 0px)) 16px 64px;
+  background: var(--page-bg);
+  color: var(--page-ink);
+}
+
+.page-intro {
+  padding: calc(var(--flap-h-tall) + 72px) 16px 120px;
+  text-align: center;
 }
 
 .page-title,
@@ -374,27 +431,12 @@
   margin: 0;
 }
 
-.page-title {
-  text-align: center;
-}
-
 .page-lead {
-  margin-top: 12px;
-  text-align: center;
-}
-
-.page--playground {
-  background: var(--color-plum-200);
-  color: var(--color-plum-900);
-}
-
-.page--about {
-  background: var(--color-blue-300);
-  color: var(--color-blue-900);
+  margin-top: 16px;
+  opacity: 0.8;
 }
 
 .projects {
-  background: var(--color-stone-0);
   color: var(--color-neutral-950);
   scroll-margin-top: 88px;
 }
@@ -425,10 +467,41 @@
   color: var(--color-stone-700);
 }
 
+/* ===== Case study cards =====
+   Figma 4026:619: two columns of 604, 32 apart; the right column starts 124 lower and cards in a
+   column are 124 apart. Phones: one column in reading order 1, 2, 3, 4. */
 .card-board {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+}
+
+.card-column {
+  display: contents;
+}
+
+.card-column .project-card {
+  order: var(--order);
+}
+
+@media (min-width: 768px) {
+  .card-board {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: clamp(20px, 2.6vw, 32px);
+  }
+
+  .card-column {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    flex-direction: column;
+    gap: clamp(48px, 8.6vw, 124px);
+  }
+
+  .card-column--2 {
+    padding-top: clamp(48px, 8.6vw, 124px);
+  }
 }
 
 .project-card {
@@ -445,16 +518,14 @@
 /* Figma "Case Study Card" (4033:3512), State=Hover: two soft shadows, nothing moves. */
 @media (hover: hover) and (pointer: fine) {
   .project-card:hover {
-    box-shadow:
-      0 0 12px var(--color-shadow-10),
-      0 4px 4px var(--color-highlight-10);
+    box-shadow: var(--shadow-card-hover);
   }
 }
 
 .project-card__media {
   position: relative;
   overflow: hidden;
-  height: 220px;
+  aspect-ratio: 556 / 400; /* Figma image area 556x400 */
   background: var(--color-stone-100);
   border: 1px solid rgba(240, 237, 229, 0.6);
   border-radius: 8px 2px 2px 8px;
@@ -553,7 +624,7 @@
   padding-block: 8px;
 }
 
-.hedge-row--footer {
+.hedges--footer .hedge-row {
   z-index: 1;
 }
 
@@ -568,19 +639,11 @@
     padding-top: 96px;
   }
 
-  .card-board {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-
   .project-card {
     padding: 20px;
     gap: 24px;
   }
 
-  .project-card__media {
-    height: 280px;
-  }
 
   .site-footer {
     min-height: 640px;
@@ -615,30 +678,11 @@
     max-width: none;
   }
 
-  .card-board {
-    position: relative;
-    display: block;
-    width: 1240px;
-    height: 1384px;
-  }
-
   .project-card {
-    position: absolute;
-    width: 604px;
-    height: 568px;
     padding: 24px;
     gap: 32px;
   }
 
-  .project-card--1 { top: 0; left: 0; }
-  .project-card--2 { top: 124px; left: 636px; }
-  .project-card--3 { top: 692px; left: 0; }
-  .project-card--4 { top: 816px; left: 636px; }
-
-  .project-card__media {
-    height: 400px;
-    flex: 0 0 400px;
-  }
 
   .site-footer {
     height: 680px;
@@ -659,7 +703,7 @@
 
   .hero-copy {
     margin: auto;
-    padding: 56px 0 calc(176 / 720 * var(--hedge-base) * var(--hedge-scale) + 32px);
+    padding: 56px 0 calc(var(--flap-h) + 96px);
     gap: 24px;
   }
 

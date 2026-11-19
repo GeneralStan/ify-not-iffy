@@ -1,16 +1,14 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import FlapNav from '../../components/FlapNav.astro';
-import '../../styles/home.css';
+import SiteLayout from '../../layouts/SiteLayout.astro';
 ---
 
-<BaseLayout
+<SiteLayout
+  page="playground"
   title="Playground — Ifeanyi Ulasika"
   description="Experiments and side projects from Ifeanyi Ulasika. Coming soon."
 >
-  <FlapNav current="playground" mode="docked" />
-  <main class="page page--playground" id="content">
-    <h1 class="page-title text-h1">Playground</h1>
-    <p class="page-lead text-body">Coming soon</p>
-  </main>
-</BaseLayout>
+  <section class="page-intro">
+    <h2 class="page-title text-h1">Playground</h2>
+    <p class="page-lead text-h2">Coming soon</p>
+  </section>
+</SiteLayout>

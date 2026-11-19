@@ -19,13 +19,16 @@ This project keeps its motion knowledge in `.claude/skills/`. Start here, then o
 - `--motion-ease-spin` `cubic-bezier(0.3, 0, 0.1, 1)`: short ease-in, long settle. Used by the logo.
 - Durations: `--motion-duration-reveal` 900ms (text lines), `--motion-duration-spin` 2000ms, `--motion-duration-pop` 720ms, plus `fast/base/slow/flap/hedge`.
 
-## Hero load-in (home only)
+## Hero load-in (first load only)
 
-`BaseLayout intro` adds `html.intro-wait` before paint (motion allowed only). `hero-intro.ts` waits for the fonts and the polaroid (capped at 1.8s), then swaps to `html.intro-play`:
+`BaseLayout intro` adds `html.intro-wait` before paint (motion allowed, first load only; page changes keep the hero). `hero-intro.ts` waits for the fonts and the polaroid (capped at 1.8s), then swaps to `html.intro-play`:
 
-1. Logo pops in (500ms) and spins one turn over 2s on `--motion-ease-spin`.
-2. The three headline lines rise from a bottom-edge mask with a blur-to-sharp, 900ms, starting 150 / 240 / 330ms.
-3. CTAs at 650ms, hedges from 700ms (45ms apart), polaroid at 1000ms, flaps from 1050ms (70ms apart).
+1. 0ms: logo pops in (500ms) and spins one turn over 2s on `--motion-ease-spin`.
+2. 200ms: headline words rise one by one from a bottom-edge mask, 70ms apart, 760ms each.
+3. 600ms: the hero polaroid grows out of its own spot, 0 → 120% → 100% (no drop, no fade).
+4. 1050 / 1130ms: the two CTA buttons rise in turn.
+5. 1200ms: flaps slide up from behind the hero's bottom edge, 60ms apart, with no fade (clipped at the line).
+6. ~1940ms (90% of the flap sequence, `HEDGE_POP_AT`): the hero hedges pop up from behind the flaps, all at once.
 
 A 3s inline timeout always removes `intro-wait`, so the page can never stay hidden.
 
@@ -33,13 +36,14 @@ A 3s inline timeout always removes `intro-wait`, so the page can never stay hidd
 
 - **Logo** (hero and docked): hover (fine pointer) or tap replays one 1.6s spin; a running spin is never restarted. The petals' hub is at (32, 33.22) of the 64 box, so the SVG spins with `transform-origin: 50% 51.9%`. Spinning around the box middle makes it bob.
 - **Polaroid** (`Polaroid.astro`, any photo in `src/assets/polaroids/`): hover (fine pointer) scales the card to 1.1. Click or tap pops it to 1.2 and back (720ms, enter ease up, in-out down; the peak is divided by the hover scale so it never reaches 1.32) while a white sheen sweeps across once (`::before`, 760ms). Only the visible card takes the pointer, not the PNG's transparent margin. The Figma frames crop the middle ~65% of each PNG, so a Figma rect of 85x96 means a 131.8x148 PNG box.
-- **Hedges**: tap shakes the bush and rustles its neighbours. Footer hedges pop up out of the bottom edge once, the first time the footer is 35% visible: middle bush first, 70ms apart, 820ms, rising to −4% then settling (the one place a small overshoot is allowed).
+- **Hedges** (Figma `Hedges` 4029:2552, Desktop and Mobile variants, data in `src/data/hedges.ts`): tap shakes the bush and rustles its neighbours. The pop (`hedge-pop`, 680ms) is the whole row at once: each bush grows from its base, 0 → 110% → 98% → 100%, a small bounce. The hero plays it during the intro; the footer plays it once, the first time its hedges are 30% visible.
 - **Flap nav** (`FlapNav.astro`, Figma component sets 4031:2832 / 4029:2506 / 4031:3203):
   - The slot is a zero-height `position: sticky; top: 0` line right under the hero. Hero flaps stand on it; docked flaps hang from it.
-  - Docking is a hinge. Each flap is a two-sided card that rotates `rotate: x 180deg` around the line (760ms, `cubic-bezier(0.55,0,0.15,1)`, Work → About 80ms apart; undocking runs About → Work). The row slides right by `--dock-shift` at the same time, and the 48px logo fades in at the bar's left. It triggers when the line rises into the top 30% of the screen (48px hysteresis).
+  - Docking is a hinge. Each flap is a two-sided card that rotates `rotate: x 180deg` around the line (760ms, `cubic-bezier(0.55,0,0.15,1)`, Work → About 80ms apart; undocking runs About → Work). The row slides right by `--dock-shift` at the same time, and the 48px logo fades in at the bar's left. It triggers only when the line reaches the top of the screen (the hero is fully gone) and reverses once the line is 24px back down.
   - Hover: the shape stretches from 66 to 80 (`scale: 1 80/66`) away from the line, and the label moves 7 with it. Hero flaps grow up, docked flaps grow down. 240ms enter ease.
   - Press: Pressed colour, 80 tall, `scale: 0.96`. Release springs back (`cubic-bezier(0.34,1.4,0.64,1)`); the page navigates 220ms after release.
-  - Once stuck, a scroll-edge band (page colour gradient plus three masked `backdrop-filter` layers, 1/3/8px) softens content sliding under the bar. There is no plate behind the flaps.
+  - Once stuck, a scroll-edge band fills the flaps' height with the page colour, then fades and un-blurs over the 48px just below them, so content disappears under the flaps and softens just beneath. There is no plate in a different colour.
+- **Pages** (`SiteLayout.astro`): Work, Playground and About share the hero, flaps and footer, which persist across page changes (Astro `ClientRouter` + `transition:persist`). Changing page swaps only `<main>` with a fade, `<html data-page>` sets the page colour, and the current flap updates in place (its colours and height transition). Leaving from the docked view lands docked on the new page, with the hero just above.
 
 ## House rules
 

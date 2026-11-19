@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import { withBase } from '../lib/url';
 
 interface Props {
@@ -7,9 +8,11 @@ interface Props {
   description: string;
   /** Pages with the animated hero hide it until hero-intro.ts plays the load-in. */
   intro?: boolean;
+  /** Sets <html data-page>, which drives the page colour and the current flap. */
+  page?: string;
 }
 
-const { title, description, intro = false } = Astro.props;
+const { title, description, intro = false, page } = Astro.props;
 const exatExtraLight = withBase('/fonts/exatcyr-extralight.otf');
 const exatLight = withBase('/fonts/exatcyr-light.otf');
 const exatRegular = withBase('/fonts/exatcyr-regular.otf');
@@ -20,7 +23,7 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-page={page}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -38,14 +41,17 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
       @font-face { font-family: "Exat CYR"; src: local("Exat CYR Black"), url("${exatBlack}") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
     `}></style>
     {intro && <script is:inline>
-      // Hide the hero for its load-in only when motion is allowed and JS runs.
+      // Hide the hero for its load-in only when motion is allowed and JS runs, and only on the
+      // first load: page changes keep the hero (ClientRouter), so it must not hide again.
       // hero-intro.ts removes the class; the timeout is a safety net.
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (!window.__ifyIntroSeen && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.__ifyIntroSeen = true;
         document.documentElement.classList.add('intro-wait');
         setTimeout(function () { document.documentElement.classList.remove('intro-wait'); }, 3000);
       }
     </script>}
     <title>{title}</title>
+    <ClientRouter />
   </head>
   <body>
     <a class="skip text-label" href="#content">Skip to content</a>
