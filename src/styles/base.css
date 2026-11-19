@@ -6,6 +6,7 @@ html {
   font-weight: var(--font-weight-regular);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
 }
 
 body {
@@ -100,5 +101,6 @@ a {
     --motion-duration-base: 0ms;
     --motion-duration-slow: 0ms;
     --motion-duration-flap: 0ms;
+    --motion-duration-hedge: 0ms;
   }
 }

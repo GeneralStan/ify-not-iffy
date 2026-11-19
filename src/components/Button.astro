@@ -28,17 +28,17 @@ const { href, label, variant = 'primary', icon = 'none', newTab = false } = Astr
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    height: 48px;
-    padding: 12px 16px;
+    gap: var(--button-gap);
+    height: var(--button-height);
+    padding: var(--button-padding-y) var(--button-padding-x);
     border-radius: 100px;
     border: 1px solid transparent;
     font-family: var(--font-body);
-    font-size: 16px;
+    font-size: var(--button-font-size);
     font-weight: var(--font-weight-medium);
     font-style: normal;
-    line-height: 24px;
-    letter-spacing: -0.32px;
+    line-height: var(--button-line-height);
+    letter-spacing: var(--button-tracking);
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
@@ -49,11 +49,11 @@ const { href, label, variant = 'primary', icon = 'none', newTab = false } = Astr
   }
 
   .btn--trailing {
-    padding: 12px 16px 12px 20px;
+    padding: var(--button-padding-y) var(--button-padding-icon) var(--button-padding-y) var(--button-padding-end);
   }
 
   .btn--leading {
-    padding: 12px 20px 12px 16px;
+    padding: var(--button-padding-y) var(--button-padding-end) var(--button-padding-y) var(--button-padding-icon);
   }
 
   .btn--primary {
@@ -96,8 +96,8 @@ const { href, label, variant = 'primary', icon = 'none', newTab = false } = Astr
 
   .btn :global(svg) {
     display: block;
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
+    width: var(--button-icon);
+    height: var(--button-icon);
+    flex: 0 0 var(--button-icon);
   }
 </style>

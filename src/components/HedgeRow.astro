@@ -1,0 +1,74 @@
+---
+import { footerHedges, heroHedges } from '../data/hedges';
+
+interface Props {
+  place: 'hero' | 'footer';
+}
+
+const { place } = Astro.props;
+const set = place === 'hero' ? heroHedges : footerHedges;
+---
+
+<div
+  class:list={['hedge-row', `hedge-row--${place}`]}
+  data-hedge-row
+  style={`--canvas-w: ${set.width}; --canvas-h: ${set.height};`}
+>
+  {
+    set.bushes.map((bush) => (
+      <button
+        type="button"
+        class="hedge"
+        data-hedge
+        aria-label={`Hedge letter ${bush.letter}`}
+        style={`--x: ${bush.x}; --y: ${bush.y}; --w: ${bush.w}; --h: ${bush.h};`}
+      >
+        <span class="hedge__plant">
+          <svg viewBox={`${bush.x} ${bush.y} ${bush.w} ${bush.h}`} aria-hidden="true" focusable="false">
+            {bush.paths.map((path) => (
+              <path d={path.d} fill={path.fill} />
+            ))}
+          </svg>
+        </span>
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function play(plant: HTMLElement, kind: 'shake' | 'rustle') {
+    plant.classList.remove('is-shaking', 'is-rustling', 'is-settling');
+    void plant.offsetWidth;
+    if (reducedQuery.matches) {
+      if (kind === 'shake') plant.classList.add('is-settling');
+      return;
+    }
+    plant.classList.add(kind === 'shake' ? 'is-shaking' : 'is-rustling');
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const button = target.closest('[data-hedge]');
+    if (!(button instanceof HTMLButtonElement)) return;
+    const row = button.closest('[data-hedge-row]');
+    if (!row) return;
+    const hedges = [...row.querySelectorAll('[data-hedge]')];
+    const index = hedges.indexOf(button);
+    hedges.forEach((hedge, hedgeIndex) => {
+      const distance = Math.abs(hedgeIndex - index);
+      if (distance > 1) return;
+      const plant = hedge.querySelector('.hedge__plant');
+      if (!(plant instanceof HTMLElement)) return;
+      play(plant, distance === 0 ? 'shake' : 'rustle');
+    });
+  });
+
+  document.addEventListener('animationend', (event) => {
+    const plant = event.target;
+    if (!(plant instanceof HTMLElement) || !plant.classList.contains('hedge__plant')) return;
+    plant.classList.remove('is-shaking', 'is-rustling', 'is-settling');
+  });
+</script>

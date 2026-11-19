@@ -123,22 +123,58 @@ rootDecls.push(['--grid-columns', 'var(--grid-columns-desktop)']);
 rootDecls.push(['--grid-gutter', 'var(--grid-gutter-desktop)']);
 rootDecls.push(['--grid-margin', 'var(--grid-margin-desktop)']);
 
-rootDecls.push(['/* Type roles, desktop. Mobile overrides sit under the tablet breakpoint. */', null]);
+rootDecls.push(['/* Type roles. Sizes fluidly scale from 390 to 1440. Line-height is a unitless ratio when the role has lineHeightRatio, so leading stays proportional. */', null]);
 
-function typeDecls(mode) {
+function fluidLength(mobileValue, desktopValue) {
+  const mobile = pxNumber(mobileValue);
+  const desktop = pxNumber(desktopValue);
+  if (mobile === desktop) return `${mobile}px`;
+  const slope = (desktop - mobile) / (1440 - 390);
+  const slopeText = Number(slope.toFixed(5)).toString();
+  return `clamp(${mobile}px, calc(${mobile}px + (100vw - 390px) * ${slopeText}), ${desktop}px)`;
+}
+
+function typeDecls() {
   const decls = [];
   for (const [role, spec] of Object.entries(typography.roles)) {
-    const values = spec[mode];
+    if (spec.mobile.tracking !== spec.desktop.tracking) {
+      throw new Error(`${role} tracking must be the same percentage at both breakpoints`);
+    }
     decls.push([`--type-${role}-family`, `var(--font-${spec.family})`]);
     decls.push([`--type-${role}-weight`, `var(--font-weight-${spec.weight})`]);
-    decls.push([`--type-${role}-size`, values.size]);
-    decls.push([`--type-${role}-line-height`, values.lineHeight]);
-    decls.push([`--type-${role}-tracking`, percentToEm(values.tracking)]);
+    decls.push([`--type-${role}-size`, fluidLength(spec.mobile.size, spec.desktop.size)]);
+    if (typeof spec.lineHeightRatio === 'number') {
+      decls.push([`--type-${role}-line-height`, String(spec.lineHeightRatio)]);
+    } else {
+      decls.push([
+        `--type-${role}-line-height`,
+        fluidLength(spec.mobile.lineHeight, spec.desktop.lineHeight),
+      ]);
+    }
+    decls.push([`--type-${role}-tracking`, percentToEm(spec.desktop.tracking)]);
   }
   return decls;
 }
 
-rootDecls.push(...typeDecls('desktop'));
+function buttonDecls(mode) {
+  const spec = primitive.button[mode];
+  return [
+    ['--button-height', spec.height],
+    ['--button-font-size', spec.fontSize],
+    ['--button-line-height', spec.lineHeight],
+    ['--button-padding-y', spec.paddingY],
+    ['--button-padding-x', spec.paddingX],
+    ['--button-padding-icon', spec.paddingIcon],
+    ['--button-padding-end', spec.paddingEnd],
+    ['--button-gap', spec.gap],
+    ['--button-icon', spec.icon],
+    ['--button-tracking', spec.tracking],
+  ];
+}
+
+rootDecls.push(...typeDecls());
+rootDecls.push(['/* Buttons, desktop. The 390px size is overridden below. */', null]);
+rootDecls.push(...buttonDecls('desktop'));
 rootDecls.push([
   '--type-nav-active-weight',
   `var(--font-weight-${typography.navActiveWeight})`,
@@ -156,14 +192,14 @@ for (const [name, value] of rootDecls) {
 emit('}');
 emit('');
 
-if (primitive.motion.easing.spring) {
-  emit('/* linear() spring is the flap easing. Older engines get a cubic overshoot. */');
+if (String(primitive.motion.easing.spring).includes('linear(')) {
+  emit('/* linear() spring fallback for older engines. */');
   emit('@supports not (transition-timing-function: linear(0, 1)) {');
   block(
     ':root',
     [
-      ['--motion-ease-spring', 'cubic-bezier(0.22, 1.4, 0.36, 1)'],
-      ['--motion-easing-spring', 'cubic-bezier(0.22, 1.4, 0.36, 1)'],
+      ['--motion-ease-spring', 'cubic-bezier(0.16, 1, 0.3, 1)'],
+      ['--motion-easing-spring', 'cubic-bezier(0.16, 1, 0.3, 1)'],
     ],
     '  ',
   );
@@ -189,15 +225,23 @@ block(
 emit('}');
 emit('');
 
-emit(`/* Mobile grid and mobile type, below the ${tabletPx}px tablet breakpoint. */`);
+emit(`/* Mobile grid, below the ${tabletPx}px tablet breakpoint. Type stays fluid. */`);
 emit(`@media (max-width: ${tabletPx - 1}px) {`);
-const mobileDecls = [
-  ['--grid-columns', 'var(--grid-columns-mobile)'],
-  ['--grid-gutter', 'var(--grid-gutter-mobile)'],
-  ['--grid-margin', 'var(--grid-margin-mobile)'],
-  ...typeDecls('mobile'),
-];
-block(':root', mobileDecls, '  ');
+block(
+  ':root',
+  [
+    ['--grid-columns', 'var(--grid-columns-mobile)'],
+    ['--grid-gutter', 'var(--grid-gutter-mobile)'],
+    ['--grid-margin', 'var(--grid-margin-mobile)'],
+  ],
+  '  ',
+);
+emit('}');
+emit('');
+
+emit('/* Compact buttons from the mobile frame down through 360px. */');
+emit('@media (max-width: 390px) {');
+block(':root', buttonDecls('mobile'), '  ');
 emit('}');
 emit('');
 

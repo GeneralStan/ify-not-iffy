@@ -147,11 +147,11 @@ const items = [
   .flap-nav__label {
     position: relative;
     z-index: 1;
-    font-family: var(--font-display);
-    font-weight: var(--font-weight-regular);
-    font-size: 24px;
-    line-height: 32px;
-    letter-spacing: -0.8px;
+    font-family: var(--type-nav-family);
+    font-weight: var(--type-nav-weight);
+    font-size: var(--type-nav-size);
+    line-height: var(--type-nav-line-height);
+    letter-spacing: var(--type-nav-tracking);
   }
 
   .flap-nav__item--work .flap-nav__label {
@@ -281,12 +281,6 @@ const items = [
       flex: 1 1 0;
       width: auto;
       height: 48px;
-    }
-
-    .flap-nav__label {
-      font-size: 18px;
-      line-height: 24px;
-      letter-spacing: -0.6px;
     }
 
     .flap-nav__item--work .flap-nav__label {
