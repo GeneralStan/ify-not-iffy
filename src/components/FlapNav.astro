@@ -1,5 +1,5 @@
 ---
-import { assetSrc } from '../lib/url';
+import { assetSrc, withBase } from '../lib/url';
 import workHero from '../assets/home/nav-flap-work-hero.svg';
 import workDocked from '../assets/home/nav-flap-work-docked.svg';
 import playHero from '../assets/home/nav-flap-playground-hero.svg';
@@ -9,114 +9,143 @@ import aboutDocked from '../assets/home/nav-flap-about-docked.svg';
 
 interface Props {
   current?: 'work' | 'playground' | 'about';
+  /** Hero pages dock on scroll. Other pages start in the docked shape. */
+  mode?: 'hero' | 'docked';
 }
 
-const { current = 'work' } = Astro.props;
+const { current = 'work', mode = 'hero' } = Astro.props;
+
+const plates = {
+  work: 'var(--color-stone-0)',
+  playground: 'var(--color-plum-200)',
+  about: 'var(--color-blue-300)',
+} as const;
 
 const items = [
-  { id: 'work', href: '#work', label: 'Work', hero: workHero, docked: workDocked },
-  { id: 'playground', href: '#playground', label: 'Playground', hero: playHero, docked: playDocked },
-  { id: 'about', href: '#about', label: 'About', hero: aboutHero, docked: aboutDocked },
+  { id: 'work', href: withBase('/'), label: 'Work', hero: workHero, docked: workDocked },
+  { id: 'playground', href: withBase('/playground/'), label: 'Playground', hero: playHero, docked: playDocked },
+  { id: 'about', href: withBase('/about/'), label: 'About', hero: aboutHero, docked: aboutDocked },
 ] as const;
 ---
 
-<nav class="flap-nav" data-flap-nav aria-label="Primary">
-  <ul class="flap-nav__list">
-    {
-      items.map((item) => (
-        <li class={`flap-nav__item flap-nav__item--${item.id}`}>
-          <a
-            class="flap-nav__link"
-            href={item.href}
-            data-section={item.id}
-            aria-current={current === item.id ? 'page' : undefined}
-          >
-            <span class="flap-nav__flap" aria-hidden="true">
-              <img class="flap-nav__shape flap-nav__shape--hero" src={assetSrc(item.hero)} alt="" />
-              <img class="flap-nav__shape flap-nav__shape--docked" src={assetSrc(item.docked)} alt="" />
-            </span>
-            <span class="flap-nav__label">{item.label}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</nav>
+<div class="flap-slot" data-flap-slot data-flap-mode={mode}>
+  <nav
+    class="flap-nav"
+    data-flap-nav
+    data-docked={mode === 'docked' ? 'true' : 'false'}
+    style={`--flap-plate: ${plates[current]}`}
+    aria-label="Primary"
+  >
+    <div class="flap-nav__plate" aria-hidden="true"></div>
+    <ul class="flap-nav__list">
+      {
+        items.map((item) => (
+          <li class={`flap-nav__item flap-nav__item--${item.id}`}>
+            <a
+              class="flap-nav__link"
+              href={item.href}
+              aria-current={current === item.id ? 'page' : undefined}
+            >
+              <span class="flap-nav__flap" aria-hidden="true">
+                <img class="flap-nav__shape flap-nav__shape--hero" src={assetSrc(item.hero)} alt="" />
+                <img class="flap-nav__shape flap-nav__shape--docked" src={assetSrc(item.docked)} alt="" />
+              </span>
+              <span class="flap-nav__label">{item.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
 
 <script>
+  const slot = document.querySelector('[data-flap-slot]');
   const nav = document.querySelector('[data-flap-nav]');
-  const sentinel = document.querySelector('[data-flap-sentinel]');
-  if (nav instanceof HTMLElement && sentinel instanceof Element) {
-    let ready = false;
-    const apply = (docked: boolean) => {
-      const next = docked ? 'true' : 'false';
-      const prev = nav.dataset.docked;
-      nav.dataset.docked = next;
-      if (ready && prev !== next) {
-        nav.dataset.motion = docked ? 'dock' : 'undock';
+
+  if (slot instanceof HTMLElement && nav instanceof HTMLElement && slot.dataset.flapMode === 'hero') {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let docked = slot.getBoundingClientRect().top <= 0;
+    nav.dataset.docked = docked ? 'true' : 'false';
+
+    const apply = (next: boolean) => {
+      if (next === docked) return;
+      docked = next;
+      nav.dataset.docked = docked ? 'true' : 'false';
+      nav.removeAttribute('data-motion');
+      if (docked && !reduced.matches) {
+        void nav.offsetWidth;
+        nav.dataset.motion = 'dock';
       }
     };
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        apply(entry.boundingClientRect.bottom <= 0);
-        ready = true;
-      },
-      { threshold: 0 },
-    );
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      const top = slot.getBoundingClientRect().top;
+      // 12px of hysteresis so iOS rubber-banding does not flicker the shape.
+      apply(docked ? top <= 12 : top <= 0);
+    };
 
-    observer.observe(sentinel);
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(read);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.visualViewport?.addEventListener('resize', onScroll);
+    window.visualViewport?.addEventListener('scroll', onScroll);
+    read();
   }
 </script>
 
 <style>
-  .flap-nav {
-    position: sticky;
-    top: 0;
+  .flap-slot {
+    position: relative;
     z-index: 50;
-    display: flex;
-    justify-content: center;
     width: 100%;
+    height: 0;
+  }
+
+  .flap-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: calc(80 / 720 * min(720px, 100vw));
+    container-type: inline-size;
     pointer-events: none;
-    container-type: scroll-state;
+    background: transparent;
+  }
+
+  .flap-nav__plate {
+    display: none;
   }
 
   .flap-nav__list {
+    position: relative;
+    z-index: 1;
     pointer-events: auto;
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    width: 720px;
-    max-width: 100%;
-    height: 80px;
-    margin: 0;
+    width: min(720px, 100%);
+    height: 100%;
+    margin: 0 auto;
     padding: 0;
     list-style: none;
-    transform: translateY(0);
-    transform-origin: top center;
   }
 
   .flap-nav[data-motion='dock'] .flap-nav__list {
-    animation: flap-dock var(--motion-duration-flap) var(--motion-easing-spring) both;
+    animation: flap-settle var(--motion-duration-flap) var(--motion-ease-out) both;
   }
 
-  .flap-nav[data-motion='undock'] .flap-nav__list {
-    animation: flap-undock var(--motion-duration-flap) var(--motion-easing-spring) both;
-  }
-
-  @keyframes flap-dock {
+  @keyframes flap-settle {
     from {
-      transform: translateY(-20px);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes flap-undock {
-    from {
-      transform: translateY(20px);
+      transform: translateY(-10px);
     }
     to {
       transform: translateY(0);
@@ -124,13 +153,13 @@ const items = [
   }
 
   .flap-nav__item {
-    flex: 0 0 240px;
-    width: 240px;
-    height: 66px;
+    flex: 1 1 0;
+    height: calc(66 / 80 * 100%);
+    min-width: 0;
   }
 
   .flap-nav__item--work {
-    height: 80px;
+    height: 100%;
   }
 
   .flap-nav__link {
@@ -155,14 +184,7 @@ const items = [
   }
 
   .flap-nav__item--work .flap-nav__label {
-    padding-top: 8px;
-  }
-
-  .flap-nav__link[aria-current='page'] .flap-nav__label {
     font-weight: var(--font-weight-medium);
-  }
-
-  .flap-nav__item--work .flap-nav__label {
     color: var(--color-lime-900);
   }
 
@@ -182,39 +204,60 @@ const items = [
   }
 
   .flap-nav__shape {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
+    object-fit: fill;
   }
 
   .flap-nav__shape--docked {
-    display: none;
+    opacity: 0;
   }
 
   .flap-nav[data-docked='true'] {
-    margin-top: 0;
+    position: fixed;
+    top: 0;
+    bottom: auto;
+    justify-content: flex-start;
+    height: auto;
+    pointer-events: auto;
+    background: var(--flap-plate, var(--color-stone-0));
+  }
+
+  .flap-nav[data-docked='true'] .flap-nav__plate {
+    display: block;
+    flex: none;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--flap-plate, var(--color-stone-0));
   }
 
   .flap-nav[data-docked='true'] .flap-nav__list {
     align-items: flex-start;
-    height: 72px;
+    height: calc(66 / 720 * min(720px, 100cqw, 100vw));
+    flex: none;
+  }
+
+  .flap-nav[data-docked='true']::after {
+    content: '';
+    display: block;
+    flex: none;
+    height: calc(6 / 720 * min(720px, 100cqw, 100vw));
+    background: var(--flap-plate, var(--color-stone-0));
   }
 
   .flap-nav[data-docked='true'] .flap-nav__item,
   .flap-nav[data-docked='true'] .flap-nav__item--work {
-    height: 66px;
-  }
-
-  .flap-nav[data-docked='true'] .flap-nav__item--work .flap-nav__label {
-    padding-top: 0;
+    height: 100%;
   }
 
   .flap-nav[data-docked='true'] .flap-nav__shape--hero {
-    display: none;
+    opacity: 0;
   }
 
   .flap-nav[data-docked='true'] .flap-nav__shape--docked {
-    display: block;
+    opacity: 1;
   }
 
   .flap-nav__link:focus-visible {
@@ -222,82 +265,9 @@ const items = [
     outline-offset: 3px;
   }
 
-  @supports (container-type: scroll-state) {
-    @container scroll-state(stuck: top) {
-      .flap-nav__list {
-        align-items: flex-start;
-        height: 72px;
-        animation: flap-dock var(--motion-duration-flap) var(--motion-easing-spring) both;
-      }
-
-      .flap-nav__item,
-      .flap-nav__item--work {
-        height: 66px;
-      }
-
-      .flap-nav__item--work .flap-nav__label {
-        padding-top: 0;
-      }
-
-      .flap-nav__shape--hero {
-        display: none;
-      }
-
-      .flap-nav__shape--docked {
-        display: block;
-      }
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .flap-nav[data-motion='dock'] .flap-nav__list,
-    .flap-nav[data-motion='undock'] .flap-nav__list {
+    .flap-nav[data-motion='dock'] .flap-nav__list {
       animation: none;
-    }
-
-    @supports (container-type: scroll-state) {
-      @container scroll-state(stuck: top) {
-        .flap-nav__list {
-          animation: none;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 767px) {
-    .flap-nav {
-      top: env(safe-area-inset-top, 0px);
-      padding-inline: 16px;
-      box-sizing: border-box;
-    }
-
-    .flap-nav__list {
-      width: 100%;
-      height: 56px;
-    }
-
-    .flap-nav__item,
-    .flap-nav__item--work {
-      flex: 1 1 0;
-      width: auto;
-      height: 48px;
-    }
-
-    .flap-nav__item--work .flap-nav__label {
-      padding-top: 4px;
-    }
-
-    .flap-nav[data-docked='true'] {
-      margin-top: 0;
-    }
-
-    .flap-nav[data-docked='true'] .flap-nav__list {
-      height: 56px;
-    }
-
-    .flap-nav[data-docked='true'] .flap-nav__item,
-    .flap-nav[data-docked='true'] .flap-nav__item--work {
-      height: 48px;
     }
   }
 </style>

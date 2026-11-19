@@ -76,8 +76,9 @@
 }
 
 .hero-title .lime {
-  /* Live Figma fill is solid Lime/300. The 60% token reads too dull on the dark field. */
-  color: var(--color-lime-300);
+  /* Figma 2116:787: Lime/300 #bfe54d at fill opacity 0.6. No layer opacity or blend. */
+  color: var(--color-lime-300-60);
+  color: color-mix(in srgb, var(--color-lime-300) 60%, transparent);
 }
 
 .hero-title .paper {
@@ -218,13 +219,33 @@
   background: var(--color-lime-950);
 }
 
-[data-flap-sentinel] {
-  display: block;
-  width: 100%;
-  height: 1px;
-  margin: -80px 0 -1px;
-  padding: 0;
-  pointer-events: none;
+.page {
+  min-height: 100svh;
+  padding: calc(72 / 720 * min(720px, 100vw) + 48px + env(safe-area-inset-top, 0px)) 16px 64px;
+}
+
+.page-title,
+.page-lead {
+  margin: 0;
+}
+
+.page-title {
+  text-align: center;
+}
+
+.page-lead {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.page--playground {
+  background: var(--color-plum-200);
+  color: var(--color-plum-900);
+}
+
+.page--about {
+  background: var(--color-blue-300);
+  color: var(--color-blue-900);
 }
 
 .projects {
@@ -504,8 +525,14 @@
     min-height: 100svh;
   }
 
-  [data-flap-sentinel] {
-    margin-top: -56px;
+  .hero-bar {
+    display: none;
+  }
+
+  .projects {
+    position: relative;
+    z-index: 1;
+    margin-top: -2px;
   }
 
   .hero-copy {
@@ -532,32 +559,42 @@
 
   .hedge-row--hero,
   .hedge-row--footer {
-    width: 100%;
-    height: 132px;
+    width: 124%;
+    height: 210px;
     aspect-ratio: auto;
-    left: 0;
-    right: 0;
+    left: 50%;
+    right: auto;
     bottom: 0;
     top: auto;
-    transform: none;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     align-items: flex-end;
+    overflow: visible;
   }
 
   .hedge {
     position: relative;
     left: auto;
     top: auto;
-    width: 120px;
-    height: 132px;
+    width: 112px;
+    height: 136px;
     flex: none;
-    margin-left: -56px;
+    margin-left: -46px;
+    transform-origin: bottom center;
   }
 
   .hedge:first-child {
     margin-left: 0;
   }
+
+  .hedge:nth-child(1) { transform: translateY(12px) rotate(-8deg) scale(1.08); }
+  .hedge:nth-child(2) { transform: translateY(-26px) rotate(7deg) scale(0.92); }
+  .hedge:nth-child(3) { transform: translateY(6px) rotate(-4deg) scale(1.16); }
+  .hedge:nth-child(4) { transform: translateY(-32px) rotate(9deg) scale(0.98); }
+  .hedge:nth-child(5) { transform: translateY(16px) rotate(-7deg) scale(1.1); }
+  .hedge:nth-child(6) { transform: translateY(-18px) rotate(5deg) scale(1.14); }
+  .hedge:nth-child(7) { transform: translateY(8px) rotate(-11deg) scale(0.88); }
 
   .site-footer {
     min-height: 520px;
