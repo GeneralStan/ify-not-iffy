@@ -104,14 +104,15 @@
   --motion-duration-base: 280ms;
   --motion-duration-slow: 480ms;
   --motion-duration-flap: 300ms;
+  --motion-duration-hedge: 640ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-easing-out: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --motion-easing-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --motion-ease-spring: linear(0 0%, 0.067 6.25%, 0.223 12.5%, 0.414 18.75%, 0.602 25%, 0.765 31.25%, 0.893 37.5%, 0.984 43.75%, 1.041 50%, 1.071 56.25%, 1.08 62.5%, 1.076 68.75%, 1.064 75%, 1.049 81.25%, 1.033 87.5%, 1.02 93.75%, 1.009 100%);
-  --motion-easing-spring: linear(0 0%, 0.067 6.25%, 0.223 12.5%, 0.414 18.75%, 0.602 25%, 0.765 31.25%, 0.893 37.5%, 0.984 43.75%, 1.041 50%, 1.071 56.25%, 1.08 62.5%, 1.076 68.75%, 1.064 75%, 1.049 81.25%, 1.033 87.5%, 1.02 93.75%, 1.009 100%);
+  --motion-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-easing-spring: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Semantic color. Edit the refs in tokens.json to retune the theme. */
   --color-bg: var(--color-lime-0);
@@ -135,36 +136,36 @@
   --grid-gutter: var(--grid-gutter-desktop);
   --grid-margin: var(--grid-margin-desktop);
 
-  /* Type roles, desktop. Mobile overrides sit under the tablet breakpoint. */
+  /* Type roles. Sizes fluidly scale from 390 to 1440. Line-height is a unitless ratio when the role has lineHeightRatio, so leading stays proportional. */
   --type-display-family: var(--font-display);
   --type-display-weight: var(--font-weight-regular);
-  --type-display-size: 56px;
-  --type-display-line-height: 64px;
+  --type-display-size: clamp(40px, calc(40px + (100vw - 390px) * 0.01524), 56px);
+  --type-display-line-height: 1;
   --type-display-tracking: -0.02em;
   --type-h1-family: var(--font-display);
   --type-h1-weight: var(--font-weight-regular);
-  --type-h1-size: 40px;
-  --type-h1-line-height: 48px;
+  --type-h1-size: clamp(32px, calc(32px + (100vw - 390px) * 0.00762), 40px);
+  --type-h1-line-height: 1;
   --type-h1-tracking: -0.02em;
   --type-h2-family: var(--font-display);
   --type-h2-weight: var(--font-weight-light);
-  --type-h2-size: 32px;
-  --type-h2-line-height: 40px;
+  --type-h2-size: clamp(24px, calc(24px + (100vw - 390px) * 0.01143), 36px);
+  --type-h2-line-height: 1.3333;
   --type-h2-tracking: -0.015em;
   --type-h3-family: var(--font-display);
   --type-h3-weight: var(--font-weight-regular);
-  --type-h3-size: 24px;
-  --type-h3-line-height: 32px;
+  --type-h3-size: clamp(20px, calc(20px + (100vw - 390px) * 0.00381), 24px);
+  --type-h3-line-height: 1;
   --type-h3-tracking: -0.01em;
   --type-nav-family: var(--font-display);
   --type-nav-weight: var(--font-weight-regular);
-  --type-nav-size: 24px;
-  --type-nav-line-height: 32px;
-  --type-nav-tracking: -0.01em;
+  --type-nav-size: clamp(18px, calc(18px + (100vw - 390px) * 0.00571), 24px);
+  --type-nav-line-height: 1.3333;
+  --type-nav-tracking: -0.03333em;
   --type-body-lg-family: var(--font-body);
   --type-body-lg-weight: var(--font-weight-regular);
-  --type-body-lg-size: 18px;
-  --type-body-lg-line-height: 28px;
+  --type-body-lg-size: clamp(16px, calc(16px + (100vw - 390px) * 0.0019), 18px);
+  --type-body-lg-line-height: clamp(24px, calc(24px + (100vw - 390px) * 0.00381), 28px);
   --type-body-lg-tracking: 0em;
   --type-body-family: var(--font-body);
   --type-body-weight: var(--font-weight-regular);
@@ -178,23 +179,27 @@
   --type-label-tracking: -0.01em;
   --type-meta-family: var(--font-mono);
   --type-meta-weight: var(--font-weight-regular);
-  --type-meta-size: 16px;
-  --type-meta-line-height: 24px;
+  --type-meta-size: clamp(14px, calc(14px + (100vw - 390px) * 0.0019), 16px);
+  --type-meta-line-height: clamp(20px, calc(20px + (100vw - 390px) * 0.00381), 24px);
   --type-meta-tracking: 0em;
   --type-caption-family: var(--font-body);
   --type-caption-weight: var(--font-weight-regular);
-  --type-caption-size: 14px;
-  --type-caption-line-height: 20px;
+  --type-caption-size: clamp(12px, calc(12px + (100vw - 390px) * 0.0019), 14px);
+  --type-caption-line-height: clamp(16px, calc(16px + (100vw - 390px) * 0.00381), 20px);
   --type-caption-tracking: 0em;
-  --type-nav-active-weight: var(--font-weight-medium);
-}
 
-/* linear() spring is the flap easing. Older engines get a cubic overshoot. */
-@supports not (transition-timing-function: linear(0, 1)) {
-  :root {
-    --motion-ease-spring: cubic-bezier(0.22, 1.4, 0.36, 1);
-    --motion-easing-spring: cubic-bezier(0.22, 1.4, 0.36, 1);
-  }
+  /* Buttons, desktop. The 390px size is overridden below. */
+  --button-height: 48px;
+  --button-font-size: 16px;
+  --button-line-height: 24px;
+  --button-padding-y: 12px;
+  --button-padding-x: 16px;
+  --button-padding-icon: 16px;
+  --button-padding-end: 20px;
+  --button-gap: 8px;
+  --button-icon: 20px;
+  --button-tracking: -0.32px;
+  --type-nav-active-weight: var(--font-weight-medium);
 }
 
 /* Tablet grid. The desktop frame is 1440px wide, so this starts just below it.
@@ -207,62 +212,28 @@
   }
 }
 
-/* Mobile grid and mobile type, below the 768px tablet breakpoint. */
+/* Mobile grid, below the 768px tablet breakpoint. Type stays fluid. */
 @media (max-width: 767px) {
   :root {
     --grid-columns: var(--grid-columns-mobile);
     --grid-gutter: var(--grid-gutter-mobile);
     --grid-margin: var(--grid-margin-mobile);
-    --type-display-family: var(--font-display);
-    --type-display-weight: var(--font-weight-regular);
-    --type-display-size: 40px;
-    --type-display-line-height: 48px;
-    --type-display-tracking: -0.02em;
-    --type-h1-family: var(--font-display);
-    --type-h1-weight: var(--font-weight-regular);
-    --type-h1-size: 32px;
-    --type-h1-line-height: 40px;
-    --type-h1-tracking: -0.02em;
-    --type-h2-family: var(--font-display);
-    --type-h2-weight: var(--font-weight-light);
-    --type-h2-size: 24px;
-    --type-h2-line-height: 32px;
-    --type-h2-tracking: -0.015em;
-    --type-h3-family: var(--font-display);
-    --type-h3-weight: var(--font-weight-regular);
-    --type-h3-size: 20px;
-    --type-h3-line-height: 28px;
-    --type-h3-tracking: -0.01em;
-    --type-nav-family: var(--font-display);
-    --type-nav-weight: var(--font-weight-regular);
-    --type-nav-size: 18px;
-    --type-nav-line-height: 24px;
-    --type-nav-tracking: -0.01em;
-    --type-body-lg-family: var(--font-body);
-    --type-body-lg-weight: var(--font-weight-regular);
-    --type-body-lg-size: 16px;
-    --type-body-lg-line-height: 24px;
-    --type-body-lg-tracking: 0em;
-    --type-body-family: var(--font-body);
-    --type-body-weight: var(--font-weight-regular);
-    --type-body-size: 16px;
-    --type-body-line-height: 24px;
-    --type-body-tracking: 0em;
-    --type-label-family: var(--font-body);
-    --type-label-weight: var(--font-weight-medium);
-    --type-label-size: 16px;
-    --type-label-line-height: 24px;
-    --type-label-tracking: -0.01em;
-    --type-meta-family: var(--font-mono);
-    --type-meta-weight: var(--font-weight-regular);
-    --type-meta-size: 14px;
-    --type-meta-line-height: 20px;
-    --type-meta-tracking: 0em;
-    --type-caption-family: var(--font-body);
-    --type-caption-weight: var(--font-weight-regular);
-    --type-caption-size: 12px;
-    --type-caption-line-height: 16px;
-    --type-caption-tracking: 0em;
+  }
+}
+
+/* Compact buttons from the mobile frame down through 360px. */
+@media (max-width: 390px) {
+  :root {
+    --button-height: 40px;
+    --button-font-size: 16px;
+    --button-line-height: 20px;
+    --button-padding-y: 8px;
+    --button-padding-x: 8px;
+    --button-padding-icon: 8px;
+    --button-padding-end: 12px;
+    --button-gap: 8px;
+    --button-icon: 16px;
+    --button-tracking: -0.32px;
   }
 }
 

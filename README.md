@@ -88,7 +88,7 @@ Figma’s `letter-spacing/*` variables are stored in **pixels**. `tokens.json` d
 
 The percentage is the same at both breakpoints, which is why the Figma pixel values shrink with the mobile size (desktop display is −1.12px on 56px; mobile is −0.8px on 40px; both are −2%). Keep editing the percentage in the JSON. Do not paste the Figma px value into CSS.
 
-Desktop type is the default (`:root`). Mobile size, line-height, and tracking apply in a `max-width` query at the tablet breakpoint (below 768px). The grid has three stops: mobile below 768, tablet from 768 up to just under 1440, desktop at 1440 and above.
+Type size fluidly scales from the 390px mobile frame to the 1440px desktop frame with `clamp`. Display, h1, and h3 use a unitless line-height of 1 so the leading stays tight as the size changes. Nav is 24/32 at desktop (letter-spacing −0.8px, stored as −3.333%) and 18/24 on mobile, ratio 1.333. h2 uses the same 1.333 ratio (24/32 mobile, 36/48 desktop). Body leading stays 1.5. The grid has three stops: mobile below 768, tablet from 768 up to just under 1440, desktop at 1440 and above.
 
 ### Fonts
 
