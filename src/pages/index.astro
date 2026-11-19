@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 import FlapNav from '../components/FlapNav.astro';
-import { assetSrc } from '../lib/url';
+import { assetSrc, withBase } from '../lib/url';
 import bloom from '../assets/home/hero-work-tab-blob.svg';
 import polaroid from '../assets/home/polaroid-ify-4.png';
 import hedges from '../assets/home/hero-hedges.svg';
@@ -18,7 +18,7 @@ const shotSrc = assetSrc(shot);
 
 const mail = 'mailto:ify@example.com';
 const linkedin = 'https://www.linkedin.com/in/placeholder';
-const resume = '#resume';
+const resume = withBase('/resume/ifeanyi-ulasika-resume.pdf');
 
 const driverTitle =
   'Redesigning the Driver App to decrease order fulfilment time and boost  driver retention.';
@@ -58,7 +58,7 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
         </div>
         <div class="hero-cta">
           <Button href={mail} label="Shoot me a message" variant="secondary" />
-          <Button href={resume} label="View resume" variant="primary" icon="trailing" />
+          <Button href={resume} label="View resume" variant="primary" icon="trailing" newTab />
         </div>
       </div>
       <img class="hero-hedges" src={hedgesSrc} alt="" />
