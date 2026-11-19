@@ -30,7 +30,7 @@ src/pages/index.astro       Placeholder home
 src/pages/tokens.astro      Style guide
 src/content.config.ts       Case-study collection schema
 src/content/work/           Markdown / MDX case studies (empty for now)
-public/fonts/               Exat CYR files go here
+public/fonts/               Exat CYR OTF files
 ```
 
 Later routes, not created yet:
@@ -94,13 +94,17 @@ Desktop type is the default (`:root`). Mobile size, line-height, and tracking ap
 
 Geist and Geist Mono load from the official `geist` package (variable woff2 files).
 
-**Exat CYR** is commercial and is not in the repo. Add the files you license to `public/fonts/`:
+**Exat CYR** is loaded from the OTF files in `public/fonts/`:
 
-- `ExatCYR-Light.woff2` (weight 300)
-- `ExatCYR-Regular.woff2` (weight 400)
-- `ExatCYR-Medium.woff2` (weight 500)
+- `exatcyr-extralight.otf` (weight 200)
+- `exatcyr-light.otf` (weight 300)
+- `exatcyr-regular.otf` (weight 400)
+- `exatcyr-medium.otf` (weight 500)
+- `exatcyr-bold.otf` (weight 700)
+- `exatcyr-extrabold.otf` (weight 800)
+- `exatcyr-black.otf` (weight 900)
 
-`@font-face` rules in `src/styles/fonts.css` already point at those paths and at a local install of the family. Until the files are present, display and nav roles fall back through Geist, Helvetica Neue, Arial, and sans-serif. The site still builds and reads correctly.
+`@font-face` rules in `src/layouts/BaseLayout.astro` point at those files and include the GitHub Pages base path. Display and nav roles use this family. Body text stays on Geist.
 
 ## Adding a case study
 
