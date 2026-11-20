@@ -60,6 +60,10 @@ const heroPolaroid = headline?.querySelector<HTMLElement>('[data-polaroid]') ?? 
 
 const POL_DX = 0.686; // centre of the photo, past the line end
 const POL_DY = 0.43;
+/** Left edge of the tilted card (14°), as a fraction of the PNG box width from its left side. */
+const CARD_LEFT = 0.15;
+/** Bottom edge of the tilted card, as a fraction of the PNG box height from its top. */
+const CARD_BOTTOM = 0.85;
 
 function placePolaroid() {
   if (!headline || !firstLine || !heroPolaroid) return;
@@ -77,14 +81,22 @@ function placePolaroid() {
   const height = heroPolaroid.offsetHeight;
   // Keep the card inside the viewport on narrow phones (the tilted card reaches 87% across the box).
   const maxX = document.documentElement.clientWidth - box.left - width * 0.87 - 4;
-  const wantX = lineEnd - box.left + POL_DX * em - width / 2;
+  // On phones the card is large relative to the type, so the Figma offset alone lets its tilted left
+  // corner (about 15% into the PNG box) cover the last letter; keep at least 4px clear of the word.
+  const clearX = lineEnd - box.left + 4 - width * CARD_LEFT;
+  const wantX = Math.max(lineEnd - box.left + POL_DX * em - width / 2, clearX);
   const x = Math.min(wantX, maxX);
   // When it has to move in over the word, lift it by the same amount (up to one line) so it pins
   // to the word's top corner instead of covering it.
   const lift = Math.min(Math.max(wantX - x, 0), em);
   // Measure from the line box, not the moving text, so the intro transform does not skew it.
   const lineBox = firstLine.parentElement!.getBoundingClientRect();
-  const y = lineBox.top - box.top + POL_DY * em - height / 2 - lift;
+  let y = lineBox.top - box.top + POL_DY * em - height / 2 - lift;
+  // Still over the word after the clamp (narrowest phones): sit the card on top of the line instead,
+  // its bottom edge just above the cap height.
+  if (x + width * CARD_LEFT < lineEnd - box.left) {
+    y = Math.min(y, lineBox.top - box.top + 0.2 * em - height * CARD_BOTTOM);
+  }
   heroPolaroid.style.setProperty('--pol-x', `${x}px`);
   heroPolaroid.style.setProperty('--pol-y', `${y}px`);
 }

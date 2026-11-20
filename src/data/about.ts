@@ -76,7 +76,7 @@ export const experience: Array<{
   {
     company: 'Crunchr',
     summary: 'Quick-commerce delivery through dark stores.',
-    note: '(formerly Choice Crunchr)',
+    note: '(formerly Choice Cruncher)',
     role: 'Co-founder and Product Designer',
     place: 'Lagos | 2020 – 2023',
     points: [

@@ -168,10 +168,10 @@
   --type-h3-weight: var(--font-weight-regular);
   --type-h3-size: clamp(20px, calc(20px + (100vw - 390px) * 0.00381), 24px);
   --type-h3-line-height: clamp(28px, calc(28px + (100vw - 390px) * 0.00381), 32px);
-  --type-h3-tracking: -0.02em;
+  --type-h3-tracking: clamp(-0.48px, calc(-0.36px + (100vw - 390px) * -0.000114), -0.36px);
   --type-nav-family: var(--font-display);
   --type-nav-weight: var(--font-weight-regular);
-  --type-nav-size: clamp(18px, calc(18px + (100vw - 390px) * 0.00571), 24px);
+  --type-nav-size: clamp(16px, calc(16px + (100vw - 390px) * 0.00762), 24px);
   --type-nav-line-height: clamp(24px, calc(24px + (100vw - 390px) * 0.00762), 32px);
   --type-nav-tracking: -0.01em;
   --type-body-lg-family: var(--font-body);
@@ -186,9 +186,14 @@
   --type-body-tracking: 0em;
   --type-label-family: var(--font-body);
   --type-label-weight: var(--font-weight-medium);
-  --type-label-size: 16px;
+  --type-label-size: clamp(14px, calc(14px + (100vw - 390px) * 0.0019), 16px);
   --type-label-line-height: 24px;
-  --type-label-tracking: -0.01em;
+  --type-label-tracking: -0.16px;
+  --type-label-md-family: var(--font-body);
+  --type-label-md-weight: var(--font-weight-medium);
+  --type-label-md-size: 14px;
+  --type-label-md-line-height: 24px;
+  --type-label-md-tracking: -0.01143em;
   --type-meta-family: var(--font-mono);
   --type-meta-weight: var(--font-weight-regular);
   --type-meta-size: clamp(14px, calc(14px + (100vw - 390px) * 0.0019), 16px);
@@ -320,6 +325,15 @@
   font-style: normal;
   line-height: var(--type-label-line-height);
   letter-spacing: var(--type-label-tracking);
+}
+
+.text-label-md {
+  font-family: var(--type-label-md-family);
+  font-size: var(--type-label-md-size);
+  font-weight: var(--type-label-md-weight);
+  font-style: normal;
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-tracking);
 }
 
 .text-meta {

@@ -258,9 +258,23 @@
   gap: 16px;
 }
 
+/* Figma divider (Vector 6921/6922): a 1.5px Blue/800 line (stroke 60% x layer 20% = 12% alpha) across the full row with round caps,
+   48px from the rows on either side. Drawn as a pill so the 1.5px weight and caps survive
+   (a 1.5px border is floored to 1px and has square ends). */
 .job + .job {
+  position: relative;
   padding-top: 40px;
-  border-top: 1.5px solid var(--color-blue-600);
+}
+
+.job + .job::before {
+  content: '';
+  position: absolute;
+  top: -0.75px;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-blue-800) 12%, transparent);
 }
 
 .job__head {

@@ -98,6 +98,10 @@
   margin: 0;
   text-align: center;
   color: var(--color-neutral-0);
+  /* Smaller than the shared Display role on phones so the hero reads as compact as desktop:
+     32/40 at 390 growing to Display's 56/64 at 1440 (same fluid slope for size and leading). */
+  font-size: clamp(32px, calc(32px + (100vw - 390px) * 0.022857), 56px);
+  line-height: clamp(40px, calc(40px + (100vw - 390px) * 0.022857), 64px);
 }
 
 .hero-line {
@@ -289,11 +293,12 @@
     display: block;
   }
 
-  /* Hero, Mobile: 334x74 for a 390 frame. The bushes tuck 14px behind the flaps so the letters show. */
+  /* Hero, Mobile: the 334x74 row (Figma, for a 390 frame) is stretched edge to edge on phones,
+     keeping its aspect ratio. The bushes tuck 14px behind the flaps so the letters show. */
   .hedges--hero .hedge-row--mobile {
     bottom: calc(var(--flap-h) - 14px);
-    left: calc(50% - 167 / 390 * 100vw);
-    width: calc(334 / 390 * 100vw);
+    left: 0;
+    width: 100%;
   }
 
   /* Footer, Mobile: 435x105, wider than the screen, centred and cut by the bottom edge like desktop. */

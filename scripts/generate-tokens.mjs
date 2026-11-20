@@ -137,12 +137,22 @@ function fluidLength(mobileValue, desktopValue) {
   return `clamp(${mobile}px, calc(${mobile}px + (100vw - 390px) * ${slopeText}), ${desktop}px)`;
 }
 
+/* Same percentage at both breakpoints: one em value. Otherwise (Figma stores tracking in px per
+   mode, e.g. H3 -0.48px at 24 and -0.36px at 20) interpolate the px values from 390 to 1440. */
+function trackingValue(spec) {
+  if (spec.mobile.tracking === spec.desktop.tracking) return percentToEm(spec.desktop.tracking);
+  const px = (side) => (pxNumber(spec[side].size) * spec[side].tracking) / 100;
+  const mobile = Number(px('mobile').toFixed(3));
+  const desktop = Number(px('desktop').toFixed(3));
+  if (mobile === desktop) return `${desktop}px`;
+  const slope = Number(((desktop - mobile) / (1440 - 390)).toFixed(6));
+  const [lo, hi] = mobile < desktop ? [mobile, desktop] : [desktop, mobile];
+  return `clamp(${lo}px, calc(${mobile}px + (100vw - 390px) * ${slope}), ${hi}px)`;
+}
+
 function typeDecls() {
   const decls = [];
   for (const [role, spec] of Object.entries(typography.roles)) {
-    if (spec.mobile.tracking !== spec.desktop.tracking) {
-      throw new Error(`${role} tracking must be the same percentage at both breakpoints`);
-    }
     decls.push([`--type-${role}-family`, `var(--font-${spec.family})`]);
     decls.push([`--type-${role}-weight`, `var(--font-weight-${spec.weight})`]);
     decls.push([`--type-${role}-size`, fluidLength(spec.mobile.size, spec.desktop.size)]);
@@ -154,7 +164,7 @@ function typeDecls() {
         fluidLength(spec.mobile.lineHeight, spec.desktop.lineHeight),
       ]);
     }
-    decls.push([`--type-${role}-tracking`, percentToEm(spec.desktop.tracking)]);
+    decls.push([`--type-${role}-tracking`, trackingValue(spec)]);
   }
   return decls;
 }

@@ -23,7 +23,7 @@ function ensureTip() {
     tip = document.createElement('div');
     tip.className = 'cursor-tip';
     tip.setAttribute('aria-hidden', 'true');
-    tip.innerHTML = '<span class="cursor-tip__pill text-label"></span>';
+    tip.innerHTML = '<span class="cursor-tip__pill text-label-md"></span>';
   }
   if (!tip.isConnected) document.body.append(tip);
   return tip;

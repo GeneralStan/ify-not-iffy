@@ -25,11 +25,14 @@ interface Props {
 
 const { current = 'work' } = Astro.props;
 
-// Figma flap backgrounds (Flaps 4031:2832), 240x66, sharp chamfer top-left. Work's chamfer is
-// shallower (17.93 tall) than Playground's and About's (21.80). The 80-tall states are the same
+// Figma flap backgrounds (Flaps 4031:2832), 240x66, chamfer top-left with 8px rounded corners at
+// both ends of the chamfer and at the top right (Figma vertex radii, exported as SVG). Work's chamfer
+// is shallower (17.93 tall) than Playground's and About's (21.80). The 80-tall states are the same
 // shapes stretched by 80/66, which is what the hover / press `scale` does.
-const workShape = 'M0 17.9337L19.4633 0H240V66H0Z';
-const tallShape = 'M0 21.8039L19.4633 0H240V66H0Z';
+const workShape =
+  'M0 21.4406C0 19.2053 0.93519 17.072 2.57905 15.5573L17.166 2.11669C18.6432 0.755602 20.5784 0 22.587 0H232C236.418 0 240 3.58172 240 8V66H0V21.4406Z';
+const tallShape =
+  'M0 24.8551C0 22.89 0.723273 20.9936 2.03189 19.5276L17.0776 2.67255C18.5954 0.972199 20.7665 0 23.0457 0H232C236.418 0 240 3.58172 240 8V66H0V24.8551Z';
 
 const items = [
   { id: 'work', href: withBase('/'), label: 'Work', shape: workShape },
@@ -215,6 +218,14 @@ const items = [
     --flap-stagger-ms: 80ms;
     --ease-hinge: cubic-bezier(0.55, 0, 0.15, 1);
     --ease-release: cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  /* Phones: Nav drops to its Mobile size (16/24), so flaps cap at 88px, the width "Playground"
+     needs with even padding, instead of filling the bar. The docked logo needs 44px, not 56. */
+  @media (max-width: 767px) {
+    :root {
+      --flap-unit: min(88px, (var(--dock-bar) - 44px) / 3);
+    }
   }
 
   @media (min-width: 768px) {
