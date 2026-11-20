@@ -49,6 +49,11 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
         document.documentElement.classList.add('intro-wait');
         setTimeout(function () { document.documentElement.classList.remove('intro-wait'); }, 3000);
       }
+      // Scroll reveals (src/scripts/reveal.ts): content below the hero waits hidden only when motion
+      // is allowed and the observer exists. Set before first paint so nothing flashes.
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('reveal-ready');
+      }
     </script>}
     <title>{title}</title>
     <ClientRouter />

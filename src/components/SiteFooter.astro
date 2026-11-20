@@ -1,9 +1,12 @@
 ---
-/** Footer shared by every page (Figma 4026:680). Persisted across page changes. */
+/** Footer shared by every page (Figma 4045:5144). Persisted across page changes. */
 import Button from './Button.astro';
 import HedgeRow from './HedgeRow.astro';
 import Polaroid from './Polaroid.astro';
-import { contact } from '../data/site';
+import { cal, contact } from '../data/site';
+
+// "Let’s Connect" rises word by word, like the hero headline.
+const titleWords = ['Let’s', 'Connect'];
 ---
 
 <footer class="site-footer" transition:persist="footer">
@@ -14,16 +17,34 @@ import { contact } from '../data/site';
   <div class="footer-copy">
     <h2 class="footer-title text-display">
       <span class="footer-title__text">
-        <Polaroid photo="cat-mooncake" class="footer-polaroid" displayWidth={102} />
-        Let’s Connect
+        <Polaroid photo="cat-mooncake" class="footer-polaroid" displayWidth={102} revealDelay={260} />
+        <span class="footer-title__words" data-reveal="words">
+          {titleWords.map((word, w) => (
+            <>
+              {w > 0 && ' '}
+              <span class="reveal-word" style={`--w: ${w}`}>
+                <span class="reveal-word__inner">{word}</span>
+              </span>
+            </>
+          ))}
+        </span>
       </span>
     </h2>
-    <p class="footer-body text-body">
+    <p class="footer-body text-body-lg" data-reveal="rise" style="--reveal-delay: 360ms">
       Thanks for visiting my little corner of the internet. Your presence here means a lot. This website was made with ❤️
     </p>
     <div class="footer-links">
-      <Button href={contact.mail} label="Email" variant="secondary" icon="leading" />
-      <Button href={contact.linkedin} label="Linkedin" variant="secondary" icon="leading" />
+      <span class="footer-links__chat" data-reveal="rise" style="--reveal-delay: 460ms">
+        <Button href={cal.url} label="Let’s Chat" variant="secondary" cal newTab class="btn--block" />
+      </span>
+      <div class="footer-links__row">
+        <span data-reveal="rise" style="--reveal-delay: 540ms">
+          <Button href={contact.mail} label="Send a note" variant="secondary" />
+        </span>
+        <span data-reveal="rise" style="--reveal-delay: 620ms">
+          <Button href={contact.linkedin} label="Linkedin" variant="secondary" newTab />
+        </span>
+      </div>
     </div>
   </div>
   <HedgeRow place="footer" />

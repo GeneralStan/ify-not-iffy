@@ -1,14 +1,89 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import Polaroid from '../../components/Polaroid.astro';
+import { aboutIntro, aboutPolaroids, experience } from '../../data/about';
+
+// The exported polaroid PNGs are 512x576 with the card filling 56.6% of the width, so the PNG box is
+// the Figma card width / 0.566 (and 576/512 of that tall). Desktop positions are on the 1440 frame.
+const box = (w: number) => w / 0.566;
+const desktopStyle = (p: (typeof aboutPolaroids)[number]) =>
+  `--cx: ${p.cx - 720}; --cy: ${p.cy}; --bw: ${box(p.w).toFixed(1)}; --pol-rotate: ${p.rot}deg;`;
+const pairs = [0, 1, 2].map((n) => aboutPolaroids.filter((p) => p.pair === n));
 ---
 
 <SiteLayout
   page="about"
   title="About — Ifeanyi Ulasika"
-  description="About Ifeanyi Ulasika, product designer. Coming soon."
+  description="Ifeanyi Ulasika is a multidisciplinary product designer with over 6 years of experience across logistics, quick commerce and design systems."
 >
-  <section class="page-intro">
-    <h2 class="page-title text-h1">About</h2>
-    <p class="page-lead text-h2">Coming soon</p>
+  <section class="page-section about">
+    <header class="section-head">
+      <h2 class="section-title text-h1" data-reveal="soft">{aboutIntro.title}</h2>
+      <p class="section-lead text-h2" data-reveal="soft" style="--reveal-delay: 100ms">{aboutIntro.lead}</p>
+    </header>
+
+    <div class="about-intro">
+      <div class="about-stage" aria-hidden="true">
+        {
+          aboutPolaroids.map((p, i) => (
+            <Polaroid
+              photo={p.photo}
+              class="about-polaroid"
+              displayWidth={Math.round(box(p.w))}
+              revealDelay={150 + i * 90}
+              style={desktopStyle(p)}
+            />
+          ))
+        }
+      </div>
+      <div class="about-copy">
+        {
+          aboutIntro.paragraphs.map((text, i) => (
+            <>
+              <div class="about-pair" aria-hidden="true">
+                {pairs[i].map((p, k) => (
+                  <Polaroid
+                    photo={p.photo}
+                    class={`about-pair__photo about-pair__photo--${p.side}`}
+                    displayWidth={150}
+                    revealDelay={k * 110}
+                    style={`--pol-rotate: ${p.rot}deg;`}
+                  />
+                ))}
+              </div>
+              <p class="about-copy__p text-h3" data-reveal="rise">{text}</p>
+            </>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="experience">
+      <h2 class="section-title text-h1" data-reveal="soft">Experience</h2>
+      <ol class="experience-list">
+        {
+          experience.map((job) => (
+            <li class="job">
+              <div class="job__head" data-reveal="rise">
+                <h3 class="job__title text-h3">
+                  {job.company} — {job.summary}
+                  {job.note && <span class="job__note">{job.note}</span>}
+                </h3>
+                <p class="job__meta text-meta">
+                  {job.role}
+                  <br />
+                  {job.place}
+                </p>
+              </div>
+              <ul class="job__points" data-reveal="rise" style="--reveal-delay: 100ms">
+                {job.points.map((point) => (
+                  <li class="text-body-lg">{point}</li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </section>
 </SiteLayout>

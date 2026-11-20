@@ -1,14 +1,37 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import { PLAYGROUND_BOARD, playground, playgroundHead } from '../../data/playground';
+
+// Desktop: cards keep the Figma board's scattered positions, scaled with the column (see pages.css).
+const px = (n: number) => `calc(${n} * var(--board-u))`;
 ---
 
 <SiteLayout
   page="playground"
   title="Playground — Ifeanyi Ulasika"
-  description="Experiments and side projects from Ifeanyi Ulasika. Coming soon."
+  description="Experiments and side projects Ifeanyi Ulasika built in his spare time: animation, illustration and branding."
 >
-  <section class="page-intro">
-    <h2 class="page-title text-h1">Playground</h2>
-    <p class="page-lead text-h2">Coming soon</p>
+  <section class="page-section playground">
+    <header class="section-head">
+      <h2 class="section-title text-h1" data-reveal="soft">{playgroundHead.title}</h2>
+      <p class="section-lead text-h2" data-reveal="soft" style="--reveal-delay: 100ms">{playgroundHead.lead}</p>
+    </header>
+    <div class="play-board" style={`--board-h: ${PLAYGROUND_BOARD.height};`}>
+      {
+        playground.map((card, i) => (
+          <article
+            class="play-card"
+            data-reveal="scale"
+            style={`--x: ${px(card.x)}; --y: ${px(card.y)}; --w: ${px(card.w)}; --media: ${card.media}; --media-w: ${card.w - 40}; --reveal-delay: ${(i % 2) * 110}ms`}
+          >
+            <div class="play-card__media">
+              {card.image && <img src={card.image.src} alt="" loading="lazy" decoding="async" />}
+              <span class="play-card__badge">{card.badge}</span>
+            </div>
+            <h3 class="play-card__title">{card.title}</h3>
+          </article>
+        ))
+      }
+    </div>
   </section>
 </SiteLayout>

@@ -164,7 +164,7 @@
   --type-h2-size: clamp(24px, calc(24px + (100vw - 390px) * 0.00762), 32px);
   --type-h2-line-height: clamp(32px, calc(32px + (100vw - 390px) * 0.00762), 40px);
   --type-h2-tracking: -0.015em;
-  --type-h3-family: var(--font-display);
+  --type-h3-family: var(--font-body);
   --type-h3-weight: var(--font-weight-regular);
   --type-h3-size: clamp(20px, calc(20px + (100vw - 390px) * 0.00381), 24px);
   --type-h3-line-height: clamp(28px, calc(28px + (100vw - 390px) * 0.00381), 32px);
@@ -201,16 +201,16 @@
   --type-caption-tracking: 0em;
 
   /* Buttons, desktop. The 390px size is overridden below. */
-  --button-height: 48px;
+  --button-height: 44px;
   --button-font-size: 16px;
   --button-line-height: 24px;
-  --button-padding-y: 12px;
-  --button-padding-x: 16px;
+  --button-padding-y: 10px;
+  --button-padding-x: 20px;
   --button-padding-icon: 16px;
   --button-padding-end: 20px;
   --button-gap: 8px;
   --button-icon: 20px;
-  --button-tracking: -0.32px;
+  --button-tracking: -0.16px;
   --type-nav-active-weight: var(--font-weight-medium);
 }
 

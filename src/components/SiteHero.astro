@@ -5,10 +5,11 @@
  * The headline is split into words so the load-in can reveal them one by one.
  */
 import Button from './Button.astro';
+import { withBase } from '../lib/url';
 import HedgeRow from './HedgeRow.astro';
 import Polaroid from './Polaroid.astro';
 import IffyLogo from '../assets/home/iffy-logo.svg';
-import { contact } from '../data/site';
+import { cal, contact } from '../data/site';
 
 // [colour, text] runs per line, as in Figma 2116:787 (Lime/300 at 60% vs Neutral/0).
 const lines: Array<Array<['lime' | 'paper', string]>> = [
@@ -30,9 +31,9 @@ const words = lines.map((runs) =>
       <div class="hero-grain"></div>
     </div>
     <div class="hero-copy">
-      <span class="hero-logo" data-spin aria-hidden="true">
-        <IffyLogo class="hero-logo__mark" width="64" height="64" />
-      </span>
+      <a class="hero-logo" href={withBase('/')} data-spin data-home aria-label="Ifeanyi Ulasika, Work">
+        <IffyLogo class="hero-logo__mark" width="64" height="64" aria-hidden="true" />
+      </a>
       <h1 class="hero-title text-display" data-headline>
         {
           words.map((line) => (
@@ -53,8 +54,8 @@ const words = lines.map((runs) =>
         <Polaroid photo="at-sea" class="hero-polaroid" displayWidth={132} eager />
       </h1>
       <div class="hero-cta">
-        <Button href={contact.mail} label="Shoot me a message" variant="secondary" />
-        <Button href={contact.resume} label="View resume" variant="primary" icon="trailing" newTab />
+        <Button href={cal.url} label="Let’s Chat" variant="secondary" cal newTab />
+        <Button href={contact.resume} label="View resume" variant="primary" newTab />
       </div>
     </div>
     <HedgeRow place="hero" />

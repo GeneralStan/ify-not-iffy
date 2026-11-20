@@ -25,15 +25,17 @@ interface Props {
 
 const { current = 'work' } = Astro.props;
 
-const items = [
-  { id: 'work', href: withBase('/'), label: 'Work' },
-  { id: 'playground', href: withBase('/playground/'), label: 'Playground' },
-  { id: 'about', href: withBase('/about/'), label: 'About' },
-] as const;
+// Figma flap backgrounds (Flaps 4031:2832), 240x66, sharp chamfer top-left. Work's chamfer is
+// shallower (17.93 tall) than Playground's and About's (21.80). The 80-tall states are the same
+// shapes stretched by 80/66, which is what the hover / press `scale` does.
+const workShape = 'M0 17.9337L19.4633 0H240V66H0Z';
+const tallShape = 'M0 21.8039L19.4633 0H240V66H0Z';
 
-// Figma flap background, 240x66, chamfer top-left (rounded corners as drawn in the component).
-const shape =
-  'M0 24.8551C0 22.89 0.723273 20.9936 2.03189 19.5276L17.0776 2.67255C18.5954 0.972199 20.7665 0 23.0457 0H232C236.418 0 240 3.58172 240 8V66H0V24.8551Z';
+const items = [
+  { id: 'work', href: withBase('/'), label: 'Work', shape: workShape },
+  { id: 'playground', href: withBase('/playground/'), label: 'Playground', shape: tallShape },
+  { id: 'about', href: withBase('/about/'), label: 'About', shape: tallShape },
+] as const;
 ---
 
 <div class="flap-slot" data-flap-slot data-docked="false" data-stuck="false" transition:persist="flaps">
@@ -43,7 +45,7 @@ const shape =
     <span class="flap-edge__blur flap-edge__blur--3"></span>
   </div>
   <nav class="flap-nav" aria-label="Primary">
-    <a class="flap-logo" href={withBase('/')} data-flap-logo data-page-link="work" aria-label="Ifeanyi Ulasika, Work" tabindex="-1">
+    <a class="flap-logo" href={withBase('/')} data-flap-logo data-home data-page-link="work" aria-label="Ifeanyi Ulasika, Work" tabindex="-1">
       <span class="flap-logo__spin" data-spin>
         <IffyLogo class="flap-logo__mark" width="48" height="48" />
       </span>
@@ -62,13 +64,13 @@ const shape =
               <span class="flap__sr">{item.label}</span>
               <span class="flap__face flap__face--hero" aria-hidden="true">
                 <svg class="flap__shape" viewBox="0 0 240 66" preserveAspectRatio="none" focusable="false">
-                  <path d={shape} />
+                  <path d={item.shape} />
                 </svg>
                 <span class="flap__label">{item.label}</span>
               </span>
               <span class="flap__face flap__face--docked" aria-hidden="true">
                 <svg class="flap__shape" viewBox="0 0 240 66" preserveAspectRatio="none" focusable="false">
-                  <path d={shape} transform="matrix(1 0 0 -1 0 66)" />
+                  <path d={item.shape} transform="matrix(1 0 0 -1 0 66)" />
                 </svg>
                 <span class="flap__label">{item.label}</span>
               </span>
@@ -176,10 +178,21 @@ const shape =
     });
   });
 
-  logo?.addEventListener('click', (event) => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  /* ---------- Logo: home, to the hero ----------
+     Both logos (hero and docked) go to Work with the hero in view: on Work it scrolls back to the
+     top; from another page it changes page without landing docked (the router starts at the top). */
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const home = target.closest<HTMLAnchorElement>('a[data-home]');
+    if (!home || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    go(logo as HTMLAnchorElement);
+    if (currentPage() === 'work') {
+      window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
+      return;
+    }
+    landDocked = false;
+    navigate(home.href);
   });
 </script>
 
@@ -360,7 +373,7 @@ const shape =
   }
 
   .flap--playground {
-    --fill-idle: var(--color-plum-200);
+    --fill-idle: var(--color-plum-150);
     --ink-idle: var(--color-plum-900);
     --fill-hover: var(--color-plum-500);
     --ink-hover: var(--color-plum-100);
@@ -368,8 +381,10 @@ const shape =
     --ink-press: var(--color-plum-50);
   }
 
+  /* About: idle is Blue/200 in the hero, Blue/150 docked and when it is the current page. */
   .flap--about {
-    --fill-idle: var(--color-blue-300);
+    --fill-idle: var(--color-blue-200);
+    --fill-current: var(--color-blue-150);
     --ink-idle: var(--color-blue-900);
     --fill-hover: var(--color-blue-500);
     --ink-hover: var(--color-blue-100);
@@ -505,8 +520,12 @@ const shape =
   }
 
   /* Current page keeps its idle colours with a Medium label. In the hero it stands 80 tall. */
+  .flap--about .flap__card:not(:hover):not([data-pressed]) .flap__face--docked {
+    --fill: var(--color-blue-150);
+  }
+
   .flap__card[aria-current='page'] {
-    --fill: var(--fill-idle);
+    --fill: var(--fill-current, var(--fill-idle));
     --ink: var(--ink-idle);
   }
 

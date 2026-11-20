@@ -35,9 +35,9 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
 >
   <section class="projects" id="work" data-section="work">
     <div class="projects-inner">
-      <header class="projects-head">
-        <h2 class="projects-title text-h1">Selected projects</h2>
-        <p class="projects-sub text-h2">
+      <header class="section-head">
+        <h2 class="section-title text-h1" data-reveal="soft">Selected projects</h2>
+        <p class="section-lead text-h2" data-reveal="soft" style="--reveal-delay: 100ms">
           Enterprise design systems,<br />
           web and mobile products
         </p>
@@ -47,7 +47,12 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
           columns.map((column, c) => (
             <div class={`card-column card-column--${c + 1}`}>
               {column.map((project) => (
-                <article class="project-card" style={`--order: ${project.n}`}>
+                <article
+                  class="project-card"
+                  data-reveal="scale"
+                  data-tooltip="View details"
+                  style={`--order: ${project.n}; --reveal-delay: ${c * 110}ms`}
+                >
                   <div class="project-card__media">
                     <img class="project-card__shot" src={shotSrc} alt="" />
                   </div>
@@ -60,7 +65,7 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                         </>
                       ))}
                     </p>
-                    <h3 class="project-card__title">{project.title}</h3>
+                    <h3 class="project-card__title text-h3">{project.title}</h3>
                   </div>
                 </article>
               ))}

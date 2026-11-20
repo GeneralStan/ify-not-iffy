@@ -1,0 +1,334 @@
+/* ===== Shared page section =====
+   Playground and About bodies (Figma 4026:700 / 4026:791). Same rhythm as Work's .projects-inner. */
+.page-section {
+  padding: 72px 0 96px;
+  color: var(--page-ink);
+  overflow-x: clip;
+}
+
+.page-section > .section-head {
+  width: min(604px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .page-section {
+    padding: 96px 0 120px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .page-section {
+    padding: 120px 0 160px;
+  }
+
+  .page-section > .section-head {
+    margin-bottom: 56px;
+  }
+
+  .page-section .section-lead {
+    width: 433px;
+    max-width: none;
+  }
+}
+
+/* ===== Playground board =====
+   Phones: one column. Tablets: two. Desktop: the Figma board, every card at its own x / y / width on
+   the 1240 column, all scaled with the column (1 unit = column width / 1240). */
+.play-board {
+  width: min(1240px, calc(100% - 32px));
+  margin-inline: auto;
+  display: grid;
+  gap: 20px;
+}
+
+.play-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: var(--color-plum-400);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card-hover);
+}
+
+.play-card__media {
+  position: relative;
+  aspect-ratio: var(--media-w) / var(--media);
+  overflow: hidden;
+  background: var(--color-neutral-0);
+  border: 1px solid rgba(240, 237, 229, 1);
+  border-radius: 4px;
+}
+
+.play-card__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Figma badge: #FFEAB3 chip, Geist Mono 18/20, #39362D. */
+.play-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 8px;
+  border-radius: 4px;
+  background: #ffeab3;
+  color: #39362d;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.play-card__title {
+  margin: 0;
+  color: var(--color-plum-950);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+@media (min-width: 768px) {
+  .play-board {
+    grid-template-columns: 1fr 1fr;
+    width: min(1240px, calc(100% - 64px));
+  }
+
+  /* Wide Figma cards (815 / 742 / 1240) take the full row. */
+  .play-card:nth-child(1),
+  .play-card:nth-child(5),
+  .play-card:nth-child(6) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .play-board {
+    display: block;
+    position: relative;
+    container-type: inline-size;
+    /* Cards are 88px taller than their scaled image (padding, gap, title), so the board is the
+       scaled 1240 x 2049 area plus that fixed 88. */
+    padding-bottom: 88px;
+  }
+
+  .play-board::before {
+    content: '';
+    display: block;
+    padding-top: calc(2049 / 1240 * 100%);
+  }
+
+  .play-card {
+    --board-u: calc(100cqw / 1240);
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+  }
+
+  .play-card__badge {
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  .play-card__title {
+    font-size: 18px;
+    line-height: 28px;
+  }
+}
+
+/* ===== About: intro with polaroids =====
+   Desktop: six polaroids around the 720-wide copy at their Figma spots on the 1440 frame, scaled
+   with the screen below 1440. Phones and tablets: they sit in pairs, tucked half off the left and
+   right edges, in the gaps before each paragraph, so they never cover a line of text. */
+.about-intro {
+  position: relative;
+  width: min(720px, calc(100% - 32px));
+  margin: 40px auto 0;
+}
+
+.about-copy {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.about-copy__p {
+  margin: 0;
+  color: var(--color-blue-800);
+}
+
+.about-stage {
+  display: none;
+}
+
+.about-pair {
+  position: relative;
+  height: 148px;
+  margin-inline: calc(50% - 50vw);
+}
+
+.about-pair:first-child {
+  height: 136px;
+}
+
+.about-pair .about-pair__photo {
+  --pol-w: 168px;
+  --pol-h: calc(168px * 576 / 512);
+  top: calc(50% - var(--pol-h) / 2);
+}
+
+.about-pair .about-pair__photo--left {
+  left: -58px;
+}
+
+.about-pair .about-pair__photo--right {
+  left: auto;
+  right: -58px;
+}
+
+@media (min-width: 768px) {
+  .about-pair .about-pair__photo--left {
+    left: 24px;
+  }
+
+  .about-pair .about-pair__photo--right {
+    right: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-intro {
+    margin-top: 0;
+  }
+
+  .about-copy {
+    gap: 48px;
+  }
+
+  .about-pair {
+    display: none;
+  }
+
+  .about-stage {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .about-stage .about-polaroid {
+    --u: min(1px, 100vw / 1440);
+    --pol-w: calc(var(--bw) * var(--u));
+    --pol-h: calc(var(--pol-w) * 576 / 512);
+    left: calc(var(--cx) * var(--u) - var(--pol-w) / 2);
+    top: calc(var(--cy) * var(--u) - var(--pol-h) / 2);
+  }
+}
+
+/* ===== About: experience ===== */
+.experience {
+  width: min(1250px, calc(100% - 32px));
+  margin: 72px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.experience > .section-title {
+  text-align: center;
+}
+
+.experience-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.job {
+  display: grid;
+  gap: 16px;
+}
+
+.job + .job {
+  padding-top: 40px;
+  border-top: 1.5px solid var(--color-blue-600);
+}
+
+.job__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.job__title {
+  margin: 0;
+  color: var(--color-blue-950);
+}
+
+.job__note {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0;
+}
+
+.job__meta {
+  margin: 0;
+  color: var(--color-blue-800);
+}
+
+.job__points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--color-blue-900);
+}
+
+.job__points li {
+  padding-left: 1em;
+  text-indent: -1em;
+}
+
+.job__points li::before {
+  content: '•';
+  display: inline-block;
+  width: 1em;
+  text-indent: 0;
+}
+
+@media (min-width: 1024px) {
+  .experience {
+    width: min(1250px, calc(100% - 64px));
+    margin-top: 56px;
+    gap: 48px;
+  }
+
+  .experience-list {
+    gap: 48px;
+  }
+
+  .job {
+    grid-template-columns: minmax(0, 492px) minmax(0, 609px);
+    justify-content: space-between;
+    column-gap: 32px;
+  }
+
+  .job + .job {
+    padding-top: 48px;
+  }
+}

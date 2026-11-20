@@ -13,6 +13,8 @@ import catMaisha from '../assets/polaroids/polaroid-cat-maisha.png';
 import catMooncake from '../assets/polaroids/polaroid-cat-mooncake.png';
 import tennisBackhand from '../assets/polaroids/polaroid-tennis-backhand.png';
 import tennisForehand from '../assets/polaroids/polaroid-tennis-forehand.png';
+import raceTrophy from '../assets/polaroids/polaroid-race-trophy.png';
+import userResearch from '../assets/polaroids/polaroid-user-research.png';
 
 const photos = {
   'at-sea': atSea,
@@ -21,7 +23,10 @@ const photos = {
   'cat-mooncake': catMooncake,
   'tennis-backhand': tennisBackhand,
   'tennis-forehand': tennisForehand,
+  'race-trophy': raceTrophy,
+  'user-research': userResearch,
 } as const;
+
 
 interface Props {
   photo: keyof typeof photos;
@@ -29,12 +34,22 @@ interface Props {
   displayWidth?: number;
   class?: string;
   eager?: boolean;
+  /** Grow in (0 → 120% → 100%) the first time it scrolls into view, after this many ms. */
+  revealDelay?: number;
+  style?: string;
 }
 
-const { photo, displayWidth = 96, class: className, eager = false } = Astro.props;
+const { photo, displayWidth = 96, class: className, eager = false, revealDelay, style } = Astro.props;
+const revealStyle = revealDelay !== undefined ? `--reveal-delay: ${revealDelay}ms;` : '';
 ---
 
-<span class:list={['polaroid', className]} data-polaroid aria-hidden="true">
+<span
+  class:list={['polaroid', className]}
+  data-polaroid
+  data-reveal={revealDelay !== undefined ? 'pop' : undefined}
+  style={`${revealStyle}${style ?? ''}` || undefined}
+  aria-hidden="true"
+>
   <span class="polaroid__card">
     <Picture
       class="polaroid__img"

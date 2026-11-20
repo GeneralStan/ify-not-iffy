@@ -1,0 +1,122 @@
+/* ===== Scroll reveal =====
+   See src/scripts/reveal.ts. Values follow the Nnamdi site's motion.ts: 900ms, enter ease for
+   movement, fade ease for opacity, 18-24px lifts. --reveal-delay staggers siblings.
+   Hidden states apply only under html.reveal-ready (motion allowed, JS running). */
+
+[data-reveal] {
+  --reveal-delay: 0ms;
+}
+
+.reveal-ready [data-reveal]:not(.is-in) {
+  opacity: 0;
+}
+
+.reveal-ready [data-reveal='rise']:not(.is-in) {
+  transform: translateY(18px);
+}
+
+/* Headings and leads: lift with a slight focus pull (the blur ends at filter: none). */
+.reveal-ready [data-reveal='soft']:not(.is-in) {
+  transform: translateY(18px);
+  filter: blur(6px);
+}
+
+/* Cards: lift with a touch of scale. */
+.reveal-ready [data-reveal='scale']:not(.is-in) {
+  transform: translateY(24px) scale(0.98);
+}
+
+.reveal-ready [data-reveal].is-in {
+  transition:
+    opacity var(--motion-duration-reveal) var(--motion-ease-fade) var(--reveal-delay),
+    transform var(--motion-duration-reveal) var(--motion-ease-enter) var(--reveal-delay),
+    filter var(--motion-duration-reveal) var(--motion-ease-enter) var(--reveal-delay),
+    box-shadow var(--motion-duration-base) var(--motion-ease-fade);
+}
+
+/* Polaroids: grow out of their own spot, 0 → 120% → 100%, like the hero photo (no fade). */
+.reveal-ready [data-reveal='pop']:not(.is-in) {
+  opacity: 1;
+  transform: scale(0);
+}
+
+.reveal-ready [data-reveal='pop'].is-in {
+  transition: none;
+  animation: intro-polaroid 760ms var(--reveal-delay) both;
+}
+
+/* Words: each word rises out of a bottom-edge mask, 70ms apart, like the hero headline.
+   Markup: [data-reveal="words"] > .reveal-word[style="--w: n"] > .reveal-word__inner */
+.reveal-word,
+.reveal-word__inner {
+  display: inline-block;
+}
+
+.reveal-ready [data-reveal='words'] {
+  opacity: 1;
+}
+
+.reveal-ready [data-reveal='words'] .reveal-word {
+  clip-path: inset(-1.5em -0.5em 0 -0.5em);
+}
+
+.reveal-ready [data-reveal='words']:not(.is-in) .reveal-word__inner {
+  opacity: 0;
+  transform: translateY(110%);
+}
+
+.reveal-ready [data-reveal='words'].is-in .reveal-word__inner {
+  animation: intro-word 760ms var(--motion-ease-enter) both;
+  animation-delay: calc(var(--reveal-delay) + var(--w, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+}
+
+/* ===== Cursor tooltip (Figma "Tooltip" 4042:3946) =====
+   Pill: padding 6/12, fully round, Lime/800 at 35% over a glass blur. Label/Medium, near-white,
+   with a faint drop shadow. Positioned by src/scripts/cursor-tooltip.ts. */
+.cursor-tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.cursor-tip__pill {
+  display: block;
+  padding: 6px 12px;
+  border-radius: 100px;
+  background: rgba(63, 81, 22, 0.35);
+  -webkit-backdrop-filter: blur(17.5px) saturate(1.2);
+  backdrop-filter: blur(17.5px) saturate(1.2);
+  color: #fefefe;
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgba(23, 31, 9, 0.1);
+  white-space: nowrap;
+  opacity: 0;
+  scale: 0.8;
+  transform-origin: 0 0;
+  transition:
+    opacity 160ms var(--motion-ease-fade),
+    scale 200ms var(--motion-ease-enter);
+}
+
+.cursor-tip.is-on .cursor-tip__pill {
+  opacity: 1;
+  scale: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-tip__pill {
+    transition: opacity 120ms linear;
+    scale: 1;
+  }
+}
