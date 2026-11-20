@@ -1,0 +1,25 @@
+---
+import Button from './Button.astro';
+import HedgeRow from './HedgeRow.astro';
+
+const mail = 'mailto:ify@example.com';
+const linkedin = 'https://www.linkedin.com/in/placeholder';
+---
+
+<footer class="site-footer">
+  <div class="footer-bg" aria-hidden="true">
+    <div class="footer-blobs"></div>
+    <div class="footer-grain"></div>
+  </div>
+  <div class="footer-copy">
+    <h2 class="footer-title text-display">Let’s Connect</h2>
+    <p class="footer-body text-body">
+      Thanks for visiting my little corner of the internet. Your presence here means a lot. This was website was made with ❤️
+    </p>
+    <div class="footer-links">
+      <Button href={mail} label="Email" variant="secondary" icon="leading" />
+      <Button href={linkedin} label="Linkedin" variant="secondary" icon="leading" />
+    </div>
+  </div>
+  <HedgeRow place="footer" />
+</footer>

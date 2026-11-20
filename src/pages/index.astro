@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 import FlapNav from '../components/FlapNav.astro';
 import HedgeRow from '../components/HedgeRow.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import StudyMedia from '../components/StudyMedia.astro';
 import { assetSrc, withBase } from '../lib/url';
 import bloom from '../assets/home/hero-work-tab-blob.svg';
 import polaroid from '../assets/home/polaroid-ify-4.png';
@@ -14,7 +16,6 @@ const polaroidSrc = assetSrc(polaroid);
 const shotSrc = assetSrc(shot);
 
 const mail = 'mailto:ify@example.com';
-const linkedin = 'https://www.linkedin.com/in/placeholder';
 const resume = withBase('/resume/ifeanyi-ulasika-resume.pdf');
 
 const driverTitle =
@@ -24,13 +25,29 @@ const projects = [
   {
     title:
       'Rebuilding Leta’s dispatch dashboard as a working prototype ops teams could test before launch.',
+    href: withBase('/work/leta-design-system/'),
+    tags: ['Leta Technologies', '·', 'Web', '·', 'B2B'],
+    video: false,
   },
-  { title: driverTitle },
-  { title: driverTitle },
-  { title: driverTitle },
+  {
+    title: 'Leta M-Pesa Mini App',
+    href: withBase('/work/leta-mpesa/'),
+    tags: ['Leta Technologies', '·', 'Mobile'],
+    video: false,
+  },
+  {
+    title: driverTitle,
+    href: withBase('/work/leta-driver-app/'),
+    tags: ['Leta Technologies', '·', 'Mobile', '·', 'B2B'],
+    video: false,
+  },
+  {
+    title: 'Crunchr',
+    href: withBase('/work/crunchr/'),
+    tags: ['Crunchr', '·', 'Mobile'],
+    video: true,
+  },
 ];
-
-const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
 ---
 
 <BaseLayout
@@ -77,41 +94,38 @@ const tags = ['Leta Technologies', '·', 'Web', '·', 'B2B'];
         <div class="card-board">
           {
             projects.map((project, index) => (
-              <article class={`project-card project-card--${index + 1}`}>
-                <div class="project-card__media">
-                  <img class="project-card__shot" src={shotSrc} alt="" />
+              <a class={`project-card project-card--${index + 1}`} href={project.href} id={project.video ? 'project-crunchr' : undefined}>
+                <div class:list={['project-card__media', project.video && 'project-card__media--phone']}>
+                  {
+                    project.video ? (
+                      <StudyMedia
+                        kind="video"
+                        frame="card"
+                        src="/work/crunchr-iphone.mp4"
+                        webm="/work/crunchr-iphone.webm"
+                        poster="/work/crunchr-iphone-poster.jpg"
+                        alt=""
+                      />
+                    ) : (
+                      <img class="project-card__shot" src={shotSrc} alt="" />
+                    )
+                  }
                 </div>
                 <div class="project-card__copy">
                   <p class="project-card__tags">
-                    {tags.map((tag) => (
+                    {project.tags.map((tag) => (
                       <span>{tag}</span>
                     ))}
                   </p>
                   <h3 class="project-card__title text-h3">{project.title}</h3>
                 </div>
-              </article>
+              </a>
             ))
           }
         </div>
       </div>
     </section>
 
-    <footer class="site-footer">
-      <div class="footer-bg" aria-hidden="true">
-        <div class="footer-blobs"></div>
-        <div class="footer-grain"></div>
-      </div>
-      <div class="footer-copy">
-        <h2 class="footer-title text-display">Let’s Connect</h2>
-        <p class="footer-body text-body">
-          Thanks for visiting my little corner of the internet. Your presence here means a lot. This was website was made with ❤️
-        </p>
-        <div class="footer-links">
-          <Button href={mail} label="Email" variant="secondary" icon="leading" />
-          <Button href={linkedin} label="Linkedin" variant="secondary" icon="leading" />
-        </div>
-      </div>
-      <HedgeRow place="footer" />
-    </footer>
+    <SiteFooter />
   </main>
 </BaseLayout>

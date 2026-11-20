@@ -294,6 +294,17 @@
   background: var(--color-neutral-0);
   border: 1.5px solid rgba(227, 227, 227, 0.8);
   border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-card__media--phone {
+  display: grid;
+  place-items: center;
+}
+
+.project-card__media--phone video {
+  pointer-events: none;
 }
 
 .project-card__media {

@@ -5,9 +5,11 @@ import { withBase } from '../lib/url';
 interface Props {
   title: string;
   description: string;
+  themeColor?: string;
+  tone?: 'stone';
 }
 
-const { title, description } = Astro.props;
+const { title, description, themeColor = '#FEFFFA', tone } = Astro.props;
 const exatExtraLight = withBase('/fonts/exatcyr-extralight.otf');
 const exatLight = withBase('/fonts/exatcyr-light.otf');
 const exatRegular = withBase('/fonts/exatcyr-regular.otf');
@@ -23,7 +25,7 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#FEFFFA" />
+    <meta name="theme-color" content={themeColor} />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <style is:inline set:html={`
@@ -37,7 +39,7 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
     `}></style>
     <title>{title}</title>
   </head>
-  <body>
+  <body class={tone === 'stone' ? 'tone-stone' : undefined}>
     <a class="skip text-label" href="#content">Skip to content</a>
     <slot />
   </body>

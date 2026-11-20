@@ -1,0 +1,129 @@
+---
+import { withBase } from '../lib/url';
+
+interface Props {
+  kind: 'image' | 'video' | 'placeholder';
+  frame: 'card' | 'hero' | 'slot';
+  src?: string;
+  webm?: string;
+  poster?: string;
+  alt?: string;
+  label?: string;
+}
+
+const { kind, frame, src, webm, poster, alt = '', label = '' } = Astro.props;
+const mediaSrc = src ? withBase(src) : undefined;
+const mediaWebm = webm ? withBase(webm) : undefined;
+const mediaPoster = poster ? withBase(poster) : undefined;
+---
+
+<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`]}>
+  {
+    kind === 'placeholder' && (
+      <p class="study-media__label text-meta">{label}</p>
+    )
+  }
+  {
+    kind === 'image' && mediaSrc && (
+      <img src={mediaSrc} alt={alt} />
+    )
+  }
+  {
+    kind === 'video' && mediaSrc && (
+      <>
+        <img class="study-media__still" src={mediaPoster} alt={alt} />
+        <video
+          class="study-media__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster={mediaPoster}
+          aria-label={alt || undefined}
+        >
+          {mediaWebm && <source src={mediaWebm} type="video/webm" />}
+          <source src={mediaSrc} type="video/mp4" />
+        </video>
+      </>
+    )
+  }
+</div>
+
+<style>
+  .study-media {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    background: var(--color-stone-100);
+    overflow: hidden;
+  }
+
+  .study-media--card {
+    position: absolute;
+    inset: 0;
+  }
+
+  .study-media--hero,
+  .study-media--slot {
+    min-height: 220px;
+    border-radius: var(--radius-sm);
+  }
+
+  .study-media--placeholder {
+    border: 1px dashed var(--color-stone-400);
+    background: var(--color-stone-50);
+  }
+
+  .study-media__label {
+    margin: 0;
+    padding: 24px;
+    text-align: center;
+    color: var(--color-stone-700);
+  }
+
+  .study-media img,
+  .study-media video {
+    display: block;
+  }
+
+  .study-media--card video,
+  .study-media--card .study-media__still {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    max-height: 100%;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .study-media--hero video,
+  .study-media--hero .study-media__still,
+  .study-media--slot video,
+  .study-media--slot .study-media__still,
+  .study-media--hero img:not(.study-media__still),
+  .study-media--slot img:not(.study-media__still) {
+    width: min(100%, 420px);
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .study-media__still {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .study-media--video .study-media__video {
+      display: none;
+    }
+
+    .study-media--video .study-media__still {
+      display: block;
+    }
+  }
+</style>
