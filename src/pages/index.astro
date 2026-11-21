@@ -57,6 +57,7 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                   class="project-card"
                   href={withBase(`/work/${project.slug}/`)}
                   data-astro-reload
+                  data-case-sheet
                   data-reveal="scale"
                   data-tooltip="View details"
                   style={`--order: ${project.n}; --reveal-delay: ${c * 110}ms`}

@@ -5,10 +5,6 @@
    56 between blocks. Section titles Heading/H1 Neutral/950; text Neutral/700; eyebrows Meta/Large
    Lime/800; sub-heads Heading/H2 Lead Neutral/950; findings Heading/H4 + Body Stone/900;
    image blocks Stone/100, 1px Stone/150, radius 8 (12 for decision visuals). */
-:root[data-page='work'] body {
-  background: var(--color-stone-0);
-}
-
 .case-page {
   min-height: 100svh;
   background: var(--color-stone-0);
@@ -371,4 +367,163 @@
 
 .case-header .is-tbd {
   background: color-mix(in srgb, var(--color-lime-300) 22%, transparent);
+}
+
+/* ===== Mobile bottom sheet (< 768px) =====
+   Case studies open over the page you came from (src/scripts/case-sheet.ts): the site stays visible,
+   dimmed, in a strip above the sheet (tap it to close). The sheet has rounded top corners, a grab
+   handle, and the close button in its top-left corner. Drag it down to close. */
+.case-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.case-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--color-lime-950) 55%, transparent);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.case-sheet__panel {
+  position: absolute;
+  inset: 40px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  background: var(--color-stone-0);
+  box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.25);
+  translate: 0 100%;
+  transition: translate 0.3s ease;
+  touch-action: pan-y;
+}
+
+.case-sheet.is-open .case-sheet__backdrop {
+  opacity: 1;
+}
+
+.case-sheet.is-open .case-sheet__panel {
+  translate: 0 0;
+}
+
+.case-sheet__panel.is-dragging {
+  transition: none;
+}
+
+.case-sheet__grab {
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 auto;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.case-sheet__handle {
+  width: 40px;
+  height: 5px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--color-neutral-0) 55%, transparent);
+}
+
+.case-sheet__close {
+  position: absolute;
+  z-index: 3;
+  top: 16px;
+  left: 16px;
+}
+
+.case-sheet__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.case-sheet__loading {
+  margin: 0;
+  padding: 120px 16px;
+  text-align: center;
+  color: var(--color-neutral-700);
+}
+
+/* The header clears the close button and handle inside the sheet. */
+.case-sheet .case-header {
+  padding-top: 80px;
+}
+
+html.has-case-sheet,
+html.has-case-sheet body {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-sheet__panel,
+  .case-sheet__backdrop {
+    transition: none;
+  }
+}
+
+/* Direct visits on phones get the same sheet look: the site's dark colour above, the page as a
+   rounded sheet with the handle and close button (src/layouts/CaseStudy.astro). */
+.case-sheet-backdrop,
+.case-page .case-sheet__grab {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  html:has(.case-page) body {
+    background: var(--color-lime-900);
+  }
+
+  .case-sheet-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto;
+    height: 40px;
+    z-index: 0;
+  }
+
+  .case-page {
+    position: relative;
+    z-index: 1;
+    margin-top: 40px;
+    border-radius: 20px 20px 0 0;
+    overflow: clip;
+    box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.25);
+  }
+
+  .case-page .case-sheet__grab {
+    display: grid;
+  }
+
+  /* Pinned to the sheet's top-left corner (40px strip + 16px), so it is always in reach. */
+  .case-page .case-rail {
+    position: fixed;
+    z-index: 4;
+    top: 56px;
+    left: 16px;
+  }
+
+  .case-page .case-header {
+    padding-top: 80px;
+  }
+}
+
+@media (max-width: 767px) {
+  .case-page {
+    transition: translate 0.3s ease;
+  }
+
+  .case-page.is-dragging {
+    transition: none;
+  }
 }

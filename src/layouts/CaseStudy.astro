@@ -45,7 +45,9 @@ const workHref = withBase('/#work');
 ---
 
 <BaseLayout page="work" title={`${data.name} — Ifeanyi Ulasika`} description={data.summary}>
-  <div class="case-page">
+  <a class="case-sheet-backdrop" href={workHref} data-astro-reload aria-label="Close, back to Work"></a>
+  <div class="case-page" data-case-page>
+    <div class="case-sheet__grab" data-sheet-grab aria-hidden="true"><span class="case-sheet__handle"></span></div>
     <div class="case-rail">
       <a class="case-close" href={workHref} data-astro-reload aria-label="Close, back to Work">
         <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -207,6 +209,19 @@ const workHref = withBase('/#work');
 </BaseLayout>
 
 <script>
+  /* Phones: the page is a sheet; drag it down (from the handle, or anywhere at the top of the page)
+     to close it and go back to Work. */
+  import { attachDrag } from '../scripts/case-sheet';
+
+  const page = document.querySelector<HTMLElement>('[data-case-page]');
+  const close = document.querySelector<HTMLAnchorElement>('.case-close');
+  if (page && close && window.matchMedia('(max-width: 767px)').matches) {
+    attachDrag(page, window, () => {
+      page.style.translate = '0 100vh';
+      window.setTimeout(() => (location.href = close.href), 250);
+    });
+  }
+
   /* Side nav: the section in view is the current link (Figma: Label/Medium, Neutral/950). */
   function bindToc() {
     const links = new Map<string, HTMLElement>();
