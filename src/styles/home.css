@@ -1,6 +1,6 @@
 .hero {
   position: relative;
-  background: var(--color-lime-950);
+  background: var(--color-lime-900);
   color: var(--color-neutral-0);
 }
 
@@ -12,14 +12,12 @@
   flex-direction: column;
 }
 
-.hero-bg,
 .footer-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.hero-blobs,
 .footer-blobs {
   position: absolute;
   inset: -8% -6%;
@@ -38,7 +36,6 @@
     #040501;
 }
 
-.hero-grain,
 .footer-grain {
   position: absolute;
   inset: 0;
@@ -98,10 +95,10 @@
   margin: 0;
   text-align: center;
   color: var(--color-neutral-0);
-  /* Smaller than the shared Display role on phones so the hero reads as compact as desktop:
-     32/40 at 390 growing to Display's 56/64 at 1440 (same fluid slope for size and leading). */
+  /* Figma: Display (56/64) on desktop, Heading/H1 (32/36) on the 390 Mobile Hero; fluid between. */
   font-size: clamp(32px, calc(32px + (100vw - 390px) * 0.022857), 56px);
-  line-height: clamp(40px, calc(40px + (100vw - 390px) * 0.022857), 64px);
+  line-height: clamp(36px, calc(36px + (100vw - 390px) * 0.026667), 64px);
+  letter-spacing: -0.02em;
 }
 
 .hero-line {
@@ -110,6 +107,23 @@
 
 .hero-line__inner {
   display: inline-block;
+}
+
+/* Figma Mobile Hero breaks after "and": "I design products and / build systems that ship."
+   On phones the last two lines flow as one run with a forced break before "build". */
+.hero-br--mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hero-br--mobile {
+    display: inline;
+  }
+
+  .hero-line:not(:first-child),
+  .hero-line:not(:first-child) .hero-line__inner {
+    display: inline;
+  }
 }
 
 .hero-title .lime {
@@ -241,12 +255,18 @@
   to { translate: 0 0; }
 }
 
-.hero-cta,
-.footer-links {
+/* Figma: the two hero buttons sit 16 apart on desktop, 8 on the Mobile Hero. */
+.hero-cta {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--button-gap);
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .hero-cta {
+    gap: 16px;
+  }
 }
 
 .flap-sentinel {
@@ -634,27 +654,34 @@
   color: var(--color-neutral-0);
 }
 
+/* Figma Footer 4058:2991: copy 688 wide, 164 from the top; headline, 32, Let's Chat, 32, link row
+   (8 padding, links 32 apart). Mobile Footer 4058:2464: 359 wide, 118 from the top, 24 gaps. */
 .footer-copy {
   position: relative;
   z-index: 1;
-  width: min(560px, calc(100% - 32px));
-  margin: 72px auto 0;
+  width: min(688px, calc(100% - 32px));
+  margin: 118px auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   text-align: center;
 }
 
 .footer-title {
   margin: 0;
   color: var(--color-neutral-0);
+  font-family: var(--type-display-family);
+  font-weight: var(--type-display-weight);
+  /* Display (56/64) on desktop, Heading/H1 (32/36) on the 390 Mobile Footer; fluid between. */
+  font-size: clamp(32px, calc(32px + (100vw - 390px) * 0.022857), 56px);
+  line-height: clamp(36px, calc(36px + (100vw - 390px) * 0.026667), 64px);
+  letter-spacing: -0.02em;
 }
 
-/* Figma 4033:3417 "Polaroid-cat-mooncake": a 67x75 crop (65.8%) of the PNG, so the whole box is
-   102x114.7 (1.821em x 2.048em at 56px), tilted 24.3deg left. Its centre sits 0.93em left of the "L"
-   and 0.64em below the top of the line. */
-.footer-title__text {
+/* The mooncake polaroid hangs off the top-left of "Thanks", tilted 24.3deg left. It sits outside
+   the word's reveal mask so it is not clipped. */
+.footer-title__first {
   position: relative;
   display: inline-block;
 }
@@ -663,29 +690,19 @@
   --pol-w: 1.821em;
   --pol-h: 2.048em;
   --pol-rotate: -24.3deg;
-  left: -1.838em;
-  top: -0.38em;
+  left: -1.55em;
+  top: -1.2em;
 }
 
-.footer-body {
-  margin: 0;
-  color: var(--color-neutral-100);
-}
-
-/* Figma footer 4045:5144: "Let’s Chat" spans the width of the row below it ("Send a note",
-   "Linkedin", 16 apart); the row sits 24 below it (16 gap + the row's 8 padding). */
 .footer-links {
-  display: grid;
-  gap: 24px;
-}
-
-.footer-links__row {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 32px;
+  padding: 8px 0;
 }
 
 /* Reveal wrappers around the buttons need a box for the lift to apply. */
+.footer-copy > span[data-reveal],
 .footer-links [data-reveal] {
   display: flex;
 }
@@ -756,26 +773,22 @@
   }
 
   .footer-copy {
-    margin-top: 160px;
+    margin-top: 164px;
     gap: 32px;
-  }
-
-  /* Figma: title and text sit 20 apart; the buttons 32 below the text. */
-  .footer-body {
-    margin-top: -12px;
   }
 
 }
 
 @media (max-width: 767px) {
+  /* Figma Mobile Hero 4058:2783: 390x500, copy 66 from the top, 30 between logo, title and buttons. */
   .hero-clip {
-    min-height: min(100svh, 780px);
+    min-height: 500px;
   }
 
   .hero-copy {
-    margin: auto;
-    padding: 56px 0 calc(var(--flap-h) + 96px);
-    gap: 24px;
+    margin: 66px auto 0;
+    padding: 0;
+    gap: 30px;
   }
 
   .hero-logo,
@@ -786,23 +799,14 @@
 
 
 
-  /* Mobile footer: as tall as its copy plus the hedges, so the hedges' tallest bush stands at most
-     64px below the buttons. The visible hedge strip scales with the screen (18.2vw, see the mobile
-     hedge row), so the space under the copy does too. */
+  /* Figma Mobile Footer 4058:2464 is 390x500. */
   .site-footer {
-    min-height: 0;
+    min-height: 500px;
   }
 
-  .footer-copy {
-    padding-bottom: calc(48px + 18.2vw);
-  }
-
-  /* 5% smaller than desktop, and its card's right edge just touches the "L" (0-1px). */
   .footer-polaroid {
-    --pol-w: calc(1.821em * 0.95);
-    --pol-h: calc(2.048em * 0.95);
-    left: -1.575em;
-    top: -0.32em;
+    left: -0.7em;
+    top: -1.7em;
   }
 }
 

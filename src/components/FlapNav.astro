@@ -25,19 +25,25 @@ interface Props {
 
 const { current = 'work' } = Astro.props;
 
-// Figma flap backgrounds (Flaps 4031:2832), 240x66, chamfer top-left with 8px rounded corners at
-// both ends of the chamfer and at the top right (Figma vertex radii, exported as SVG). Work's chamfer
-// is shallower (17.93 tall) than Playground's and About's (21.80). The 80-tall states are the same
-// shapes stretched by 80/66, which is what the hover / press `scale` does.
-const workShape =
-  'M0 21.4406C0 19.2053 0.93519 17.072 2.57905 15.5573L17.166 2.11669C18.6432 0.755602 20.5784 0 22.587 0H232C236.418 0 240 3.58172 240 8V66H0V21.4406Z';
-const tallShape =
-  'M0 24.8551C0 22.89 0.723273 20.9936 2.03189 19.5276L17.0776 2.67255C18.5954 0.972199 20.7665 0 23.0457 0H232C236.418 0 240 3.58172 240 8V66H0V24.8551Z';
+// Figma flap backgrounds (Flaps 4031:2832): chamfer top-left, 8px rounded corners at both ends of the
+// chamfer and at the top right. Desktop flaps are 200x56 (64 when hovered, pressed or current);
+// Mobile flaps are 119x44 (56). Work's chamfer is shallower than Playground's and About's. Paths are
+// generated from Figma's vertex positions and radii with Figma's own corner curves.
+const shapes = {
+  work: {
+    desktop: 'M0 18.6807C0 16.4704 0.9145 14.3586 2.5264 12.8463L13.911 2.1656C15.394 0.7744 17.3512 0 19.3846 0H192C196.4183 0 200 3.5817 200 8V56H0Z',
+    mobile: 'M0 14.7817C0 12.9531 0.6264 11.1798 1.7749 9.7569L7.249 2.9752C8.7677 1.0937 11.056 0 13.474 0H111C115.4183 0 119 3.5817 119 8V44H0Z',
+  },
+  tall: {
+    desktop: 'M0 21.5105C0 19.5701 0.7053 17.6957 1.9845 16.2366L13.8294 2.7261C15.3484 0.9935 17.5407 0 19.8449 0H192C196.4183 0 200 3.5817 200 8V56H0Z',
+    mobile: 'M0 16.9498C0 15.3756 0.4644 13.8364 1.3351 12.5249L7.2769 3.5751C8.7594 1.3422 11.2616 0 13.9418 0H111C115.4183 0 119 3.5817 119 8V44H0Z',
+  },
+};
 
 const items = [
-  { id: 'work', href: withBase('/'), label: 'Work', shape: workShape },
-  { id: 'playground', href: withBase('/playground/'), label: 'Playground', shape: tallShape },
-  { id: 'about', href: withBase('/about/'), label: 'About', shape: tallShape },
+  { id: 'work', href: withBase('/'), label: 'Work', shape: shapes.work },
+  { id: 'playground', href: withBase('/playground/'), label: 'Playground', shape: shapes.tall },
+  { id: 'about', href: withBase('/about/'), label: 'About', shape: shapes.tall },
 ] as const;
 ---
 
@@ -66,14 +72,20 @@ const items = [
             >
               <span class="flap__sr">{item.label}</span>
               <span class="flap__face flap__face--hero" aria-hidden="true">
-                <svg class="flap__shape" viewBox="0 0 240 66" preserveAspectRatio="none" focusable="false">
-                  <path d={item.shape} />
+                <svg class="flap__shape flap__shape--desktop" viewBox="0 0 200 56" preserveAspectRatio="none" focusable="false">
+                  <path d={item.shape.desktop} />
+                </svg>
+                <svg class="flap__shape flap__shape--mobile" viewBox="0 0 119 44" preserveAspectRatio="none" focusable="false">
+                  <path d={item.shape.mobile} />
                 </svg>
                 <span class="flap__label">{item.label}</span>
               </span>
               <span class="flap__face flap__face--docked" aria-hidden="true">
-                <svg class="flap__shape" viewBox="0 0 240 66" preserveAspectRatio="none" focusable="false">
-                  <path d={item.shape} transform="matrix(1 0 0 -1 0 66)" />
+                <svg class="flap__shape flap__shape--desktop" viewBox="0 0 200 56" preserveAspectRatio="none" focusable="false">
+                  <path d={item.shape.desktop} transform="matrix(1 0 0 -1 0 56)" />
+                </svg>
+                <svg class="flap__shape flap__shape--mobile" viewBox="0 0 119 44" preserveAspectRatio="none" focusable="false">
+                  <path d={item.shape.mobile} transform="matrix(1 0 0 -1 0 44)" />
                 </svg>
                 <span class="flap__label">{item.label}</span>
               </span>
@@ -209,34 +221,48 @@ const items = [
   /* ===== Flap nav sizes =====
      One flap is 240 wide at desktop and shrinks so logo + gap + three flaps fit the docked bar.
      Height follows width (66/240) but never drops below 48px, so it stays tappable on phones. */
+  /* Figma Hero / Docked Navigation (4029:2506, 4058:2752).
+     Desktop: 200x56 flaps (64 when grown) in a 600 row; docked, the 48px logo sits at the left of the
+     1240 bar, centred on the 64 height, and the flaps sit at the right.
+     Mobile (<768): 119x44 flaps (56 when grown) fill the width minus 16px margins; no docked logo. */
   :root {
     --dock-margin: 16px;
     --dock-bar: min(1240px, 100vw - 2 * var(--dock-margin));
-    --flap-unit: min(240px, (var(--dock-bar) - 56px) / 3);
+    --flap-unit: calc(var(--dock-bar) / 3);
     --flap-row: calc(3 * var(--flap-unit));
-    --flap-h: clamp(48px, var(--flap-unit) * 0.275, 66px);
-    --flap-h-tall: calc(var(--flap-h) * 80 / 66);
-    --flap-lift: calc(var(--flap-h) * 7 / 66);
-    --flap-grow: calc(80 / 66);
+    --flap-h: 44px;
+    --flap-h-tall: 56px;
+    --flap-lift: calc((var(--flap-h-tall) - var(--flap-h)) / 2);
+    --flap-grow: calc(56 / 44);
     --dock-shift: calc((var(--dock-bar) - var(--flap-row)) / 2);
-    --dock-logo: calc(var(--flap-h) * 48 / 66);
+    --dock-logo: 48px;
     --flap-hinge-ms: 760ms;
     --flap-stagger-ms: 80ms;
     --ease-hinge: cubic-bezier(0.55, 0, 0.15, 1);
     --ease-release: cubic-bezier(0.34, 1.4, 0.64, 1);
   }
 
-  /* Phones: Nav drops to its Mobile size (16/24), so flaps cap at 88px, the width "Playground"
-     needs with even padding, instead of filling the bar. The docked logo needs 44px, not 56. */
-  @media (max-width: 767px) {
-    :root {
-      --flap-unit: min(88px, (var(--dock-bar) - 44px) / 3);
-    }
-  }
-
   @media (min-width: 768px) {
     :root {
       --dock-margin: 32px;
+      --flap-unit: min(200px, (var(--dock-bar) - 64px) / 3);
+      --flap-h: 56px;
+      --flap-h-tall: 64px;
+      --flap-grow: calc(64 / 56);
+    }
+  }
+
+  .flap__shape--desktop {
+    display: none !important;
+  }
+
+  @media (min-width: 768px) {
+    .flap__shape--desktop {
+      display: block !important;
+    }
+
+    .flap__shape--mobile {
+      display: none !important;
     }
   }
 
@@ -301,10 +327,10 @@ const items = [
     opacity: 1;
   }
 
-  /* ===== Docked logo (Figma Logo/Size=Docked, 48px, centred on the 66 bar) ===== */
+  /* ===== Docked logo (Figma Logo/Size=Small, 48px, centred on the 64 bar). Not on phones. ===== */
   .flap-logo {
     position: absolute;
-    top: calc((var(--flap-h) - var(--dock-logo)) / 2);
+    top: calc((var(--flap-h-tall) - var(--dock-logo)) / 2);
     left: calc(50% - var(--dock-bar) / 2);
     width: var(--dock-logo);
     height: var(--dock-logo);
@@ -339,6 +365,12 @@ const items = [
     visibility: visible;
     pointer-events: auto;
     transition-delay: calc(3 * var(--flap-stagger-ms)), calc(3 * var(--flap-stagger-ms)), 0ms;
+  }
+
+  @media (max-width: 767px) {
+    .flap-logo {
+      display: none;
+    }
   }
 
   .flap-logo:focus-visible {
@@ -536,7 +568,7 @@ const items = [
       scale 140ms var(--motion-ease-out);
   }
 
-  /* Current page keeps its idle colours with a Medium label. In the hero it stands 80 tall. */
+  /* Current page keeps its idle colours with a Medium label and stands at its grown height. */
   .flap--about .flap__card:not(:hover):not([data-pressed]) .flap__face--docked {
     --fill: var(--color-blue-150);
   }
@@ -550,7 +582,7 @@ const items = [
     font-weight: var(--font-weight-medium);
   }
 
-  .flap__card[aria-current='page'] .flap__face--hero {
+  .flap__card[aria-current='page'] .flap__face {
     --grow: var(--flap-grow);
     --lift: var(--flap-lift);
   }

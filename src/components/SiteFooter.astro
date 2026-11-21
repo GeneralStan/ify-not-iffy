@@ -1,12 +1,16 @@
 ---
-/** Footer shared by every page (Figma 4045:5144). Persisted across page changes. */
+/**
+ * Footer shared by every page (Figma Footer 4058:2991, Mobile Footer 4058:2464). Persisted across
+ * page changes. Display headline (Heading/H1 on phones) with the mooncake polaroid tucked at the top
+ * left of "Thanks", then Let's Chat (Secondary) and two Link buttons.
+ */
 import Button from './Button.astro';
 import HedgeRow from './HedgeRow.astro';
 import Polaroid from './Polaroid.astro';
 import { cal, contact } from '../data/site';
 
-// "Let’s Connect" rises word by word, like the hero headline.
-const titleWords = ['Let’s', 'Connect'];
+// The headline rises word by word, like the hero.
+const titleWords = 'Thanks for stopping by my corner of the internet.'.split(' ');
 ---
 
 <footer class="site-footer" transition:persist="footer">
@@ -15,36 +19,35 @@ const titleWords = ['Let’s', 'Connect'];
     <div class="footer-grain"></div>
   </div>
   <div class="footer-copy">
-    <h2 class="footer-title text-display">
-      <span class="footer-title__text">
-        <Polaroid photo="cat-mooncake" class="footer-polaroid" displayWidth={102} revealDelay={260} />
-        <span class="footer-title__words" data-reveal="words">
-          {titleWords.map((word, w) => (
-            <>
-              {w > 0 && ' '}
-              <span class="reveal-word" style={`--w: ${w}`}>
+    <h2 class="footer-title" data-reveal="words">
+      {titleWords.map((word, w) => (
+        <>
+          {w > 0 && ' '}
+          {w === 0 ? (
+            <span class="footer-title__first">
+              <Polaroid photo="cat-mooncake" class="footer-polaroid" displayWidth={102} revealDelay={420} />
+              <span class="reveal-word" style="--w: 0">
                 <span class="reveal-word__inner">{word}</span>
               </span>
-            </>
-          ))}
-        </span>
-      </span>
+            </span>
+          ) : (
+            <span class="reveal-word" style={`--w: ${w}`}>
+              <span class="reveal-word__inner">{word}</span>
+            </span>
+          )}
+        </>
+      ))}
     </h2>
-    <p class="footer-body text-body-lg" data-reveal="rise" style="--reveal-delay: 360ms">
-      Thanks for visiting my little corner of the internet. Your presence here means a lot. This website was made with ❤️
-    </p>
+    <span data-reveal="rise" style="--reveal-delay: 520ms">
+      <Button href={cal.url} label="Let’s Chat" variant="secondary" cal newTab />
+    </span>
     <div class="footer-links">
-      <span class="footer-links__chat" data-reveal="rise" style="--reveal-delay: 460ms">
-        <Button href={cal.url} label="Let’s Chat" variant="secondary" cal newTab class="btn--block" />
+      <span data-reveal="rise" style="--reveal-delay: 600ms">
+        <Button href={contact.mail} label="Email" variant="link" icon="trailing" />
       </span>
-      <div class="footer-links__row">
-        <span data-reveal="rise" style="--reveal-delay: 540ms">
-          <Button href={contact.mail} label="Send a note" variant="secondary" />
-        </span>
-        <span data-reveal="rise" style="--reveal-delay: 620ms">
-          <Button href={contact.linkedin} label="Linkedin" variant="secondary" newTab />
-        </span>
-      </div>
+      <span data-reveal="rise" style="--reveal-delay: 680ms">
+        <Button href={contact.linkedin} label="Linkedin" variant="link" icon="trailing" newTab />
+      </span>
     </div>
   </div>
   <HedgeRow place="footer" />

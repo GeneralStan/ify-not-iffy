@@ -4,7 +4,8 @@ import ArrowIcon from './ArrowIcon.astro';
 interface Props {
   href: string;
   label: string;
-  variant?: 'primary' | 'secondary';
+  /** Link (Figma Type=Link): text + up-right arrow, no pill; underline on hover, Lime/400 when pressed. */
+  variant?: 'primary' | 'secondary' | 'link';
   icon?: 'none' | 'leading' | 'trailing';
   newTab?: boolean;
   /** No-icon buttons grow into their Trailing Icon variant on hover (on by default). */
@@ -20,7 +21,7 @@ const {
   variant = 'primary',
   icon = 'none',
   newTab = false,
-  morph = icon === 'none',
+  morph = icon === 'none' && variant !== 'link',
   cal = false,
   class: className,
 } = Astro.props;
@@ -117,6 +118,41 @@ const morphs = icon === 'none' && morph;
     background: var(--color-lime-50);
     color: var(--color-lime-900);
     border-color: rgba(13, 18, 2, 0.6);
+  }
+
+  /* Figma Button, Type=Link: Label/Large on every breakpoint, 24 tall, no padding, arrow 8 after.
+     Hover draws a 1px line under the label and arrow; Pressed turns both Lime/400. */
+  .btn--link {
+    position: relative;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--color-neutral-0);
+    font-size: 16px;
+  }
+
+  .btn--link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--motion-duration-base) var(--motion-ease-enter);
+  }
+
+  .btn--link:hover::after,
+  .btn--link:active::after {
+    transform: scaleX(1);
+  }
+
+  .btn--link:active {
+    color: var(--color-lime-400);
   }
 
   .btn--block {
