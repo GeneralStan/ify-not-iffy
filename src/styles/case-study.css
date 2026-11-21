@@ -371,8 +371,9 @@
 
 /* ===== Phone and tablet bottom sheet (< 1024px) =====
    Case studies open over the page you came from (src/scripts/case-sheet.ts): the site stays visible,
-   dimmed, in a strip above the sheet (tap it to close). The sheet has rounded top corners, a grab
-   handle, and the close button in its top-left corner. Drag it down to close. */
+   dimmed, in a 56px strip above the sheet (tap it to close). The close button sits in that strip,
+   8px above the sheet's top-left corner, and moves with the sheet when it is dragged. The sheet has
+   rounded top corners and a grab handle. Drag it down to close. */
 .case-sheet {
   position: fixed;
   inset: 0;
@@ -392,10 +393,9 @@
 
 .case-sheet__panel {
   position: absolute;
-  inset: 40px 0 0;
+  inset: 56px 0 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   border-radius: 20px 20px 0 0;
   background: var(--color-stone-0);
   box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.25);
@@ -437,13 +437,14 @@
 .case-sheet__close {
   position: absolute;
   z-index: 3;
-  top: 16px;
+  top: -48px;
   left: 16px;
 }
 
 .case-sheet__scroll {
   flex: 1;
   overflow-y: auto;
+  border-radius: 20px 20px 0 0;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
@@ -480,6 +481,9 @@ html.has-case-sheet body {
 }
 
 @media (max-width: 1023px) {
+  /* On the root, not just body: the sheet's top margin collapses through body, so body's own
+     background would start below the strip. */
+  html:has(.case-page),
   html:has(.case-page) body {
     background: var(--color-lime-900);
   }
@@ -488,14 +492,14 @@ html.has-case-sheet body {
     display: block;
     position: fixed;
     inset: 0 0 auto;
-    height: 40px;
+    height: 56px;
     z-index: 0;
   }
 
   .case-page {
     position: relative;
     z-index: 1;
-    margin-top: 40px;
+    margin-top: 56px;
     border-radius: 20px 20px 0 0;
     overflow: clip;
     box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.25);
@@ -505,11 +509,11 @@ html.has-case-sheet body {
     display: grid;
   }
 
-  /* Pinned to the sheet's top-left corner (40px strip + 16px), so it is always in reach. */
+  /* In the 56px strip, 8px above the sheet's top-left corner; pinned there so it is always in reach. */
   .case-page .case-rail {
     position: fixed;
     z-index: 4;
-    top: 56px;
+    top: 8px;
     left: 16px;
   }
 
