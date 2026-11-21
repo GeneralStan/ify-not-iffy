@@ -318,6 +318,63 @@ const CLOSE =
     }
   }
 
+  /* ===== Desktop: the name and role stay pinned with the toolbar =====
+     Lined up with the capsule (same vertical centre, the bar's left edge). At the top of the page they
+     sit bare, as with the flaps; once the page scrolls they get the same glass behind them so they
+     read over whatever passes underneath. */
+  @media (min-width: 1024px) {
+    :global(html[data-navstyle='glass']) :global(.site-nav__lead) {
+      position: fixed;
+      z-index: 60;
+      top: 8px;
+      left: max(32px, calc((100vw - 1200px) / 2));
+      margin: 0;
+      padding: 6px 18px 6px 0;
+      border-radius: 22px;
+      transition:
+        padding 0.3s ease,
+        background-color 0.3s ease,
+        box-shadow 0.3s ease,
+        -webkit-backdrop-filter 0.3s ease,
+        backdrop-filter 0.3s ease;
+    }
+
+    :global(html[data-navstyle='glass'].is-scrolled) :global(.site-nav__lead) {
+      padding-left: 18px;
+      left: calc(max(32px, calc((100vw - 1200px) / 2)) - 18px);
+      background: rgba(255, 255, 255, 0.42);
+      -webkit-backdrop-filter: blur(16px) saturate(1.7) brightness(1.04);
+      backdrop-filter: blur(16px) saturate(1.7) brightness(1.04);
+      box-shadow:
+        0 0 0 0.5px rgba(10, 10, 10, 0.1),
+        0 8px 24px rgba(10, 10, 10, 0.12),
+        0 1px 2px rgba(10, 10, 10, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 0 14px rgba(255, 255, 255, 0.14);
+    }
+
+    /* Ink follows what is under the bar: light text over the hero and footer, the page's own inks
+       elsewhere (Home's light section uses Work's stone inks). */
+    :global(html[data-navstyle='glass'][data-page='home']:not(.glass-on-dark)) :global(.site-nav) {
+      --nav-name: var(--color-stone-950);
+      --nav-role: var(--color-stone-700);
+    }
+
+    :global(html[data-navstyle='glass'].glass-on-dark) :global(.site-nav) {
+      --nav-name: var(--color-neutral-0);
+      --nav-role: var(--color-stone-400);
+    }
+
+    :global(html[data-navstyle='glass'].is-scrolled.glass-on-dark) :global(.site-nav__lead) {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow:
+        0 0 0 0.5px rgba(255, 255, 255, 0.16),
+        0 8px 24px rgba(10, 10, 10, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 0 14px rgba(255, 255, 255, 0.14);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .glass,
     .glass-nav__pill,
