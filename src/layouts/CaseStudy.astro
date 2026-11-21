@@ -1,0 +1,181 @@
+---
+/**
+ * Case study page. Structure: Problem, Action, Impact (PAI), see "Portfolio Case Study Structure".
+ * Header (title, hero clip, role / scope / timeline), Problem, 3 to 5 Actions (each a small PAI with
+ * the rejected options in the middle), Impact (metrics, quotes, projected impact, one reflection).
+ * Lives inside the shared site frame: Work stays the current flap and the page opens docked.
+ * Anything still "[TBD: …]" is marked with .is-tbd so drafts are easy to spot.
+ */
+import type { CollectionEntry } from 'astro:content';
+import SiteLayout from './SiteLayout.astro';
+import StudyMedia from '../components/StudyMedia.astro';
+import { withBase } from '../lib/url';
+
+interface Neighbor {
+  id: string;
+  data: { name: string };
+}
+
+interface Props {
+  study: CollectionEntry<'work'>;
+  prev?: Neighbor | null;
+  next?: Neighbor | null;
+}
+
+const { study, prev = null, next = null } = Astro.props;
+const { data } = study;
+const isTbd = (value: string) => value.includes('[TBD');
+---
+
+<SiteLayout page="work" land="docked" bodyClass="case" title={`${data.name} — Ifeanyi Ulasika`} description={data.summary}>
+  <article class="case-wrap">
+    <p class="case-back">
+      <a class="case-back__link text-meta" href={withBase('/#work')}>Back to Work</a>
+    </p>
+
+    <header class="case-header" id="case-header">
+      <p class="case-tags text-meta">
+        {data.tags.map((tag, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <span>{tag}</span>
+          </>
+        ))}
+      </p>
+      <h1 class:list={['case-title text-h1', isTbd(data.title) && 'is-tbd']}>{data.title}</h1>
+      <div class="case-hero">
+        <StudyMedia frame="hero" {...data.hero} />
+      </div>
+      <dl class="case-meta">
+        <div>
+          <dt class="text-meta">Role</dt>
+          <dd class:list={['text-body', isTbd(data.role) && 'is-tbd']}>{data.role}</dd>
+        </div>
+        <div>
+          <dt class="text-meta">Scope</dt>
+          <dd class:list={['text-body', isTbd(data.scope) && 'is-tbd']}>{data.scope}</dd>
+        </div>
+        <div>
+          <dt class="text-meta">Timeline</dt>
+          <dd class:list={['text-body', isTbd(data.timeline) && 'is-tbd']}>{data.timeline}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <section class="case-act" id="problem" aria-labelledby="problem-title">
+      <h2 class="case-act__label text-meta" id="problem-title">Problem</h2>
+      <p class:list={['case-prose text-body-lg', isTbd(data.problem.body) && 'is-tbd']}>{data.problem.body}</p>
+      <div class="case-visual">
+        <StudyMedia frame="slot" {...data.problem.visual} />
+      </div>
+      {
+        data.problem.hmw && (
+          <p class:list={['case-hmw text-body', isTbd(data.problem.hmw) && 'is-tbd']}>
+            <span class="case-hmw__label text-meta">HMW</span>
+            {data.problem.hmw}
+          </p>
+        )
+      }
+    </section>
+
+    <section class="case-act" id="actions" aria-labelledby="actions-title">
+      <h2 class="case-act__label text-meta" id="actions-title">Actions</h2>
+      <ol class="action-list">
+        {
+          data.actions.map((item, index) => (
+            <li class="action" id={`action-${index + 1}`}>
+              <p class="action__index text-meta">{String(index + 1).padStart(2, '0')}</p>
+              <h3 class:list={['action__title text-h3', isTbd(item.title) && 'is-tbd']}>{item.title}</h3>
+              <div class="pai">
+                <h4 class="pai__label text-meta">Problem</h4>
+                <p class:list={['text-body', isTbd(item.problem) && 'is-tbd']}>{item.problem}</p>
+              </div>
+              <div class="pai pai--options">
+                <h4 class="pai__label text-meta">Options</h4>
+                <ul class="option-list">
+                  {item.options.map((option) => (
+                    <li class="option">
+                      <p class="option__name">
+                        <span class="option__mark text-meta">Dropped</span>
+                        <s class:list={[isTbd(option.name) && 'is-tbd']}>{option.name}</s>
+                      </p>
+                      <p class:list={['option__reason text-body', isTbd(option.reason) && 'is-tbd']}>{option.reason}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class="pai pai--chosen">
+                <h4 class="pai__label text-meta">Action</h4>
+                <p class:list={['text-body', isTbd(item.action) && 'is-tbd']}>{item.action}</p>
+              </div>
+              <div class="pai">
+                <h4 class="pai__label text-meta">Impact</h4>
+                <p class:list={['text-body', isTbd(item.impact) && 'is-tbd']}>{item.impact}</p>
+              </div>
+              {item.visual && (
+                <div class="case-visual">
+                  <StudyMedia frame="slot" {...item.visual} />
+                </div>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="case-act" id="impact" aria-labelledby="impact-title">
+      <h2 class="case-act__label text-meta" id="impact-title">Impact</h2>
+      <ul class="metric-list">
+        {
+          data.impact.metrics.map((metric) => (
+            <li class:list={['metric', metric.projected && 'metric--projected']}>
+              <p class="metric__value">
+                <span class:list={[isTbd(metric.value) && 'is-tbd']}>{metric.value}</span>
+                {metric.projected && <span class="metric__flag">Projected</span>}
+              </p>
+              <p class:list={['metric__label text-body', isTbd(metric.label) && 'is-tbd']}>{metric.label}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="quote-list">
+        {
+          data.impact.quotes.map((quote) => (
+            <li>
+              <blockquote class="quote">
+                <p class:list={['text-body-lg', isTbd(quote.text) && 'is-tbd']}>{quote.text}</p>
+                <footer class:list={['text-meta', isTbd(quote.source) && 'is-tbd']}>{quote.source}</footer>
+              </blockquote>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="reflection">
+        <h3 class="pai__label text-meta">Reflection</h3>
+        <p class:list={['text-body', isTbd(data.impact.reflection) && 'is-tbd']}>{data.impact.reflection}</p>
+      </div>
+    </section>
+
+    <nav class="case-pager" aria-label="Other case studies">
+      <a class="case-pager__back text-meta" href={withBase('/#work')}>Back to Work</a>
+      <div class="case-pager__moves">
+        {
+          prev && (
+            <a class="case-pager__move" href={withBase(`/work/${prev.id}/`)}>
+              <span class="text-meta">Previous</span>
+              <span class="case-pager__name">{prev.data.name}</span>
+            </a>
+          )
+        }
+        {
+          next && (
+            <a class="case-pager__move case-pager__move--next" href={withBase(`/work/${next.id}/`)}>
+              <span class="text-meta">Next</span>
+              <span class="case-pager__name">{next.data.name}</span>
+            </a>
+          )
+        }
+      </div>
+    </nav>
+  </article>
+</SiteLayout>

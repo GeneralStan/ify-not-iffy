@@ -543,6 +543,8 @@
 }
 
 .project-card {
+  color: inherit;
+  text-decoration: none;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -551,6 +553,16 @@
   border: 1.5px solid rgba(227, 227, 227, 0.8);
   border-radius: var(--radius-md);
   transition: box-shadow var(--motion-duration-base) var(--motion-ease-fade);
+}
+
+/* Crunchr: the phone video sits centred in the media box. */
+.project-card__media--phone {
+  display: grid;
+  place-items: center;
+}
+
+.project-card__media--phone video {
+  pointer-events: none;
 }
 
 /* Figma "Case Study Card" (4033:3512), State=Hover: two soft shadows, nothing moves. */

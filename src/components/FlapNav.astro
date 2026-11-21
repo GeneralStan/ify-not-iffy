@@ -138,17 +138,23 @@ const items = [
   };
 
   let landDocked = false;
+  // Case study pages (<html data-land="docked">) always open docked, hero just above.
+  const wantsDocked = () => document.documentElement.dataset.land === 'docked';
+  const dock = () => {
+    if (!slot) return;
+    const line = slot.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: line, behavior: 'instant' });
+  };
+  if (wantsDocked() && !location.hash) dock();
   document.addEventListener('astro:after-swap', () => {
     syncCurrent();
-    if (landDocked && slot) {
-      const line = slot.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: line, behavior: 'instant' });
-    }
+    if (landDocked || wantsDocked()) dock();
     landDocked = false;
   });
 
   function go(link: HTMLAnchorElement) {
-    if (link.dataset.pageLink === currentPage()) {
+    const samePath = new URL(link.href).pathname === location.pathname;
+    if (link.dataset.pageLink === currentPage() && samePath) {
       // Already here: back to the top of this page.
       window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
       return;

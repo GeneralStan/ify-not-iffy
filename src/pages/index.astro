@@ -1,6 +1,7 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
-import { assetSrc } from '../lib/url';
+import StudyMedia from '../components/StudyMedia.astro';
+import { assetSrc, withBase } from '../lib/url';
 import shot from '../assets/home/project-screenshot-2026-11-17.png';
 
 const shotSrc = assetSrc(shot);
@@ -8,20 +9,25 @@ const shotSrc = assetSrc(shot);
 // Figma "Work (Final)" 4026:619. Cards 1 and 3 sit in the left column; 2 and 4 in the right, 124px lower.
 const projects = [
   {
+    slug: 'leta-design-system',
     tags: ['Leta Technologies', 'Web', 'B2B'],
     title: 'Rebuilding Leta’s dispatch dashboard as a working prototype ops teams could test before launch.',
   },
   {
-    tags: ['Leta Technologies', 'Web', 'B2B'],
-    title: 'Redesigning the Driver App to decrease order fulfilment time and boost driver retention.',
+    slug: 'leta-mpesa',
+    tags: ['Leta Technologies', 'Mobile'],
+    title: 'Bringing Leta deliveries inside M-PESA and cutting time to first value by 69%.',
   },
   {
+    slug: 'leta-driver-app',
     tags: ['Leta Technologies', 'Mobile', 'B2B'],
     title: 'Redesigning the Driver App to decrease order fulfilment time and boost driver retention.',
   },
   {
-    tags: ['Leta Technologies', 'Mobile', 'B2C'],
+    slug: 'crunchr',
+    tags: ['Crunchr', 'Mobile', 'B2C'],
     title: 'Enabling users to purchase everyday essentials within 30 minutes.',
+    video: true,
   },
 ].map((project, index) => ({ ...project, n: index + 1 }));
 
@@ -47,14 +53,26 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
           columns.map((column, c) => (
             <div class={`card-column card-column--${c + 1}`}>
               {column.map((project) => (
-                <article
+                <a
                   class="project-card"
+                  href={withBase(`/work/${project.slug}/`)}
                   data-reveal="scale"
                   data-tooltip="View details"
                   style={`--order: ${project.n}; --reveal-delay: ${c * 110}ms`}
                 >
-                  <div class="project-card__media">
-                    <img class="project-card__shot" src={shotSrc} alt="" />
+                  <div class:list={['project-card__media', project.video && 'project-card__media--phone']}>
+                    {project.video ? (
+                      <StudyMedia
+                        kind="video"
+                        frame="card"
+                        src="/work/crunchr-iphone.mp4"
+                        webm="/work/crunchr-iphone.webm"
+                        poster="/work/crunchr-iphone-poster.jpg"
+                        alt=""
+                      />
+                    ) : (
+                      <img class="project-card__shot" src={shotSrc} alt="" />
+                    )}
                   </div>
                   <div class="project-card__copy">
                     <p class="project-card__tags text-meta">
@@ -67,7 +85,7 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                     </p>
                     <h3 class="project-card__title text-h3">{project.title}</h3>
                   </div>
-                </article>
+                </a>
               ))}
             </div>
           ))
