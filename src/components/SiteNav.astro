@@ -199,6 +199,22 @@ const CLOSE =
     margin-top: 10px;
     text-decoration: none;
     border-radius: 4px;
+    /* Back in after the menu closes: slides in from the left once the flaps have left. */
+    transition:
+      translate var(--motion-duration-base) var(--motion-ease-enter) 120ms,
+      opacity var(--motion-duration-base) var(--motion-ease-fade) 120ms,
+      visibility 0s linear 0s;
+  }
+
+  /* Menu open: the name and role slide out to the left and fade while the flaps come in. */
+  .site-nav.is-open .site-nav__lead {
+    translate: -24px 0;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      translate var(--motion-duration-base) var(--motion-ease-enter),
+      opacity var(--motion-duration-fast) var(--motion-ease-fade),
+      visibility 0s linear var(--motion-duration-base);
   }
 
   .site-nav__name {
@@ -518,8 +534,14 @@ const CLOSE =
     .site-nav__menu,
     .site-nav__menu-panel .flap,
     .site-nav__close,
-    .nav-edge {
+    .nav-edge,
+    .site-nav__lead,
+    .site-nav.is-open .site-nav__lead {
       transition: none;
+    }
+
+    .site-nav.is-open .site-nav__lead {
+      translate: none;
     }
   }
 </style>
