@@ -2,7 +2,8 @@
  * Glass toolbar (src/components/GlassNav.astro). Only runs when the glass nav is on.
  * - Phones and tablets: Menu morphs into the capsule; × (on its left), Escape, a tap outside or
  *   following a link closes it. The header's .is-open also slides the name and role out.
- * - The selection pill sits behind the current page and slides to a hovered or pressed item.
+ * - The selection pill sits behind the current page and slides to a hovered or pressed item. On
+ *   Home it appears behind Work once Selected projects reaches the toolbar.
  * - Over the dark hero or footer, html.glass-on-dark switches the glass to its dark style.
  * - Chromium: each glass shape gets an SVG displacement map that bends what is behind it near the
  *   rim, like a thick glass edge. Safari and Firefox do not support SVG filters in backdrop-filter,
@@ -19,7 +20,11 @@ if (root.dataset.navstyle === 'glass') {
   const closeButton = wrap?.querySelector<HTMLButtonElement>('[data-glass-close]');
   const pill = wrap?.querySelector<HTMLElement>('[data-glass-pill]');
   const items = [...(wrap?.querySelectorAll<HTMLElement>('[data-glass-item]') ?? [])];
-  const current = items.find((item) => item.getAttribute('aria-current') === 'page') ?? null;
+  const pageItem = items.find((item) => item.getAttribute('aria-current') === 'page') ?? null;
+  /* Home has no page item; once Selected projects reaches the toolbar, Work is selected. */
+  const workItem = items.find((item) => item.getAttribute('href')?.endsWith('/work/')) ?? null;
+  const projects = root.dataset.page === 'home' ? document.querySelector<HTMLElement>('#work') : null;
+  let current = pageItem;
   const compact = window.matchMedia('(max-width: 1023px)');
 
   /* ---------- Open / close (phones and tablets) ---------- */
@@ -88,6 +93,14 @@ if (root.dataset.navstyle === 'glass') {
       return r.top <= line && r.bottom >= line;
     });
     root.classList.toggle('glass-on-dark', dark);
+    if (projects) {
+      const inWork = projects.getBoundingClientRect().top <= line;
+      const next = inWork ? workItem : null;
+      if (next !== current) {
+        current = next;
+        if (!capsule?.matches(':hover')) placePill(current);
+      }
+    }
   }
   window.addEventListener('scroll', tone, { passive: true });
 
@@ -175,7 +188,7 @@ if (root.dataset.navstyle === 'glass') {
     displace.setAttribute('yChannelSelector', 'G');
     filter.append(feImage, displace);
     defs.append(filter);
-    const value = `blur(4px) url(#${id}) blur(10px) saturate(1.7) brightness(1.04)`;
+    const value = `blur(4px) url(#${id}) blur(13.5px) saturate(1.2)`;
     el.style.setProperty('backdrop-filter', value);
     el.style.setProperty('-webkit-backdrop-filter', value);
   }
