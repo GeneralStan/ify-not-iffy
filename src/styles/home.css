@@ -627,13 +627,7 @@
   color: var(--color-neutral-700);
 }
 
-/* Figma Case Study Card: tags are Geist Mono 18/24, -0.32px on desktop. */
-@media (min-width: 1024px) {
-  .project-card__tags {
-    font-size: 18px;
-    letter-spacing: -0.32px;
-  }
-}
+/* Figma Case Study Card: tags are Meta/Large (Geist Mono 18/24, 16/24 on mobile) via .text-meta-lg. */
 
 /* Heading/H3 (Geist Regular 24/32, -2%) via .text-h3. */
 .project-card__title {
@@ -680,7 +674,10 @@
 }
 
 /* The mooncake polaroid hangs off the top-left of "Thanks", tilted 24.3deg left. It sits outside
-   the word's reveal mask so it is not clipped. */
+   the word's reveal mask so it is not clipped. Placed from Figma's transform: on desktop (Footer
+   4058:2991) the 67x75 card's centre is 9.6px left of and 18.6px above the start of "Thanks"; on
+   the Mobile Footer (4058:2464) the 49.9x56 card is relatively larger and its centre is 50.3px
+   right of and 19.7px above it. The PNG box is the card / 0.658 (see Polaroid.astro). */
 .footer-title__first {
   position: relative;
   display: inline-block;
@@ -690,8 +687,8 @@
   --pol-w: 1.821em;
   --pol-h: 2.048em;
   --pol-rotate: -24.3deg;
-  left: -1.55em;
-  top: -1.2em;
+  left: -1.082em;
+  top: -1.356em;
 }
 
 .footer-links {
@@ -805,8 +802,15 @@
   }
 
   .footer-polaroid {
-    left: -0.7em;
-    top: -1.7em;
+    --pol-w: 2.369em;
+    --pol-h: 2.663em;
+    left: 0.388em;
+    top: -1.946em;
+  }
+
+  /* Mobile Footer: the two links sit 16 apart (32 on desktop). */
+  .footer-links {
+    gap: 16px;
   }
 }
 

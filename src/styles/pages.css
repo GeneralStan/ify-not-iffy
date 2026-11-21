@@ -68,7 +68,7 @@
   object-fit: cover;
 }
 
-/* Figma badge: #FFEAB3 chip, Geist Mono 18/20, #39362D. */
+/* Figma badge: #FFEAB3 chip, Meta/Large (Geist Mono 18/24, 16/24 on mobile), #39362D. */
 .play-card__badge {
   position: absolute;
   top: 12px;
@@ -77,9 +77,9 @@
   border-radius: 4px;
   background: #ffeab3;
   color: #39362d;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  line-height: 16px;
+  font-family: var(--type-meta-lg-family);
+  font-size: var(--type-meta-lg-size);
+  line-height: var(--type-meta-lg-line-height);
 }
 
 .play-card__title {
@@ -127,11 +127,6 @@
     left: var(--x);
     top: var(--y);
     width: var(--w);
-  }
-
-  .play-card__badge {
-    font-size: 18px;
-    line-height: 20px;
   }
 
   .play-card__title {

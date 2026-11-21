@@ -15,7 +15,9 @@
   color: var(--color-neutral-700);
 }
 
-/* ===== Rail and close button ===== */
+/* ===== Rail and close button =====
+   Figma draws the rail transparent with a white-outlined, white close button: the page is a sheet over
+   the dark site. The rail takes the hero's Lime/900 so the button reads the same. */
 .case-rail {
   position: fixed;
   z-index: 20;
@@ -92,6 +94,7 @@
     top: 0;
     left: auto;
     height: 100svh;
+    background: var(--color-lime-900);
     padding-top: 80px;
     display: flex;
     justify-content: center;
@@ -99,15 +102,9 @@
   }
 
   .case-close {
-    border-color: var(--color-neutral-200);
     background: transparent;
-    color: var(--color-neutral-950);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  .case-close:hover {
-    background: var(--color-stone-100);
   }
 
   .case-toc {
