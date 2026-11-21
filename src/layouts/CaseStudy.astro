@@ -209,13 +209,13 @@ const workHref = withBase('/work/');
 </BaseLayout>
 
 <script>
-  /* Phones: the page is a sheet; drag it down (from the handle, or anywhere at the top of the page)
+  /* Phones and tablets: the page is a sheet; drag it down (from the handle, or anywhere at the top of the page)
      to close it and go back to Work. */
   import { attachDrag } from '../scripts/case-sheet';
 
   const page = document.querySelector<HTMLElement>('[data-case-page]');
   const close = document.querySelector<HTMLAnchorElement>('.case-close');
-  if (page && close && window.matchMedia('(max-width: 767px)').matches) {
+  if (page && close && window.matchMedia('(max-width: 1023px)').matches) {
     attachDrag(page, window, () => {
       page.style.translate = '0 100vh';
       window.setTimeout(() => (location.href = close.href), 250);

@@ -369,7 +369,7 @@
   background: color-mix(in srgb, var(--color-lime-300) 22%, transparent);
 }
 
-/* ===== Mobile bottom sheet (< 768px) =====
+/* ===== Phone and tablet bottom sheet (< 1024px) =====
    Case studies open over the page you came from (src/scripts/case-sheet.ts): the site stays visible,
    dimmed, in a strip above the sheet (tap it to close). The sheet has rounded top corners, a grab
    handle, and the close button in its top-left corner. Drag it down to close. */
@@ -472,14 +472,14 @@ html.has-case-sheet body {
   }
 }
 
-/* Direct visits on phones get the same sheet look: the site's dark colour above, the page as a
+/* Direct visits on phones and tablets get the same sheet look: the site's dark colour above, the page as a
    rounded sheet with the handle and close button (src/layouts/CaseStudy.astro). */
 .case-sheet-backdrop,
 .case-page .case-sheet__grab {
   display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   html:has(.case-page) body {
     background: var(--color-lime-900);
   }
@@ -518,7 +518,7 @@ html.has-case-sheet body {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .case-page {
     transition: translate 0.3s ease;
   }

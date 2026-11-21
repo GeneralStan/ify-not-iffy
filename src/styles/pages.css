@@ -12,21 +12,30 @@
 }
 
 /* ===== Playground canvas (Figma Playground 4068:7511) =====
-   A window onto a board bigger than the screen; drag to explore. The board keeps the Figma frame's
-   coordinates (origin at the 1440 frame's left edge, centred on the screen) and is scaled down on
-   phones. Wheel and trackpad scrolling still scroll the page. */
+   The canvas fills the page from the top; the heading floats over it (it lets drags through), and
+   the board starts just below the heading, so dragged cards slide under the title, the lead and the
+   nav bar. The board keeps the Figma frame's coordinates (origin at the 1440 frame's left edge,
+   centred on the screen) and is scaled down below 1200. Wheel and trackpad scrolling still scroll
+   the page. On phones the canvas stays shorter than the screen so there is always page to swipe. */
 .playground {
-  padding-bottom: 0;
+  padding: 0;
 }
 
 .play-canvas {
+  --board-top: calc(var(--section-top) + 176px);
   position: relative;
-  height: clamp(480px, 78svh, 1616px);
+  height: calc(var(--board-top) + clamp(480px, 70svh, 1616px));
   overflow: hidden;
   cursor: grab;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+}
+
+@media (max-width: 767px) {
+  .play-canvas {
+    height: min(calc(var(--board-top) + 50svh), 80svh);
+  }
 }
 
 .play-canvas.is-dragging {
@@ -38,10 +47,21 @@
   outline-offset: -4px;
 }
 
+.play-head {
+  position: absolute;
+  z-index: 2;
+  top: var(--section-top);
+  left: 50%;
+  translate: -50% 0;
+  width: min(604px, calc(100% - 32px));
+  margin: 0;
+  pointer-events: none;
+}
+
 .play-board {
   --s: 0.62;
   position: absolute;
-  top: 0;
+  top: var(--board-top);
   left: calc(50% - 720px * var(--s));
   width: calc(1440px * var(--s));
   height: 0;

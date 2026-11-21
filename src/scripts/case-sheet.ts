@@ -1,12 +1,12 @@
 /**
- * Case studies on phones (< 768px) open as a tall bottom sheet over the page you came from:
+ * Case studies on phones and tablets (< 1024px) open as a tall bottom sheet over the page you came from:
  * a dimmed strip of the site stays visible above it (tap it to close), with a grab handle and a
  * close button at the top of the sheet. Drag the sheet down to close it. The URL changes to the
  * case study, and the back button closes the sheet (see the popstate guard in BaseLayout.astro).
- * Larger screens follow the link to the full case study page as before.
+ * Desktops follow the link to the full case study page as before.
  */
 
-const phone = window.matchMedia('(max-width: 767px)');
+const phone = window.matchMedia('(max-width: 1023px)');
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 const CLOSE_MS = 300;
 const DRAG_CLOSE_PX = 120;
