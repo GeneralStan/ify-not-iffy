@@ -107,18 +107,47 @@
 }
 
 /* ===== About: intro with polaroids =====
-   Desktop: six polaroids around the 720-wide copy at their Figma spots on the 1440 frame, scaled
-   with the screen below 1440. Phones and tablets: they sit in pairs, tucked half off the left and
-   right edges, in the gaps before each paragraph, so they never cover a line of text. */
+   Desktop (1024+, Figma About 4068:7754): six polaroids around the 720-wide copy at their Figma spots
+   on the 1440 frame, scaled with the screen below 1440.
+   Phones and tablets (Figma 4074:8017): heading 100 from the top (title and lead 4 apart), 24, one row
+   of six polaroids running off both edges, 24, the copy in Body/Default (16 between paragraphs). */
+.about {
+  padding-top: 100px;
+}
+
+.about > .section-head {
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.about .section-lead {
+  width: min(266px, 100%);
+}
+
+.about-strip {
+  position: relative;
+  height: 129px;
+  margin-bottom: 24px;
+}
+
+.about-strip .about-strip__photo {
+  /* Card 98.8x120; the PNG box is the card / 0.566 wide and 576/512 of that tall. */
+  --pol-w: 174.6px;
+  --pol-h: 196.4px;
+  left: calc(50% + var(--dx) * 1px - var(--pol-w) / 2);
+  top: calc(50% - var(--pol-h) / 2);
+}
+
 .about-intro {
   position: relative;
   width: min(720px, calc(100% - 32px));
-  margin: 40px auto 0;
+  margin: 0 auto;
 }
 
 .about-copy {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   text-align: center;
 }
 
@@ -127,56 +156,38 @@
   color: var(--color-blue-800);
 }
 
+@media (max-width: 1023px) {
+  .about-copy__p {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0;
+  }
+}
+
 .about-stage {
   display: none;
 }
 
-.about-pair {
-  position: relative;
-  height: 148px;
-  margin-inline: calc(50% - 50vw);
-}
-
-.about-pair:first-child {
-  height: 136px;
-}
-
-.about-pair .about-pair__photo {
-  --pol-w: 168px;
-  --pol-h: calc(168px * 576 / 512);
-  top: calc(50% - var(--pol-h) / 2);
-}
-
-.about-pair .about-pair__photo--left {
-  left: -58px;
-}
-
-.about-pair .about-pair__photo--right {
-  left: auto;
-  right: -58px;
-}
-
-@media (min-width: 768px) {
-  .about-pair .about-pair__photo--left {
-    left: 24px;
-  }
-
-  .about-pair .about-pair__photo--right {
-    right: 24px;
-  }
-}
-
 @media (min-width: 1024px) {
-  .about-intro {
-    margin-top: 0;
+  .about {
+    padding-top: var(--section-top);
+  }
+
+  .about > .section-head {
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+
+  .about .section-lead {
+    width: min(433px, 100%);
+  }
+
+  .about-strip {
+    display: none;
   }
 
   .about-copy {
     gap: 48px;
-  }
-
-  .about-pair {
-    display: none;
   }
 
   .about-stage {
@@ -198,16 +209,35 @@
 }
 
 /* ===== About: experience ===== */
+/* Phones and tablets (Figma 4074:8017): 52 below the copy, "Experience" in Heading/H2 Lead, 24 to the
+   jobs; each job is the title and meta (8 apart), 16, the points (8 apart); dividers 24 from each job. */
 .experience {
   width: min(1250px, calc(100% - 32px));
-  margin: 88px auto 0;
+  margin: 52px auto 0;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
 }
 
 .experience > .section-title {
   text-align: center;
+}
+
+@media (max-width: 1023px) {
+  .experience > .section-title {
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: -0.36px;
+  }
+
+  .experience .job__points {
+    gap: 8px;
+  }
+
+  .experience .job__points li {
+    font-size: 16px;
+    line-height: 24px;
+  }
 }
 
 .experience-list {
@@ -216,7 +246,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
 }
 
 .job {
@@ -224,12 +254,12 @@
   gap: 16px;
 }
 
-/* Figma divider (Vector 6921/6922): a 1.5px Blue/800 line (stroke 60% x layer 20% = 12% alpha) across the full row with round caps,
-   48px from the rows on either side. Drawn as a pill so the 1.5px weight and caps survive
+/* Figma divider (Vector 6921/6922): a 1.5px Blue/800 line (stroke 60% x layer 20% = 12% alpha) across the
+   full row with round caps, 48px from the rows on either side (24 on phones). Drawn as a pill so the 1.5px weight and caps survive
    (a 1.5px border is floored to 1px and has square ends). */
 .job + .job {
   position: relative;
-  padding-top: 40px;
+  padding-top: 24px;
 }
 
 .job + .job::before {
@@ -264,9 +294,10 @@
   letter-spacing: 0;
 }
 
+/* Meta/Medium, Blue/600. */
 .job__meta {
   margin: 0;
-  color: var(--color-blue-800);
+  color: var(--color-blue-600);
 }
 
 .job__points {

@@ -1,14 +1,13 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Polaroid from '../../components/Polaroid.astro';
-import { aboutIntro, aboutPolaroids, experience } from '../../data/about';
+import { aboutIntro, aboutPolaroids, aboutStrip, experience } from '../../data/about';
 
 // The exported polaroid PNGs are 512x576 with the card filling 56.6% of the width, so the PNG box is
 // the Figma card width / 0.566 (and 576/512 of that tall). Desktop positions are on the 1440 frame.
 const box = (w: number) => w / 0.566;
 const desktopStyle = (p: (typeof aboutPolaroids)[number]) =>
   `--cx: ${p.cx - 720}; --cy: ${p.cy}; --bw: ${box(p.w).toFixed(1)}; --pol-rotate: ${p.rot}deg;`;
-const pairs = [0, 1, 2].map((n) => aboutPolaroids.filter((p) => p.pair === n));
 ---
 
 <SiteLayout
@@ -21,6 +20,20 @@ const pairs = [0, 1, 2].map((n) => aboutPolaroids.filter((p) => p.pair === n));
       <h2 class="section-title text-h1" data-reveal="soft">{aboutIntro.title}</h2>
       <p class="section-lead text-h3" data-reveal="soft" style="--reveal-delay: 100ms">{aboutIntro.lead}</p>
     </header>
+
+    <div class="about-strip" aria-hidden="true">
+      {
+        aboutStrip.map((p, i) => (
+          <Polaroid
+            photo={p.photo}
+            class="about-strip__photo"
+            displayWidth={175}
+            revealDelay={100 + i * 70}
+            style={`--dx: ${p.dx}; --pol-rotate: ${p.rot}deg;`}
+          />
+        ))
+      }
+    </div>
 
     <div class="about-intro">
       <div class="about-stage" aria-hidden="true">
@@ -38,21 +51,8 @@ const pairs = [0, 1, 2].map((n) => aboutPolaroids.filter((p) => p.pair === n));
       </div>
       <div class="about-copy">
         {
-          aboutIntro.paragraphs.map((text, i) => (
-            <>
-              <div class="about-pair" aria-hidden="true">
-                {pairs[i].map((p, k) => (
-                  <Polaroid
-                    photo={p.photo}
-                    class={`about-pair__photo about-pair__photo--${p.side}`}
-                    displayWidth={150}
-                    revealDelay={k * 110}
-                    style={`--pol-rotate: ${p.rot}deg;`}
-                  />
-                ))}
-              </div>
-              <p class="about-copy__p text-h3" data-reveal="rise">{text}</p>
-            </>
+          aboutIntro.paragraphs.map((text) => (
+            <p class="about-copy__p text-h3" data-reveal="rise">{text}</p>
           ))
         }
       </div>

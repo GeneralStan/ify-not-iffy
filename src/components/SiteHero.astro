@@ -1,7 +1,7 @@
 ---
 /**
  * Home hero (Figma Home 4068:6024 hero 4068:6051, Mobile Hero 4068:7252): solid Lime/900.
- * "I design experiences / Engineer systems / & build products", with the at-sea polaroid tucked on
+ * "I design experiences / engineer systems / & build products", with the at-sea polaroid tucked on
  * "experiences" and the ampersand sticker by "build", then "Scroll to view work" and the hedges.
  * Each run (white or lime) rises in on load; see hero-intro.ts and home.css.
  */
@@ -13,7 +13,7 @@ import ampersand from '../assets/home/hero-ampersand.png';
 // [tone, text] runs per line: Neutral/0 and Lime/400.
 const lines: Array<Array<['paper' | 'lime', string]>> = [
   [['paper', 'I design'], ['lime', 'experiences']],
-  [['paper', 'Engineer'], ['lime', 'systems']],
+  [['paper', 'engineer'], ['lime', 'systems']],
   [['paper', 'build'], ['lime', 'products']],
 ];
 
@@ -40,7 +40,9 @@ const runs = lines.map((line) => line.map(([tone, text]) => ({ tone, text, index
                       {text === 'build' && (
                         <Image class="hero-amp" src={ampersand} alt="&" width={127} height={173} loading="eager" />
                       )}
-                      <span class="hero-word__inner">{text}</span>
+                      <span class="hero-word__mask">
+                        <span class="hero-word__inner">{text}</span>
+                      </span>
                     </span>
                   </>
                 ))}

@@ -5,7 +5,8 @@
  * The bar sits at the top of the page and scrolls away with it. A fixed blur strip at the top of the
  * screen softens content as it slides under the top edge.
  * Desktop: name and role on the left, three flaps hanging from the top edge on the right.
- * Phones: name and a Menu flap. Menu drops the three flaps down over the page with a close button.
+ * Phones and tablets (below 1024): name and a Menu flap. Menu pops the three flaps in from the right,
+ * right-aligned above a close button, over the page.
  * Flaps: the shape is one path, stretched to each size (Figma's mobile and tall shapes are exact
  * stretches of the 200x48 desktop one). Hover and press grow it from 48 to 64 (36 to 48 on phones).
  */
@@ -85,8 +86,8 @@ const CLOSE =
   edge();
   window.addEventListener('scroll', edge, { passive: true });
 
-  /* Phone menu: Menu drops the flaps down over the page; close with ×, Escape, a tap outside,
-     or by following a link. */
+  /* Phone and tablet menu: the flaps pop in from the right over the page; close with ×, Escape,
+     a tap outside, or by following a link. */
   const nav = document.querySelector<HTMLElement>('[data-nav]');
   const openButton = nav?.querySelector<HTMLButtonElement>('[data-menu-open]');
   const panel = nav?.querySelector<HTMLElement>('[data-menu]');
@@ -110,7 +111,7 @@ const CLOSE =
     if (!(event.target instanceof Node) || panel?.contains(event.target) || openButton?.contains(event.target)) return;
     setOpen(false, false);
   });
-  window.matchMedia('(min-width: 768px)').addEventListener('change', () => setOpen(false, false));
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', () => setOpen(false, false));
 </script>
 
 <style>
@@ -363,26 +364,30 @@ const CLOSE =
     padding: 0;
   }
 
-  /* ===== Phones: Menu flap and drop-down (Mobile Nav Bar, Collapsed / Default) ===== */
+  /* ===== Phones and tablets: Menu flap and pop-in panel (Mobile Nav Bar, Collapsed / Default) =====
+     The three flaps sit right-aligned at the top edge with the close button under the right end.
+     They pop in from the right, the nearest (About) first; the close button follows. */
   .site-nav__menu-panel {
     position: absolute;
     inset: 0 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     gap: 16px;
     visibility: hidden;
     pointer-events: none;
   }
 
   .site-nav__menu-panel .flap {
-    translate: 0 calc(-100% - 2px);
-    transition: translate var(--motion-duration-base) var(--motion-ease-enter);
-    transition-delay: calc(var(--i) * 40ms);
+    opacity: 0;
+    translate: calc((3 - var(--i)) * 40px + 60px) 0;
+    transition:
+      translate var(--motion-duration-base) var(--motion-ease-enter),
+      opacity var(--motion-duration-fast) var(--motion-ease-fade);
+    transition-delay: calc((2 - var(--i)) * 50ms);
   }
 
   .site-nav__close {
-    align-self: flex-end;
     display: grid;
     place-items: center;
     width: 40px;
@@ -394,9 +399,9 @@ const CLOSE =
     color: var(--nav-close);
     cursor: pointer;
     opacity: 0;
-    scale: 0.8;
+    scale: 0.6;
     transition:
-      opacity var(--motion-duration-base) var(--motion-ease-fade),
+      opacity var(--motion-duration-fast) var(--motion-ease-fade),
       scale var(--motion-duration-base) var(--motion-ease-enter);
   }
 
@@ -406,7 +411,9 @@ const CLOSE =
   }
 
   .site-nav__menu {
-    transition: translate var(--motion-duration-base) var(--motion-ease-enter);
+    transition:
+      translate var(--motion-duration-base) var(--motion-ease-enter),
+      opacity var(--motion-duration-fast) var(--motion-ease-fade);
   }
 
   .site-nav.is-open .site-nav__menu-panel {
@@ -415,29 +422,31 @@ const CLOSE =
   }
 
   .site-nav.is-open .site-nav__menu-panel .flap {
+    opacity: 1;
     translate: 0 0;
   }
 
   .site-nav.is-open .site-nav__close {
     opacity: 1;
     scale: 1;
-    transition-delay: 120ms;
+    transition-delay: 160ms;
   }
 
+  /* The Menu flap tucks up out of the way while the panel is open. */
   .site-nav.is-open .site-nav__menu {
     translate: 0 calc(-100% - 2px);
   }
 
-  .site-nav.is-open .site-nav__lead {
-    visibility: hidden;
-  }
-
-  /* Close hides the panel only after the flaps have gone back up. */
+  /* Close: everything slides back out to the right together, then the panel hides. */
   .site-nav:not(.is-open) .site-nav__menu-panel {
     transition: visibility 0s linear var(--motion-duration-base);
   }
 
-  /* ===== Desktop (Desktop Nav Bar: 1200 wide, 88 tall; flaps 200x48) ===== */
+  .site-nav:not(.is-open) .site-nav__menu-panel .flap {
+    transition-delay: 0ms;
+  }
+
+  /* ===== Tablets (768+): the name and role take the desktop styles; the Menu stays ===== */
   @media (min-width: 768px) {
     .site-nav__bar {
       width: min(1200px, calc(100% - 64px));
@@ -463,9 +472,12 @@ const CLOSE =
       line-height: 24px;
       font-weight: var(--type-body-weight);
     }
+  }
 
+  /* ===== Desktop, 1024+ (Desktop Nav Bar: 1200 wide, 88 tall; flaps 200x48 in a row) ===== */
+  @media (min-width: 1024px) {
     .flap {
-      /* 200 wide, narrower between 768 and ~1040 so the row always fits beside the name. */
+      /* 200 wide, narrower below ~1040 so the row always fits beside the name. */
       --f-w: min(200px, calc((100vw - 64px - 176px) / 3));
       --f-h: 48px;
     }
@@ -489,20 +501,15 @@ const CLOSE =
       pointer-events: auto;
     }
 
-    .site-nav__menu-panel .flap {
+    .site-nav__menu-panel .flap,
+    .site-nav:not(.is-open) .site-nav__menu-panel .flap {
+      opacity: 1;
       translate: none;
       transition: none;
     }
 
     .site-nav__close {
       display: none;
-    }
-  }
-
-  @media (max-width: 767px) {
-    /* The open panel spans the bar: three 116 flaps centred, close button under the right edge. */
-    .site-nav__menu-panel .flaps {
-      justify-content: center;
     }
   }
 

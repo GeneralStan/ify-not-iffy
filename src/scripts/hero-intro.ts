@@ -13,7 +13,7 @@ const root = document.documentElement;
 
 /* Matches the timeline in home.css (intro-play): the hedges pop once the copy has landed. */
 const HEDGE_POP_AT = 900;
-const INTRO_TOTAL_MS = 1700;
+const INTRO_TOTAL_MS = 1950;
 
 function decoded(img: HTMLImageElement | null) {
   if (!img) return Promise.resolve();

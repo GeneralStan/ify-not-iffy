@@ -4,9 +4,16 @@
   color: var(--color-neutral-0);
 }
 
+.hero {
+  z-index: 2;
+}
+
+/* The hedges bleed past the hero's bottom edge into the next section (Figma frames do not clip
+   them); only the sides are clipped. */
 .hero-clip {
   position: relative;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
 }
@@ -86,6 +93,7 @@
   display: inline-block;
 }
 
+.hero-word__mask,
 .hero-word__inner {
   display: inline-block;
 }
@@ -112,7 +120,7 @@
 }
 
 /* Ampersand sticker by "build": 38x52, centred 30px left of the word and 43.5px below the line top,
-   tilted 24deg the other way. */
+   tilted 24deg the other way (Mobile Hero: 23.5x32, 16.75px left and 24.9px below). */
 .hero-amp {
   position: absolute;
   z-index: 2;
@@ -159,10 +167,10 @@
   }
 
   .hero-amp {
-    left: -0.668em;
-    top: 0.55em;
-    width: 0.66em;
-    height: 0.9em;
+    left: -0.713em;
+    top: 0.173em;
+    width: 0.588em;
+    height: 0.8em;
   }
 }
 
@@ -170,9 +178,11 @@
    html.intro-wait: hidden until the font and polaroid are ready (BaseLayout + hero-intro.ts).
    html.intro-play: the sequence below, timed from the moment the fonts are ready.
      0      the six runs rise one by one from a bottom-edge mask, 70ms apart
-     450    polaroid grows 0 → 120% → 100%; the ampersand follows
+     450    polaroid grows 0 → 120% → 100%
      800    "Scroll to view work" rises
-     900    the hedges pop up from behind the hero's bottom edge, all at once (hero-intro.ts) */
+     900    the hedges pop up from behind the hero's bottom edge, all at once (hero-intro.ts)
+     1150   once every word has landed, the ampersand grows like the polaroid
+   The polaroid and the ampersand sit outside the words' masks, so nothing cuts them. */
 .intro-wait .hero-word__inner,
 .intro-wait .hero-polaroid,
 .intro-wait .hero-amp,
@@ -185,15 +195,9 @@
   scale: 0;
 }
 
-.intro-wait .hero-word,
-.intro-play .hero-word {
+.intro-wait .hero-word__mask,
+.intro-play .hero-word__mask {
   clip-path: inset(-1.5em -0.5em 0 -0.5em);
-}
-
-/* The polaroid and sticker hang outside their word, so the word's mask must not cut them. */
-.intro-wait .hero-word:has(.hero-polaroid, .hero-amp),
-.intro-play .hero-word:has(.hero-polaroid, .hero-amp) {
-  clip-path: inset(-3em -1.5em 0 -1.5em);
 }
 
 .intro-play .hero-word__inner {
@@ -206,7 +210,7 @@
 }
 
 .intro-play .hero-amp {
-  animation: intro-polaroid 760ms 560ms both;
+  animation: intro-polaroid 760ms 1150ms both;
 }
 
 .intro-play .hero-scroll {
@@ -252,10 +256,12 @@
 
 /* Hero, Desktop (Figma Home 4068:6051): seven bushes on a 1440x344 canvas from x 0, y 577 of the
    1440x800 hero, so it runs 121.5px below the hero bottom (bushes reach past both side edges). */
+/* The row is as wide as the frame, so it scales with the screen up to 1440. */
 .hedges--hero .hedge-row--desktop {
-  bottom: calc(-121.51 / 720 * var(--hedge-base));
-  left: calc(50% - 720 / 720 * var(--hedge-base));
-  width: calc(1440 / 720 * var(--hedge-base));
+  --hero-hedge-w: min(1440px, 100vw);
+  bottom: calc(-121.51 / 1440 * var(--hero-hedge-w));
+  left: calc(50% - var(--hero-hedge-w) / 2);
+  width: var(--hero-hedge-w);
 }
 
 /* Footer, Desktop: 1200x322 at x124 y466 of the 1440x680 footer, cut 108px by its bottom. */
