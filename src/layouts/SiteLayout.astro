@@ -1,11 +1,11 @@
 ---
 /**
- * Every page has the same frame: hero, flap nav, page body, footer.
- * Hero, nav and footer are persisted across page changes (Astro ClientRouter), so switching pages
- * only swaps the body: the flaps animate to the new current page and the page colour changes.
+ * Site pages (Figma "Portfolio" 4033:3766): Home, Work, Playground and About are separate pages.
+ * Every page has the top nav bar and the footer; only Home has the hero.
+ * Plain page loads (no client router), so each page ships only what it needs.
  */
 import BaseLayout from './BaseLayout.astro';
-import FlapNav from '../components/FlapNav.astro';
+import SiteNav from '../components/SiteNav.astro';
 import SiteHero from '../components/SiteHero.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import type { PageId } from '../data/site';
@@ -23,10 +23,10 @@ interface Props {
 const { page, title, description } = Astro.props;
 ---
 
-<BaseLayout intro page={page} title={title} description={description}>
-  <SiteHero />
-  <FlapNav current={page} />
-  <main id="content" class={`page-body page-body--${page}`} transition:animate="fade">
+<BaseLayout intro={page === 'home'} page={page} title={title} description={description}>
+  <SiteNav current={page} />
+  {page === 'home' && <SiteHero />}
+  <main id="content" class={`page-body page-body--${page}`}>
     <slot />
   </main>
   <SiteFooter />

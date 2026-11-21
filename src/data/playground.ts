@@ -1,8 +1,10 @@
 /**
- * Playground cards (Figma "Playground" 4026:700, grid 4026:734).
- * Placeholders until the real work is in: add `image` (an imported asset) and `title` per card.
- * Geometry is the Figma board: x / y / w on the 1240 column, y from the top of the grid,
- * `media` the height of the image area (the card is 20 + media + 20 + 28 + 20 tall).
+ * Playground canvas (Figma "Playground" 4068:7511, board 4068:7643).
+ * A board larger than the screen that visitors drag to explore. Placeholders until the real work is in:
+ * add `image` (an imported asset) per card.
+ * Geometry is the Figma frame: x / y are the card's top-left on the 1440 frame, y measured from the
+ * top of the board (frame y 376); w is the card width; mediaW / mediaH the image area inside it
+ * (the card is 24 + media + 16 + 24 + 24 tall).
  */
 import type { ImageMetadata } from 'astro';
 
@@ -11,21 +13,23 @@ export const playgroundHead = {
   lead: '1M+ tokens burnt, 7,000 Github commits & counting',
 };
 
-export const PLAYGROUND_BOARD = { width: 1240, height: 2137 };
+/** Content bounds on the 1440 frame (board coordinates), for clamping the pan. */
+export const PLAYGROUND_BOUNDS = { minX: -346, maxX: 1860, minY: 3, maxY: 1773 };
 
 export const playground: Array<{
-  badge: string;
-  title: string;
+  tags: string[];
   image?: ImageMetadata;
   x: number;
   y: number;
   w: number;
-  media: number;
+  mediaH: number;
 }> = [
-  { badge: 'Animation', title: 'Lorem Ipsum ipsum', x: 0, y: 0, w: 815, media: 400 },
-  { badge: 'Illustration', title: 'Lorem Ipsum ipsum', x: 910, y: 258, w: 328, media: 400 },
-  { badge: 'Illustration', title: 'Lorem Ipsum ipsum', x: 128, y: 576, w: 340, media: 300 },
-  { badge: 'Illustration', title: 'Lorem Ipsum ipsum', x: 898, y: 878, w: 340, media: 300 },
-  { badge: 'Animation', title: 'Lorem Ipsum ipsum', x: 0, y: 1068, w: 742, media: 400 },
-  { badge: 'Branding', title: 'Lorem Ipsum ipsum', x: 0, y: 1649, w: 1240, media: 400 },
+  { tags: ['Leta Technologies', 'Mobile', 'B2B'], x: -105, y: 3, w: 709, mediaH: 328 },
+  { tags: ['Leta Technologies'], x: 967, y: 64, w: 362, mediaH: 400 },
+  { tags: ['Leta Technologies', 'Mobile', 'B2B'], x: 250, y: 611, w: 470, mediaH: 344 },
+  { tags: ['Leta Technologies', 'Mobile', 'B2B'], x: 1390, y: 395, w: 470, mediaH: 344 },
+  { tags: ['Leta Technologies', 'Mobile', 'B2B'], x: -346, y: 761, w: 470, mediaH: 344 },
+  { tags: ['Leta Technologies', 'Mobile', 'B2B'], x: 875, y: 856, w: 470, mediaH: 344 },
+  { tags: ['Leta Technologies', 'Mobile', 'B2B'], x: 100, y: 1232, w: 649, mediaH: 400 },
+  { tags: ['Leta Technologies', 'Mobile', 'B2B'], x: 1329, y: 1341, w: 470, mediaH: 344 },
 ];

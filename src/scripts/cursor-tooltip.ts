@@ -80,4 +80,3 @@ document.addEventListener('pointerout', (event) => {
 });
 
 window.addEventListener('scroll', () => active && hide(), { passive: true });
-document.addEventListener('astro:after-swap', hide);

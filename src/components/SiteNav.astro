@@ -1,0 +1,518 @@
+---
+/**
+ * Top nav bar on every page (Figma "Desktop Nav Bar" 4068:6393, "Mobile Nav Bar" 4068:7409,
+ * flaps 4031:2832, Hero Navigation 4068:7036).
+ * The bar sits at the top of the page and scrolls away with it. A fixed blur strip at the top of the
+ * screen softens content as it slides under the top edge.
+ * Desktop: name and role on the left, three flaps hanging from the top edge on the right.
+ * Phones: name and a Menu flap. Menu drops the three flaps down over the page with a close button.
+ * Flaps: the shape is one path, stretched to each size (Figma's mobile and tall shapes are exact
+ * stretches of the 200x48 desktop one). Hover and press grow it from 48 to 64 (36 to 48 on phones).
+ */
+import { withBase } from '../lib/url';
+
+export type NavPage = 'home' | 'work' | 'playground' | 'about';
+
+interface Props {
+  current: NavPage;
+}
+
+const { current } = Astro.props;
+
+const items = [
+  { id: 'work', href: withBase('/work/'), label: 'Work' },
+  { id: 'playground', href: withBase('/playground/'), label: 'Playground' },
+  { id: 'about', href: withBase('/about/'), label: 'About' },
+] as const;
+
+// Figma flap (Docked, 200x48), flipped so the wide edge is the top of the screen.
+const FLAP =
+  'M30.2725 45.4087C31.3407 47.0111 33.3288 48 35.4819 48H164.5181C166.6712 48 168.6593 47.0111 169.7275 45.4087L200 0H0Z';
+const CLOSE =
+  'M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z';
+---
+
+<div class="nav-edge" aria-hidden="true">
+  <span class="nav-edge__blur nav-edge__blur--1"></span>
+  <span class="nav-edge__blur nav-edge__blur--2"></span>
+  <span class="nav-edge__blur nav-edge__blur--3"></span>
+</div>
+
+<header class={`site-nav site-nav--${current}`} data-nav>
+  <div class="site-nav__bar">
+    <a class="site-nav__lead" href={withBase('/')} aria-label="Ifeanyi Ulasika, home">
+      <span class="site-nav__name">Ifeanyi Ulasika</span>
+      <span class="site-nav__role">Design Engineer</span>
+    </a>
+
+    <button
+      class="flap flap--menu site-nav__menu"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-open
+    >
+      <svg class="flap__bg" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden="true"><path d={FLAP} /></svg>
+      <span class="flap__label">Menu</span>
+    </button>
+
+    <nav class="site-nav__menu-panel" id="site-menu" aria-label="Primary" data-menu>
+      <ul class="flaps" role="list">
+        {
+          items.map((item, i) => (
+            <li class={`flap flap--${item.id}`} style={`--i: ${i}`}>
+              <a class="flap__link" href={item.href} aria-current={current === item.id ? 'page' : undefined}>
+                <svg class="flap__bg" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden="true">
+                  <path d={FLAP} />
+                </svg>
+                <span class="flap__label">{item.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <button class="site-nav__close" type="button" aria-label="Close menu" data-menu-close>
+        <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<script>
+  /* Blur strip: shown once the page has scrolled, so the hero top stays crisp at rest. */
+  const root = document.documentElement;
+  const edge = () => root.classList.toggle('is-scrolled', window.scrollY > 8);
+  edge();
+  window.addEventListener('scroll', edge, { passive: true });
+
+  /* Phone menu: Menu drops the flaps down over the page; close with ×, Escape, a tap outside,
+     or by following a link. */
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const openButton = nav?.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const panel = nav?.querySelector<HTMLElement>('[data-menu]');
+
+  function setOpen(open: boolean, focus = true) {
+    if (!nav || !openButton) return;
+    nav.classList.toggle('is-open', open);
+    openButton.setAttribute('aria-expanded', String(open));
+    if (!focus) return;
+    if (open) panel?.querySelector<HTMLElement>('.flap__link')?.focus({ preventScroll: true });
+    else openButton.focus({ preventScroll: true });
+  }
+
+  openButton?.addEventListener('click', () => setOpen(true));
+  nav?.querySelector('[data-menu-close]')?.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && nav?.classList.contains('is-open')) setOpen(false);
+  });
+  document.addEventListener('pointerdown', (event) => {
+    if (!nav?.classList.contains('is-open')) return;
+    if (!(event.target instanceof Node) || panel?.contains(event.target) || openButton?.contains(event.target)) return;
+    setOpen(false, false);
+  });
+  window.matchMedia('(min-width: 768px)').addEventListener('change', () => setOpen(false, false));
+</script>
+
+<style>
+  /* ===== Blur strip (fixed at the top of the screen) ===== */
+  .nav-edge {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 40;
+    height: calc(40px + env(safe-area-inset-top, 0px));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--motion-duration-base) var(--motion-ease-fade);
+  }
+
+  :global(.is-scrolled) .nav-edge {
+    opacity: 1;
+  }
+
+  .nav-edge__blur {
+    position: absolute;
+    inset: 0;
+  }
+
+  .nav-edge__blur--1 {
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    mask-image: linear-gradient(to bottom, #000 50%, transparent 100%);
+  }
+
+  .nav-edge__blur--2 {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    mask-image: linear-gradient(to bottom, #000 25%, transparent 70%);
+  }
+
+  .nav-edge__blur--3 {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 40%);
+  }
+
+  /* ===== Bar ===== */
+  .site-nav {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 50;
+    /* Name and role inks per page (Figma Desktop Nav Bar variants). */
+    --nav-name: var(--color-stone-950);
+    --nav-role: var(--color-stone-700);
+    --nav-close: var(--color-neutral-950);
+  }
+
+  .site-nav--home {
+    --nav-name: var(--color-lime-0);
+    --nav-role: var(--color-stone-500);
+    --nav-close: var(--color-neutral-0);
+  }
+
+  .site-nav--playground {
+    --nav-name: var(--color-plum-950);
+    --nav-role: var(--color-plum-700);
+    --nav-close: var(--color-plum-950);
+  }
+
+  .site-nav--about {
+    --nav-name: var(--color-blue-950);
+    --nav-role: var(--color-blue-500);
+    --nav-close: var(--color-blue-950);
+  }
+
+  .site-nav__bar {
+    position: relative;
+    width: calc(100% - 32px);
+    margin-inline: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  /* Leading: Body/Default + Body/Caption on phones (Mobile Nav Bar, 10 from the top);
+     Heading/H3 + Body/Default with a 4 gap on desktop (14 from the top). */
+  .site-nav__lead {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+
+  .site-nav__name {
+    color: var(--nav-name);
+    font-family: var(--type-body-family);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: var(--type-body-weight);
+  }
+
+  .site-nav__role {
+    color: var(--nav-role);
+    font-family: var(--type-caption-family);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: var(--type-caption-weight);
+  }
+
+  .site-nav__lead:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  /* ===== Flaps ===== */
+  .flap {
+    /* Work and Menu (Stone / Lime). */
+    --f-bg: var(--color-stone-0);
+    --f-ink: var(--color-lime-900);
+    --f-bg-hover: var(--color-stone-300);
+    --f-ink-hover: var(--color-lime-800);
+    --f-bg-press: var(--color-stone-700);
+    --f-ink-press: var(--color-lime-100);
+    --f-bg-active: var(--color-stone-0);
+    --f-ink-active: var(--color-lime-900);
+    --f-w: 116px;
+    --f-h: 36px;
+    position: relative;
+    list-style: none;
+    width: var(--f-w);
+    height: var(--f-h);
+  }
+
+  .flap--playground {
+    --f-bg: var(--color-plum-150);
+    --f-ink: var(--color-plum-900);
+    --f-bg-hover: var(--color-plum-500);
+    --f-ink-hover: var(--color-plum-100);
+    --f-bg-press: var(--color-plum-700);
+    --f-ink-press: var(--color-plum-50);
+    --f-bg-active: var(--color-plum-150);
+    --f-ink-active: var(--color-plum-900);
+  }
+
+  .flap--about {
+    --f-bg: var(--color-blue-150);
+    --f-ink: var(--color-blue-900);
+    --f-bg-hover: var(--color-blue-500);
+    --f-ink-hover: var(--color-blue-100);
+    --f-bg-press: var(--color-blue-700);
+    --f-ink-press: var(--color-blue-50);
+    --f-bg-active: var(--color-blue-150);
+    --f-ink-active: var(--color-blue-900);
+  }
+
+  .flap__link,
+  button.flap {
+    position: relative;
+    display: block;
+    width: var(--f-w);
+    height: var(--f-h);
+    padding: 0;
+    border: 0;
+    background: none;
+    text-decoration: none;
+    color: var(--f-ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .flap__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: var(--f-bg);
+    transform-origin: 50% 0;
+    transition:
+      scale var(--motion-duration-flap) var(--motion-ease-enter),
+      fill var(--motion-duration-flap) var(--motion-ease-fade);
+  }
+
+  /* Nav/Default, centred; 10 from the top on phones, 12 on desktop. */
+  .flap__label {
+    position: absolute;
+    inset: 10px 0 auto;
+    text-align: center;
+    font-family: var(--type-nav-family);
+    font-size: var(--type-nav-size);
+    line-height: var(--type-nav-line-height);
+    letter-spacing: var(--type-nav-tracking);
+    font-weight: 400;
+    color: inherit;
+    transition: color var(--motion-duration-flap) var(--motion-ease-fade);
+    white-space: nowrap;
+  }
+
+  /* Hover grows the flap down to the tall size (64/48 = 48/36) and darkens it. */
+  @media (hover: hover) and (pointer: fine) {
+    .flap__link:not([aria-current]):hover,
+    button.flap:hover {
+      color: var(--f-ink-hover);
+    }
+
+    .flap__link:not([aria-current]):hover .flap__bg,
+    button.flap:hover .flap__bg {
+      scale: 1 1.3333;
+      fill: var(--f-bg-hover);
+    }
+  }
+
+  .flap__link:not([aria-current]):focus-visible .flap__bg,
+  button.flap:focus-visible .flap__bg {
+    scale: 1 1.3333;
+    fill: var(--f-bg-hover);
+  }
+
+  .flap__link:not([aria-current]):focus-visible,
+  button.flap:focus-visible {
+    outline: none;
+    color: var(--f-ink-hover);
+  }
+
+  .flap__link:not([aria-current]):active,
+  button.flap:active {
+    color: var(--f-ink-press);
+  }
+
+  .flap__link:not([aria-current]):active .flap__bg,
+  button.flap:active .flap__bg {
+    scale: 1 1.3333;
+    fill: var(--f-bg-press);
+  }
+
+  /* Current page: Nav/Active (Medium), active fill, no hover growth. */
+  .flap__link[aria-current] {
+    color: var(--f-ink-active);
+    cursor: default;
+  }
+
+  .flap__link[aria-current] .flap__bg {
+    fill: var(--f-bg-active);
+  }
+
+  .flap__link[aria-current] .flap__label {
+    font-weight: 500;
+  }
+
+  .flaps {
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ===== Phones: Menu flap and drop-down (Mobile Nav Bar, Collapsed / Default) ===== */
+  .site-nav__menu-panel {
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .site-nav__menu-panel .flap {
+    translate: 0 calc(-100% - 2px);
+    transition: translate var(--motion-duration-base) var(--motion-ease-enter);
+    transition-delay: calc(var(--i) * 40ms);
+  }
+
+  .site-nav__close {
+    align-self: flex-end;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--nav-close);
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--nav-close);
+    cursor: pointer;
+    opacity: 0;
+    scale: 0.8;
+    transition:
+      opacity var(--motion-duration-base) var(--motion-ease-fade),
+      scale var(--motion-duration-base) var(--motion-ease-enter);
+  }
+
+  .site-nav__close:focus-visible {
+    outline: 2px solid var(--nav-close);
+    outline-offset: 3px;
+  }
+
+  .site-nav__menu {
+    transition: translate var(--motion-duration-base) var(--motion-ease-enter);
+  }
+
+  .site-nav.is-open .site-nav__menu-panel {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .site-nav.is-open .site-nav__menu-panel .flap {
+    translate: 0 0;
+  }
+
+  .site-nav.is-open .site-nav__close {
+    opacity: 1;
+    scale: 1;
+    transition-delay: 120ms;
+  }
+
+  .site-nav.is-open .site-nav__menu {
+    translate: 0 calc(-100% - 2px);
+  }
+
+  .site-nav.is-open .site-nav__lead {
+    visibility: hidden;
+  }
+
+  /* Close hides the panel only after the flaps have gone back up. */
+  .site-nav:not(.is-open) .site-nav__menu-panel {
+    transition: visibility 0s linear var(--motion-duration-base);
+  }
+
+  /* ===== Desktop (Desktop Nav Bar: 1200 wide, 88 tall; flaps 200x48) ===== */
+  @media (min-width: 768px) {
+    .site-nav__bar {
+      width: min(1200px, calc(100% - 64px));
+      height: 88px;
+    }
+
+    .site-nav__lead {
+      margin-top: 14px;
+      gap: 4px;
+    }
+
+    .site-nav__name {
+      font-family: var(--type-h3-family);
+      font-size: 24px;
+      line-height: 32px;
+      letter-spacing: -0.48px;
+      font-weight: var(--type-h3-weight);
+    }
+
+    .site-nav__role {
+      font-family: var(--type-body-family);
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: var(--type-body-weight);
+    }
+
+    .flap {
+      /* 200 wide, narrower between 768 and ~1040 so the row always fits beside the name. */
+      --f-w: min(200px, calc((100vw - 64px - 176px) / 3));
+      --f-h: 48px;
+    }
+
+    /* Figma desktop About flap idles on Blue/200 (Blue/150 on phones and when active). */
+    .flap--about {
+      --f-bg: var(--color-blue-200);
+    }
+
+    .flap__label {
+      top: 12px;
+    }
+
+    button.site-nav__menu {
+      display: none;
+    }
+
+    .site-nav__menu-panel {
+      position: static;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .site-nav__menu-panel .flap {
+      translate: none;
+      transition: none;
+    }
+
+    .site-nav__close {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    /* The open panel spans the bar: three 116 flaps centred, close button under the right edge. */
+    .site-nav__menu-panel .flaps {
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flap__bg,
+    .site-nav__menu,
+    .site-nav__menu-panel .flap,
+    .site-nav__close,
+    .nav-edge {
+      transition: none;
+    }
+  }
+</style>

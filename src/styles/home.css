@@ -7,7 +7,6 @@
 .hero-clip {
   position: relative;
   overflow: hidden;
-  min-height: 800px;
   display: flex;
   flex-direction: column;
 }
@@ -45,150 +44,45 @@
   background-size: 160px 160px;
 }
 
+/* ===== Hero copy (Figma Home 4068:6051; Mobile Hero 4068:7252) =====
+   Desktop 1440x800: first line 247 from the top, "Scroll to view work" 97 below the last line.
+   Mobile 390x500: first line 174 from the top, 68 to the scroll line. Fluid between. */
+.hero-clip {
+  min-height: clamp(500px, calc(500px + (100vw - 390px) * 0.285714), 800px);
+}
+
 .hero-copy {
   position: relative;
   z-index: 3;
-  width: min(1200px, calc(100% - 32px));
-  margin: 152px auto 0;
+  width: calc(100% - 32px);
+  margin: clamp(174px, calc(174px + (100vw - 390px) * 0.069524), 247px) auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
+  gap: clamp(68px, calc(68px + (100vw - 390px) * 0.027619), 97px);
 }
 
-/* ===== Shared scale =====
-   Desktop hedges are laid out against a 720px reference (the hero flap row, Figma 4029:2505) that
-   shrinks with the viewport, so their spacing matches the frame at every width. Below 768px the
-   Figma Mobile variants are used instead, sized to the 390 frame. */
-:root {
-  --hedge-base: min(720px, 100vw);
-}
-
-/* ===== Hero logo (Figma 4026:590) ===== */
-.hero-logo {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  border-radius: 50%;
-}
-
-.hero-logo:focus-visible {
-  outline: 2px solid var(--color-lime-300);
-  outline-offset: 4px;
-}
-
-.hero-logo__mark {
-  display: block;
-  width: 64px;
-  height: 64px;
-  /* The seven petals are not centred in the 64 box: their hub is at (32, 33.22).
-     Spinning around the box middle made the logo bob up and down. */
-  transform-origin: 50% 51.9%;
-}
-
-/* ===== Hero headline ===== */
+/* Display 56/64 on desktop; the Mobile Hero sets the lines at 40px, 44 apart. */
 .hero-title {
+  position: relative;
   margin: 0;
   text-align: center;
-  color: var(--color-neutral-0);
-  /* Figma: Display (56/64) on desktop, Heading/H1 (32/36) on the 390 Mobile Hero; fluid between. */
-  font-size: clamp(32px, calc(32px + (100vw - 390px) * 0.022857), 56px);
-  line-height: clamp(36px, calc(36px + (100vw - 390px) * 0.026667), 64px);
+  font-family: var(--type-display-family);
+  font-weight: 400;
+  font-size: clamp(40px, calc(40px + (100vw - 390px) * 0.015238), 56px);
+  line-height: clamp(44px, calc(44px + (100vw - 390px) * 0.019048), 64px);
   letter-spacing: -0.02em;
 }
 
+/* Each line is a centred row; runs sit 8 apart on desktop (4 on the Mobile Hero). */
 .hero-line {
-  display: block;
-}
-
-.hero-line__inner {
-  display: inline-block;
-}
-
-/* Figma Mobile Hero breaks after "and": "I design products and / build systems that ship."
-   On phones the last two lines flow as one run with a forced break before "build". */
-.hero-br--mobile {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .hero-br--mobile {
-    display: inline;
-  }
-
-  .hero-line:not(:first-child),
-  .hero-line:not(:first-child) .hero-line__inner {
-    display: inline;
-  }
-}
-
-.hero-title .lime {
-  /* Figma 2116:787: Lime/300 #bfe54d at fill opacity 0.6. */
-  color: var(--color-lime-300-60);
-  color: color-mix(in srgb, var(--color-lime-300) 60%, transparent);
-}
-
-.hero-title .paper {
-  color: var(--color-neutral-0);
-}
-
-/* ===== Hero polaroid (Figma 4033:3415 "Polaroid-at-sea") =====
-   Figma shows the middle 64.5% of the 512x576 PNG in an 85x96 frame, so the whole PNG box is
-   131.8x148.3 (2.353em x 2.648em at 56px), rotated 14deg, with two drop shadows.
-   hero-intro.ts measures where the headline's first line ends and sets --pol-x / --pol-y,
-   so the photo sits off the last word of that line ("Ulasika" on desktop, "Ifeanyi" on phones). */
-.hero-title {
-  position: relative;
-}
-
-.hero-polaroid {
-  --pol-w: 2.353em;
-  --pol-h: 2.648em;
-  --pol-rotate: 14deg;
-  translate: var(--pol-x, 75%) var(--pol-y, -0.9em);
-  filter:
-    drop-shadow(0 2px 1px var(--color-shadow-25))
-    drop-shadow(0 2px 25px var(--color-highlight-10));
-}
-
-/* ===== Hero load-in =====
-   html.intro-wait: hidden until the font and polaroid are ready (BaseLayout + hero-intro.ts).
-   html.intro-play: the sequence below, timed from the moment the fonts are ready.
-     0      logo pops in and spins (2s)
-     200    headline words rise one by one from a bottom-edge mask, 70ms apart
-     600    polaroid grows from 0 to 120% and settles to 100% where it sits
-     1050   CTA buttons rise, one after the other
-     1200   flaps slide up from behind the hero's bottom edge (no fade), 60ms apart
-     ~1940  at 90% of the flap sequence the hedges pop up from behind the flaps, all at once
-   The hedge pop is triggered from hero-intro.ts (HEDGE_POP_AT) by adding .is-popped. */
-.intro-wait .hero-logo,
-.intro-wait .hero-word__inner,
-.intro-wait .hero-polaroid,
-.intro-wait .hero-cta > * {
-  opacity: 0;
-}
-
-.intro-wait .flap,
-.intro-play .flap {
-  translate: 0 var(--flap-h-tall);
-}
-
-.intro-wait .flap-list,
-.intro-play .flap-list {
-  /* The list is zero-height and its top edge is the line, so this hides anything below the line. */
-  clip-path: inset(-400px -100vw 0 -100vw);
-}
-
-.intro-wait .hedges--hero .hedge,
-.intro-play .hedges--hero:not(.is-popped) .hedge {
-  scale: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.143em;
 }
 
 .hero-word {
+  position: relative;
   display: inline-block;
 }
 
@@ -196,40 +90,127 @@
   display: inline-block;
 }
 
+.hero-title .paper {
+  color: var(--color-neutral-0);
+}
+
+.hero-title .lime {
+  color: var(--color-lime-400);
+}
+
+/* At-sea polaroid on "experiences": the 74x83 card (Figma crops the middle 64.5% of the 512x576 PNG)
+   is centred 2px right of the word's left edge and 17.6px above the line, tilted 14deg. */
+.hero-polaroid {
+  --pol-w: 2.051em;
+  --pol-h: 2.308em;
+  --pol-rotate: 14deg;
+  left: -0.99em;
+  top: -1.468em;
+  filter:
+    drop-shadow(0 2px 1px var(--color-shadow-25))
+    drop-shadow(0 2px 25px var(--color-highlight-10));
+}
+
+/* Ampersand sticker by "build": 38x52, centred 30px left of the word and 43.5px below the line top,
+   tilted 24deg the other way. */
+.hero-amp {
+  position: absolute;
+  z-index: 2;
+  left: -0.876em;
+  top: 0.313em;
+  width: 0.679em;
+  height: 0.929em;
+  rotate: -24deg;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Heading/H3 Stone/500 on desktop, Body/Large on the Mobile Hero. */
+.hero-scroll {
+  font-family: var(--type-body-family);
+  font-size: clamp(16px, calc(16px + (100vw - 390px) * 0.007619), 24px);
+  line-height: clamp(24px, calc(24px + (100vw - 390px) * 0.007619), 32px);
+  letter-spacing: -0.02em;
+  color: var(--color-stone-500);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: color 0.3s ease;
+}
+
+.hero-scroll:hover {
+  color: var(--color-stone-300);
+}
+
+.hero-scroll:focus-visible {
+  outline: 2px solid var(--color-lime-300);
+  outline-offset: 4px;
+}
+
+@media (max-width: 767px) {
+  .hero-line {
+    gap: 0.1em;
+  }
+
+  .hero-polaroid {
+    --pol-w: 1.791em;
+    --pol-h: 2.015em;
+    left: -0.328em;
+    top: -1.227em;
+  }
+
+  .hero-amp {
+    left: -0.668em;
+    top: 0.55em;
+    width: 0.66em;
+    height: 0.9em;
+  }
+}
+
+/* ===== Hero load-in =====
+   html.intro-wait: hidden until the font and polaroid are ready (BaseLayout + hero-intro.ts).
+   html.intro-play: the sequence below, timed from the moment the fonts are ready.
+     0      the six runs rise one by one from a bottom-edge mask, 70ms apart
+     450    polaroid grows 0 → 120% → 100%; the ampersand follows
+     800    "Scroll to view work" rises
+     900    the hedges pop up from behind the hero's bottom edge, all at once (hero-intro.ts) */
+.intro-wait .hero-word__inner,
+.intro-wait .hero-polaroid,
+.intro-wait .hero-amp,
+.intro-wait .hero-scroll {
+  opacity: 0;
+}
+
+.intro-wait .hedges--hero .hedge,
+.intro-play .hedges--hero:not(.is-popped) .hedge {
+  scale: 0;
+}
+
 .intro-wait .hero-word,
 .intro-play .hero-word {
   clip-path: inset(-1.5em -0.5em 0 -0.5em);
 }
 
-.intro-play .hero-logo {
-  transform-origin: 50% 51.9%;
-  animation: intro-pop 500ms var(--motion-ease-enter) both;
+/* The polaroid and sticker hang outside their word, so the word's mask must not cut them. */
+.intro-wait .hero-word:has(.hero-polaroid, .hero-amp),
+.intro-play .hero-word:has(.hero-polaroid, .hero-amp) {
+  clip-path: inset(-3em -1.5em 0 -1.5em);
 }
 
 .intro-play .hero-word__inner {
   animation: intro-word 760ms var(--motion-ease-enter) both;
-  animation-delay: calc(200ms + var(--w) * 70ms);
+  animation-delay: calc(var(--w) * 70ms);
 }
 
 .intro-play .hero-polaroid {
-  animation: intro-polaroid 760ms 600ms both;
+  animation: intro-polaroid 760ms 450ms both;
 }
 
-.intro-play .hero-cta > * {
-  animation: intro-rise 700ms var(--motion-ease-enter) both;
+.intro-play .hero-amp {
+  animation: intro-polaroid 760ms 560ms both;
 }
 
-.intro-play .hero-cta > :nth-child(1) { animation-delay: 1050ms; }
-.intro-play .hero-cta > :nth-child(2) { animation-delay: 1130ms; }
-
-.intro-play .flap {
-  animation: intro-flap 700ms var(--motion-ease-enter) both;
-  animation-delay: calc(1200ms + var(--i) * 60ms);
-}
-
-@keyframes intro-pop {
-  from { opacity: 0; transform: scale(0.6); }
-  to { opacity: 1; transform: none; }
+.intro-play .hero-scroll {
+  animation: intro-rise 700ms var(--motion-ease-enter) 800ms both;
 }
 
 @keyframes intro-word {
@@ -250,32 +231,11 @@
   to { opacity: 1; transform: none; }
 }
 
-@keyframes intro-flap {
-  from { translate: 0 var(--flap-h-tall); }
-  to { translate: 0 0; }
-}
-
-/* Figma: the two hero buttons sit 16 apart on desktop, 8 on the Mobile Hero. */
-.hero-cta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-
-@media (min-width: 768px) {
-  .hero-cta {
-    gap: 16px;
-  }
-}
-
-.flap-sentinel {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 1px;
-  height: 1px;
-  pointer-events: none;
+/* ===== Hedge scale =====
+   Desktop hedges are laid out against a 720px reference that shrinks below 720 wide, so their
+   spacing matches the frame. Below 768px the Figma Mobile variants are used instead. */
+:root {
+  --hedge-base: min(720px, 100vw);
 }
 
 /* ===== Hedges (Figma 4029:2552) ===== */
@@ -290,11 +250,12 @@
   display: none;
 }
 
-/* Hero, Desktop: 1104x289 at x162 y624 of the 1440x800 frame, so it is cut 113px by the hero bottom. */
+/* Hero, Desktop (Figma Home 4068:6051): seven bushes on a 1440x344 canvas from x 0, y 577 of the
+   1440x800 hero, so it runs 121.5px below the hero bottom (bushes reach past both side edges). */
 .hedges--hero .hedge-row--desktop {
-  bottom: calc(-113.47 / 720 * var(--hedge-base));
-  left: calc(50% - (551.9 + 6.1) / 720 * var(--hedge-base));
-  width: calc(1103.81 / 720 * var(--hedge-base));
+  bottom: calc(-121.51 / 720 * var(--hedge-base));
+  left: calc(50% - 720 / 720 * var(--hedge-base));
+  width: calc(1440 / 720 * var(--hedge-base));
 }
 
 /* Footer, Desktop: 1200x322 at x124 y466 of the 1440x680 footer, cut 108px by its bottom. */
@@ -313,19 +274,19 @@
     display: block;
   }
 
-  /* Hero, Mobile (Figma Mobile Hero 4058:2783): the 534x157 row starts 72 left of the screen and
-     runs 43 below the hero's bottom edge on a 390 frame; it scales with the screen width. */
+  /* Hero, Mobile (Figma Mobile Hero 4068:7252): the 550x161 row starts 72 left of the screen and
+     runs 64 below the hero's bottom edge on a 390 frame; it scales with the screen width. */
   .hedges--hero .hedge-row--mobile {
-    bottom: calc(-43.44 / 390 * 100vw);
+    bottom: calc(-64.22 / 390 * 100vw);
     left: calc(-72 / 390 * 100vw);
-    width: calc(533.95 / 390 * 100vw);
+    width: calc(549.95 / 390 * 100vw);
   }
 
-  /* Footer, Mobile (Figma Mobile Footer 4058:2464): 507x182, 53 left of the screen, 46 below. */
+  /* Footer, Mobile (Figma Mobile Footer 4058:2464): 507x192, 60 left of the screen, 36 below. */
   .hedges--footer .hedge-row--mobile {
-    bottom: calc(-45.72 / 390 * 100vw);
-    left: calc(-53.03 / 390 * 100vw);
-    width: calc(506.59 / 390 * 100vw);
+    bottom: calc(-35.72 / 390 * 100vw);
+    left: calc(-60.03 / 390 * 100vw);
+    width: calc(506.56 / 390 * 100vw);
   }
 }
 
@@ -421,7 +382,7 @@
 }
 
 /* ===== Hedge pop (hero intro and footer) =====
-   The whole row at once: each bush grows from its base behind the flaps / bottom edge, overshoots
+   The whole row at once: each bush grows from its base behind the bottom edge, overshoots
    to 110%, dips a touch under, and settles at 100%. */
 .hedges--footer.is-armed:not(.is-popped) .hedge {
   scale: 0;
@@ -450,68 +411,61 @@
 }
 
 /* ===== Page body =====
-   Each page has its own body colour and heading inks (Figma 4026:583 / 4026:700 / 4026:791),
-   set on <html data-page> so the docked flaps' edge fade can use the colour too. */
+   Each page has its own body colour and heading inks (Figma Home/Work 4026:926, Playground 4068:7511,
+   About 4068:7754), set on <html data-page>. */
+:root[data-page='home'],
 :root[data-page='work'] {
   --page-bg: var(--color-stone-0);
   --page-ink: var(--color-neutral-950);
-  --head-ink: var(--color-neutral-950);
-  --lead-ink: var(--color-stone-700);
+  --head-ink: var(--color-stone-950);
+  --lead-ink: var(--color-stone-600);
 }
 
 :root[data-page='playground'] {
   --page-bg: var(--color-plum-150);
   --page-ink: var(--color-plum-950);
   --head-ink: var(--color-plum-950);
-  --lead-ink: var(--color-plum-800);
+  --lead-ink: var(--color-plum-600);
 }
 
 :root[data-page='about'] {
   --page-bg: var(--color-blue-150);
   --page-ink: var(--color-blue-900);
   --head-ink: var(--color-blue-950);
-  --lead-ink: var(--color-blue-800);
+  --lead-ink: var(--color-blue-600);
 }
 
 .page-body {
-  min-height: 100svh;
   background: var(--page-bg);
   color: var(--page-ink);
 }
 
-.page-intro {
-  padding: calc(var(--flap-h-tall) + 72px) 16px 120px;
-  text-align: center;
-}
-
-.page-title,
-.page-lead {
-  margin: 0;
-}
-
-.page-lead {
-  margin-top: 16px;
-  opacity: 0.8;
+/* Every page body starts its heading 200 below the top of its section on desktop (Figma containers
+   pad 200; the nav bar sits over that space on Work, Playground and About). */
+:root {
+  --section-top: clamp(112px, calc(112px + (100vw - 390px) * 0.08381), 200px);
 }
 
 .projects {
   color: var(--color-neutral-950);
-  scroll-margin-top: 88px;
+  scroll-margin-top: 0;
 }
 
 .projects-inner {
   width: min(1240px, calc(100% - 32px));
   margin-inline: auto;
-  padding: 72px 0 80px;
+  padding: var(--section-top) 0 clamp(96px, 12vw, 224px);
 }
 
+/* Heading/H1 title over a Heading/H3 lead, 8 apart; 56 to the content. */
 .section-head {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
   text-align: center;
-  margin-bottom: 40px;
+  width: min(604px, 100%);
+  margin: 0 auto clamp(32px, 4vw, 56px);
 }
 
 .section-title {
@@ -521,13 +475,13 @@
 
 .section-lead {
   margin: 0;
-  max-width: 18em;
+  width: min(433px, 100%);
   color: var(--lead-ink);
 }
 
 /* ===== Case study cards =====
-   Figma 4026:619: two columns of 604, 32 apart; the right column starts 124 lower and cards in a
-   column are 124 apart. Phones: one column in reading order 1, 2, 3, 4. */
+   Figma Home container: two columns of 604, 32 apart; the right column starts 124 lower and cards in
+   a column are 116 apart. Phones: one column in reading order 1, 2, 3, 4. */
 .card-board {
   display: flex;
   flex-direction: column;
@@ -554,7 +508,7 @@
     flex: 1 1 0;
     min-width: 0;
     flex-direction: column;
-    gap: clamp(48px, 8.6vw, 124px);
+    gap: clamp(32px, 8vw, 116px);
   }
 
   .card-column--2 {
@@ -562,17 +516,18 @@
   }
 }
 
+/* Figma "Case Study Card": Neutral/0, 1.5 border, radius 16, padding 24, 32 between image and copy. */
 .project-card {
   color: inherit;
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 16px;
+  gap: clamp(20px, 2.2vw, 32px);
+  padding: clamp(16px, 1.7vw, 24px);
   background: var(--color-neutral-0);
   border: 1.5px solid rgba(227, 227, 227, 0.8);
   border-radius: var(--radius-md);
-  transition: box-shadow var(--motion-duration-base) var(--motion-ease-fade);
+  transition: box-shadow 0.3s ease;
 }
 
 /* Crunchr: the phone video sits centred in the media box. */
@@ -585,7 +540,7 @@
   pointer-events: none;
 }
 
-/* Figma "Case Study Card" (4033:3512), State=Hover: two soft shadows, nothing moves. */
+/* State=Hover: two soft shadows, nothing moves. */
 @media (hover: hover) and (pointer: fine) {
   .project-card:hover {
     box-shadow: var(--shadow-card-hover);
@@ -619,6 +574,7 @@
   gap: 8px;
 }
 
+/* Meta/Large, Neutral/700, 8 apart. */
 .project-card__tags {
   display: flex;
   flex-wrap: wrap;
@@ -627,38 +583,32 @@
   color: var(--color-neutral-700);
 }
 
-/* Figma Case Study Card: tags are Meta/Large (Geist Mono 18/24, 16/24 on mobile) via .text-meta-lg. */
-
-/* Heading/H3 (Geist Regular 24/32, -2%) via .text-h3. */
+/* Heading/H3, Neutral/950. */
 .project-card__title {
   margin: 0;
   color: var(--color-neutral-950);
 }
 
-.section-anchor {
-  height: 1px;
-  scroll-margin-top: 88px;
-}
-
+/* ===== Footer (Figma Footer 4068:6036, Mobile Footer 4058:2464) =====
+   1440x680: copy 688 wide, 164 from the top; headline, 32, Let's Chat, 32, link row (8 padding,
+   links 32 apart). Mobile 390x500: 359 wide, 118 from the top, 24 gaps. */
 .site-footer {
   position: relative;
   overflow: hidden;
-  min-height: 560px;
+  min-height: clamp(500px, calc(500px + (100vw - 390px) * 0.171429), 680px);
   background: var(--color-lime-950);
   color: var(--color-neutral-0);
 }
 
-/* Figma Footer 4058:2991: copy 688 wide, 164 from the top; headline, 32, Let's Chat, 32, link row
-   (8 padding, links 32 apart). Mobile Footer 4058:2464: 359 wide, 118 from the top, 24 gaps. */
 .footer-copy {
   position: relative;
   z-index: 1;
   width: min(688px, calc(100% - 32px));
-  margin: 118px auto 0;
+  margin: clamp(118px, calc(118px + (100vw - 390px) * 0.04381), 164px) auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: clamp(24px, calc(24px + (100vw - 390px) * 0.007619), 32px);
   text-align: center;
 }
 
@@ -673,11 +623,8 @@
   letter-spacing: -0.02em;
 }
 
-/* The mooncake polaroid hangs off the top-left of "Thanks", tilted 24.3deg left. It sits outside
-   the word's reveal mask so it is not clipped. Placed from Figma's transform: on desktop (Footer
-   4058:2991) the 67x75 card's centre is 9.6px left of and 18.6px above the start of "Thanks"; on
-   the Mobile Footer (4058:2464) the 49.9x56 card is relatively larger and its centre is 50.3px
-   right of and 19.7px above it. The PNG box is the card / 0.658 (see Polaroid.astro). */
+/* The mooncake polaroid hangs off the top-left of "Thanks", tilted 24deg left. It sits outside
+   the word's reveal mask so it is not clipped. The PNG box is the card / 0.658 (see Polaroid.astro). */
 .footer-title__first {
   position: relative;
   display: inline-block;
@@ -708,99 +655,7 @@
   z-index: 1;
 }
 
-@media (min-width: 768px) {
-  .hero-copy {
-    width: min(1200px, calc(100% - 64px));
-    margin-top: 120px;
-  }
-
-  .projects-inner {
-    width: min(1240px, calc(100% - 64px));
-    padding-top: 96px;
-  }
-
-  .project-card {
-    padding: 20px;
-    gap: 24px;
-  }
-
-
-  .site-footer {
-    min-height: 640px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .hero-clip {
-    height: 800px;
-    min-height: 800px;
-  }
-
-  .hero-copy {
-    width: 1200px;
-    margin-top: 152px;
-    gap: 40px;
-  }
-
-  .projects-inner {
-    width: 1240px;
-    padding: 120px 0 96px;
-  }
-
-  .section-head {
-    width: 604px;
-    margin-inline: auto;
-    margin-bottom: 56px;
-  }
-
-  .section-lead {
-    width: 433px;
-    max-width: none;
-  }
-
-  .project-card {
-    padding: 24px;
-    gap: 32px;
-  }
-
-
-  .site-footer {
-    height: 680px;
-    min-height: 680px;
-  }
-
-  .footer-copy {
-    margin-top: 164px;
-    gap: 32px;
-  }
-
-}
-
 @media (max-width: 767px) {
-  /* Figma Mobile Hero 4058:2783: 390x500, copy 66 from the top, 30 between logo, title and buttons. */
-  .hero-clip {
-    min-height: 500px;
-  }
-
-  .hero-copy {
-    margin: 66px auto 0;
-    padding: 0;
-    gap: 30px;
-  }
-
-  .hero-logo,
-  .hero-logo__mark {
-    width: 48px;
-    height: 48px;
-  }
-
-
-
-  /* Figma Mobile Footer 4058:2464 is 390x500. */
-  .site-footer {
-    min-height: 500px;
-  }
-
   .footer-polaroid {
     --pol-w: 2.369em;
     --pol-h: 2.663em;
@@ -808,19 +663,8 @@
     top: -1.946em;
   }
 
-  /* Mobile Footer: the two links sit 16 apart (32 on desktop). */
+  /* Mobile Footer: the two links sit 16 apart. */
   .footer-links {
     gap: 16px;
-  }
-}
-
-@media (max-width: 390px) {
-  .hero-cta {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    gap: var(--button-gap);
   }
 }

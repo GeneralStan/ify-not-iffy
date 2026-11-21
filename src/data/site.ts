@@ -18,4 +18,4 @@ export const cal = {
   config: { layout: 'week_view', useSlotsViewOnSmallScreen: 'true', theme: 'auto' },
 };
 
-export type PageId = 'work' | 'playground' | 'about';
+export type PageId = 'home' | 'work' | 'playground' | 'about';

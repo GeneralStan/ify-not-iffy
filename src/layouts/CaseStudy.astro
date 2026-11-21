@@ -41,7 +41,7 @@ const sections = [
   ['learnings', 'Learnings & reflections'],
 ] as const;
 
-const workHref = withBase('/#work');
+const workHref = withBase('/work/');
 ---
 
 <BaseLayout page="work" title={`${data.name} — Ifeanyi Ulasika`} description={data.summary}>
@@ -239,8 +239,6 @@ const workHref = withBase('/#work');
       { rootMargin: '-30% 0px -60% 0px' },
     );
     sections.forEach((section) => observer.observe(section));
-    document.addEventListener('astro:before-swap', () => observer.disconnect(), { once: true });
   }
   bindToc();
-  document.addEventListener('astro:after-swap', bindToc);
 </script>

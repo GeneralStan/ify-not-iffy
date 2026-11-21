@@ -1,14 +1,13 @@
 ---
 import '../styles/global.css';
-import { ClientRouter } from 'astro:transitions';
 import { withBase } from '../lib/url';
 
 interface Props {
   title: string;
   description: string;
-  /** Pages with the animated hero hide it until hero-intro.ts plays the load-in. */
+  /** Home: the hero is hidden until hero-intro.ts plays the load-in. */
   intro?: boolean;
-  /** Sets <html data-page>, which drives the page colour and the current flap. */
+  /** Sets <html data-page>, which drives the page colour. */
   page?: string;
 }
 
@@ -41,24 +40,24 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
       @font-face { font-family: "Exat CYR"; src: local("Exat CYR Black"), url("${exatBlack}") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
     `}></style>
     {intro && <script is:inline>
-      // Hide the hero for its load-in only when motion is allowed and JS runs, and only on the
-      // first load: page changes keep the hero (ClientRouter), so it must not hide again.
+      // Hide the hero for its load-in only when motion is allowed and JS runs.
       // hero-intro.ts removes the class; the timeout is a safety net.
-      if (!window.__ifyIntroSeen && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        window.__ifyIntroSeen = true;
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.documentElement.classList.add('intro-wait');
         setTimeout(function () { document.documentElement.classList.remove('intro-wait'); }, 3000);
       }
-      // Scroll reveals (src/scripts/reveal.ts): content below the hero waits hidden only when motion
-      // is allowed and the observer exists. Set before first paint so nothing flashes.
+    </script>}
+    <script is:inline>
+      // Scroll reveals (src/scripts/reveal.ts): content waits hidden only when motion is allowed and
+      // the observer exists. Set before first paint so nothing flashes.
       if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.documentElement.classList.add('reveal-ready');
       }
-    </script>}
+    </script>
     <title>{title}</title>
     <script is:inline>
-      // Mobile case study sheet (src/scripts/case-sheet.ts): while a sheet is open, Back closes it
-      // instead of letting the page router reload the page underneath. Registered before the router.
+      // Mobile case study sheet (src/scripts/case-sheet.ts): while a sheet is open, Back closes it,
+      // and Forward into a sheet entry reopens it in place.
       window.addEventListener('popstate', function (event) {
         var sheet = window.__caseSheet;
         if (sheet && sheet.open) {
@@ -70,7 +69,6 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
         }
       });
     </script>
-    <ClientRouter />
   </head>
   <body>
     <a class="skip text-label" href="#content">Skip to content</a>

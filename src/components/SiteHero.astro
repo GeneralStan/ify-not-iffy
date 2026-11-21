@@ -1,62 +1,55 @@
 ---
 /**
- * Hero shared by every page (Figma Hero 4058:2919, Mobile Hero 4058:2783): solid Lime/900.
- * It is persisted across page changes (transition:persist), so it never reloads or replays.
- * The headline is split into words so the load-in can reveal them one by one.
+ * Home hero (Figma Home 4068:6024 hero 4068:6051, Mobile Hero 4068:7252): solid Lime/900.
+ * "I design experiences / Engineer systems / & build products", with the at-sea polaroid tucked on
+ * "experiences" and the ampersand sticker by "build", then "Scroll to view work" and the hedges.
+ * Each run (white or lime) rises in on load; see hero-intro.ts and home.css.
  */
-import Button from './Button.astro';
-import { withBase } from '../lib/url';
+import { Image } from 'astro:assets';
 import HedgeRow from './HedgeRow.astro';
 import Polaroid from './Polaroid.astro';
-import IffyLogo from '../assets/home/iffy-logo.svg';
-import { cal, contact } from '../data/site';
+import ampersand from '../assets/home/hero-ampersand.png';
 
-// [colour, text] runs per line, as in Figma Hero 4058:2919 (Lime/300 at 60% vs Neutral/0).
-const lines: Array<Array<['lime' | 'paper', string]>> = [
-  [['lime', 'Hi, I’m'], ['paper', 'Ifeanyi Ulasika.']],
-  [['lime', 'I design'], ['paper', 'products'], ['lime', 'and build']],
-  [['paper', 'systems that ship.']],
+// [tone, text] runs per line: Neutral/0 and Lime/400.
+const lines: Array<Array<['paper' | 'lime', string]>> = [
+  [['paper', 'I design'], ['lime', 'experiences']],
+  [['paper', 'Engineer'], ['lime', 'systems']],
+  [['paper', 'build'], ['lime', 'products']],
 ];
 
-let wordIndex = 0;
-const words = lines.map((runs) =>
-  runs.flatMap(([tone, text]) => text.split(' ').map((word) => ({ tone, word, index: wordIndex++ }))),
-);
+let runIndex = 0;
+const runs = lines.map((line) => line.map(([tone, text]) => ({ tone, text, index: runIndex++ })));
 ---
 
-<section class="hero" id="hero" data-hero transition:persist="hero">
+<section class="hero" id="hero" data-hero>
   <div class="hero-clip">
     <div class="hero-copy">
-      <a class="hero-logo" href={withBase('/')} data-spin data-home aria-label="Ifeanyi Ulasika, Work">
-        <IffyLogo class="hero-logo__mark" width="64" height="64" aria-hidden="true" />
-      </a>
-      <h1 class="hero-title text-display" data-headline>
+      <h1 class="hero-title" data-headline>
         {
-          words.map((line, l) => (
+          runs.map((line, l) => (
             <>
-            {l > 0 && ' '}
-            <span class="hero-line" data-line>
-              <span class="hero-line__inner">
-                {line.map(({ tone, word, index }, i) => (
+              {l > 0 && ' '}
+              <span class="hero-line">
+                {line.map(({ tone, text, index }, i) => (
                   <>
-                    {word === 'build' && <br class="hero-br--mobile" />}
+                    {i > 0 && ' '}
                     <span class={`hero-word ${tone}`} style={`--w: ${index}`}>
-                      <span class="hero-word__inner">{word}</span>
+                      {text === 'experiences' && (
+                        <Polaroid photo="at-sea" class="hero-polaroid" displayWidth={116} eager />
+                      )}
+                      {text === 'build' && (
+                        <Image class="hero-amp" src={ampersand} alt="&" width={127} height={173} loading="eager" />
+                      )}
+                      <span class="hero-word__inner">{text}</span>
                     </span>
-                    {i < line.length - 1 ? ' ' : ''}
                   </>
                 ))}
               </span>
-            </span>
             </>
           ))
         }
-        <Polaroid photo="at-sea" class="hero-polaroid" displayWidth={132} eager />
       </h1>
-      <div class="hero-cta">
-        <Button href={cal.url} label="Let’s Chat" variant="secondary" cal newTab />
-        <Button href={contact.resume} label="View resume" variant="primary" newTab />
-      </div>
+      <a class="hero-scroll" href="#work">Scroll to view work</a>
     </div>
     <HedgeRow place="hero" />
   </div>

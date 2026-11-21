@@ -1,64 +1,81 @@
 /* ===== Shared page section =====
-   Playground and About bodies (Figma 4026:700 / 4026:791). Same rhythm as Work's .projects-inner. */
+   Playground and About bodies (Figma 4068:7511 / 4068:7754): heading 200 from the top on desktop
+   (the nav bar sits over that space), 56 to the content. */
 .page-section {
-  padding: 72px 0 96px;
+  padding: var(--section-top) 0 clamp(96px, 14vw, 240px);
   color: var(--page-ink);
   overflow-x: clip;
 }
 
 .page-section > .section-head {
   width: min(604px, calc(100% - 32px));
-  margin-inline: auto;
 }
 
-@media (min-width: 768px) {
-  .page-section {
-    padding: 96px 0 120px;
-  }
+/* ===== Playground canvas (Figma Playground 4068:7511) =====
+   A window onto a board bigger than the screen; drag to explore. The board keeps the Figma frame's
+   coordinates (origin at the 1440 frame's left edge, centred on the screen) and is scaled down on
+   phones. Wheel and trackpad scrolling still scroll the page. */
+.playground {
+  padding-bottom: 0;
 }
 
-@media (min-width: 1440px) {
-  .page-section {
-    padding: 120px 0 160px;
-  }
-
-  .page-section > .section-head {
-    margin-bottom: 56px;
-  }
-
-  .page-section .section-lead {
-    width: 433px;
-    max-width: none;
-  }
+.play-canvas {
+  position: relative;
+  height: clamp(480px, 78svh, 1616px);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* ===== Playground board =====
-   Phones: one column. Tablets: two. Desktop: the Figma board, every card at its own x / y / width on
-   the 1240 column, all scaled with the column (1 unit = column width / 1240). */
+.play-canvas.is-dragging {
+  cursor: grabbing;
+}
+
+.play-canvas:focus-visible {
+  outline: 2px solid var(--color-plum-700);
+  outline-offset: -4px;
+}
+
 .play-board {
-  width: min(1240px, calc(100% - 32px));
-  margin-inline: auto;
-  display: grid;
-  gap: 20px;
+  --s: 0.62;
+  position: absolute;
+  top: 0;
+  left: calc(50% - 720px * var(--s));
+  width: calc(1440px * var(--s));
+  height: 0;
+  will-change: translate;
 }
 
+.play-board.is-easing {
+  transition: translate 0.3s ease;
+}
+
+/* Card: Neutral/0, 1.5 border, radius 16, padding 24; image Stone/50 with a Stone/150 border;
+   Meta/Large tags centred, 16 below the image. */
 .play-card {
+  position: absolute;
+  left: calc(var(--x) * 1px * var(--s));
+  top: calc(var(--y) * 1px * var(--s));
+  width: calc(var(--w) * 1px);
+  scale: var(--s);
+  transform-origin: 0 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px;
-  background: var(--color-plum-400);
-  border-radius: 8px;
-  box-shadow: var(--shadow-card-hover);
+  gap: 16px;
+  padding: 24px;
+  background: var(--color-neutral-0);
+  border: 1.5px solid rgba(227, 227, 227, 0.8);
+  border-radius: var(--radius-md);
+  color: var(--color-neutral-700);
 }
 
 .play-card__media {
-  position: relative;
-  aspect-ratio: var(--media-w) / var(--media);
+  height: calc(var(--media-h) * 1px);
   overflow: hidden;
-  background: var(--color-neutral-0);
-  border: 1px solid rgba(240, 237, 229, 1);
-  border-radius: 4px;
+  background: var(--color-stone-50);
+  border: 1px solid var(--color-stone-150);
 }
 
 .play-card__media img {
@@ -66,72 +83,26 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
 }
 
-/* Figma badge: #FFEAB3 chip, Meta/Large (Geist Mono 18/24, 16/24 on mobile), #39362D. */
-.play-card__badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 8px;
-  border-radius: 4px;
-  background: #ffeab3;
-  color: #39362d;
-  font-family: var(--type-meta-lg-family);
-  font-size: var(--type-meta-lg-size);
-  line-height: var(--type-meta-lg-line-height);
-}
-
-.play-card__title {
+.play-card__tags {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 0;
-  color: var(--color-plum-950);
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-medium);
-  font-size: 16px;
-  line-height: 24px;
 }
 
 @media (min-width: 768px) {
   .play-board {
-    grid-template-columns: 1fr 1fr;
-    width: min(1240px, calc(100% - 64px));
-  }
-
-  /* Wide Figma cards (815 / 742 / 1240) take the full row. */
-  .play-card:nth-child(1),
-  .play-card:nth-child(5),
-  .play-card:nth-child(6) {
-    grid-column: 1 / -1;
+    --s: 0.85;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .play-board {
-    display: block;
-    position: relative;
-    container-type: inline-size;
-    /* Cards are 88px taller than their scaled image (padding, gap, title), so the board is the
-       scaled 1240 x 2049 area plus that fixed 88. */
-    padding-bottom: 88px;
-  }
-
-  .play-board::before {
-    content: '';
-    display: block;
-    padding-top: calc(2049 / 1240 * 100%);
-  }
-
-  .play-card {
-    --board-u: calc(100cqw / 1240);
-    position: absolute;
-    left: var(--x);
-    top: var(--y);
-    width: var(--w);
-  }
-
-  .play-card__title {
-    font-size: 18px;
-    line-height: 28px;
+    --s: 1;
   }
 }
 

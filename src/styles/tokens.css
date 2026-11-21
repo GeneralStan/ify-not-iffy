@@ -165,7 +165,7 @@
   --type-h1-line-height: clamp(36px, calc(36px + (100vw - 390px) * 0.01143), 48px);
   --type-h1-tracking: -0.02em;
   --type-h2-family: var(--font-display);
-  --type-h2-weight: var(--font-weight-light);
+  --type-h2-weight: var(--font-weight-regular);
   --type-h2-size: clamp(24px, calc(24px + (100vw - 390px) * 0.00762), 32px);
   --type-h2-line-height: clamp(32px, calc(32px + (100vw - 390px) * 0.00762), 40px);
   --type-h2-tracking: -0.015em;
@@ -181,8 +181,8 @@
   --type-h4-tracking: -0.02em;
   --type-nav-family: var(--font-display);
   --type-nav-weight: var(--font-weight-regular);
-  --type-nav-size: clamp(16px, calc(16px + (100vw - 390px) * 0.00381), 20px);
-  --type-nav-line-height: 24px;
+  --type-nav-size: clamp(15px, calc(15px + (100vw - 390px) * 0.00476), 20px);
+  --type-nav-line-height: clamp(17px, calc(17px + (100vw - 390px) * 0.00667), 24px);
   --type-nav-tracking: clamp(-0.24px, calc(-0.16px + (100vw - 390px) * -0.000076), -0.16px);
   --type-body-lg-family: var(--font-body);
   --type-body-lg-weight: var(--font-weight-regular);

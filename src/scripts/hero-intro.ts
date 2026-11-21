@@ -1,113 +1,19 @@
 /**
- * Hero load-in, logo spin and hero polaroid placement.
+ * Home hero load-in.
  *
  * Rules (see .claude/skills/site-motion/SKILL.md):
  * - The hero waits for the display font and the polaroid before anything moves.
  * - Only transform and opacity animate. No bounce.
- * - Reduced motion: no intro and no spin.
- * Polaroid hover / pop lives in src/scripts/polaroid.ts.
+ * - Reduced motion: no intro.
+ * The polaroid and the ampersand are placed in CSS (home.css); polaroid hover / pop lives in
+ * src/scripts/polaroid.ts.
  */
 
 const root = document.documentElement;
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
-/** Matches --motion-ease-spin: a short ease-in, then a long settle (fast early, slow at the end). */
-const EASE_SPIN = 'cubic-bezier(0.3, 0, 0.1, 1)';
-
-const INTRO_SPIN_MS = 2000;
-const REPLAY_SPIN_MS = 1600;
-/* Matches the timeline in home.css (intro-play). Flaps start at 1200ms, 60ms apart, 700ms each, so
-   90% through the flap sequence is 1200 + 0.9 * (2 * 60 + 700) ≈ 1940ms: the hedges pop then. */
-const HEDGE_POP_AT = 1940;
-const INTRO_TOTAL_MS = 2700;
-
-/* ---------- Logo spin (hero logo and docked logo) ----------
-   The SVG turns around the petals' hub (transform-origin set in CSS), so it never drifts. */
-
-const spins = new WeakMap<Element, Animation>();
-
-function spinLogo(host: Element | null, duration: number, delay = 0) {
-  const mark = host?.querySelector('svg');
-  if (!host || !mark || reduced.matches) return;
-  if (spins.get(host)?.playState === 'running') return; // never restart mid-spin
-  spins.set(
-    host,
-    mark.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], {
-      duration,
-      delay,
-      easing: EASE_SPIN,
-    }),
-  );
-}
-
-document.querySelectorAll('[data-spin]').forEach((host) => {
-  host.addEventListener('pointerenter', () => {
-    if (finePointer.matches) spinLogo(host, REPLAY_SPIN_MS);
-  });
-  host.addEventListener('pointerup', (event) => {
-    if ((event as PointerEvent).pointerType !== 'mouse') spinLogo(host, REPLAY_SPIN_MS);
-  });
-});
-
-/* ---------- Hero polaroid placement ----------
-   Figma 4033:3415: the photo's centre sits 0.69em right of the end of "Ulasika"
-   and 0.43em below the top of the first line (56px display type). */
-
-const headline = document.querySelector<HTMLElement>('[data-headline]');
-const firstLine = headline?.querySelector<HTMLElement>('[data-line] .hero-line__inner') ?? null;
-const heroPolaroid = headline?.querySelector<HTMLElement>('[data-polaroid]') ?? null;
-
-const POL_DX = 0.686; // centre of the photo, past the line end
-const POL_DY = 0.43;
-/** Left edge of the tilted card (14°), as a fraction of the PNG box width from its left side. */
-const CARD_LEFT = 0.15;
-/** Bottom edge of the tilted card, as a fraction of the PNG box height from its top. */
-const CARD_BOTTOM = 0.85;
-
-function placePolaroid() {
-  if (!headline || !firstLine || !heroPolaroid) return;
-  // Measure the word wrappers, which never move: the intro animates the inner spans, and measuring
-  // those mid-rise put the photo on top of "Ulasika".
-  const rects = [...firstLine.querySelectorAll('.hero-word')]
-    .map((word) => word.getBoundingClientRect())
-    .filter((r) => r.width > 0);
-  if (!rects.length) return;
-  const top = Math.min(...rects.map((r) => r.top));
-  const lineEnd = Math.max(...rects.filter((r) => Math.abs(r.top - top) < 2).map((r) => r.right));
-  const box = headline.getBoundingClientRect();
-  const em = parseFloat(getComputedStyle(headline).fontSize);
-  const width = heroPolaroid.offsetWidth;
-  const height = heroPolaroid.offsetHeight;
-  // Keep the card inside the viewport on narrow phones (the tilted card reaches 87% across the box).
-  const maxX = document.documentElement.clientWidth - box.left - width * 0.87 - 4;
-  // On phones the card is large relative to the type, so the Figma offset alone lets its tilted left
-  // corner (about 15% into the PNG box) cover the last letter; keep at least 4px clear of the word.
-  const clearX = lineEnd - box.left + 4 - width * CARD_LEFT;
-  const wantX = Math.max(lineEnd - box.left + POL_DX * em - width / 2, clearX);
-  const x = Math.min(wantX, maxX);
-  // When it has to move in over the word, lift it by the same amount (up to one line) so it pins
-  // to the word's top corner instead of covering it.
-  const lift = Math.min(Math.max(wantX - x, 0), em);
-  // Measure from the line box, not the moving text, so the intro transform does not skew it.
-  const lineBox = firstLine.parentElement!.getBoundingClientRect();
-  let y = lineBox.top - box.top + POL_DY * em - height / 2 - lift;
-  // Still over the word after the clamp (narrowest phones): sit the card on top of the line instead,
-  // its bottom edge just above the cap height.
-  if (x + width * CARD_LEFT < lineEnd - box.left) {
-    y = Math.min(y, lineBox.top - box.top + 0.2 * em - height * CARD_BOTTOM);
-  }
-  heroPolaroid.style.setProperty('--pol-x', `${x}px`);
-  heroPolaroid.style.setProperty('--pol-y', `${y}px`);
-}
-
-if (headline) {
-  placePolaroid();
-  document.fonts?.ready.then(placePolaroid);
-  new ResizeObserver(placePolaroid).observe(headline);
-}
-
-/* ---------- Load-in ---------- */
+/* Matches the timeline in home.css (intro-play): the hedges pop once the copy has landed. */
+const HEDGE_POP_AT = 900;
+const INTRO_TOTAL_MS = 1700;
 
 function decoded(img: HTMLImageElement | null) {
   if (!img) return Promise.resolve();
@@ -119,13 +25,11 @@ function decoded(img: HTMLImageElement | null) {
 }
 
 async function intro() {
-  if (!root.classList.contains('intro-wait')) {
-    // Reduced motion, or the safety timeout already revealed the page.
-    return;
-  }
+  // Reduced motion, a page without the hero, or the safety timeout already revealed it.
+  if (!root.classList.contains('intro-wait')) return;
 
   const fonts = document.fonts?.ready ?? Promise.resolve();
-  const photo = heroPolaroid?.querySelector<HTMLImageElement>('img') ?? null;
+  const photo = document.querySelector<HTMLImageElement>('.hero-polaroid img');
   const cap = new Promise((resolve) => setTimeout(resolve, 1800));
   await Promise.race([Promise.all([fonts, decoded(photo)]), cap]);
 
@@ -133,12 +37,10 @@ async function intro() {
 
   root.classList.add('intro-play');
   root.classList.remove('intro-wait');
-  spinLogo(document.querySelector('.hero-logo[data-spin]'), INTRO_SPIN_MS, 120);
   window.setTimeout(
     () => document.querySelector('[data-hedges="hero"]')?.classList.add('is-popped'),
     HEDGE_POP_AT,
   );
-
   window.setTimeout(() => root.classList.remove('intro-play'), INTRO_TOTAL_MS + 300);
 }
 

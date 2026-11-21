@@ -1,9 +1,9 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import { PLAYGROUND_BOARD, playground, playgroundHead } from '../../data/playground';
+import { PLAYGROUND_BOUNDS, playground, playgroundHead } from '../../data/playground';
 
-// Desktop: cards keep the Figma board's scattered positions, scaled with the column (see pages.css).
-const px = (n: number) => `calc(${n} * var(--board-u))`;
+// Figma Playground 4068:7511: the board scrolls in every direction; drag it to explore.
+const b = PLAYGROUND_BOUNDS;
 ---
 
 <SiteLayout
@@ -14,24 +14,154 @@ const px = (n: number) => `calc(${n} * var(--board-u))`;
   <section class="page-section playground">
     <header class="section-head">
       <h2 class="section-title text-h1" data-reveal="soft">{playgroundHead.title}</h2>
-      <p class="section-lead text-h2" data-reveal="soft" style="--reveal-delay: 100ms">{playgroundHead.lead}</p>
+      <p class="section-lead text-h3" data-reveal="soft" style="--reveal-delay: 100ms">{playgroundHead.lead}</p>
     </header>
-    <div class="play-board" style={`--board-h: ${PLAYGROUND_BOARD.height};`}>
-      {
-        playground.map((card, i) => (
-          <article
-            class="play-card"
-            data-reveal="scale"
-            style={`--x: ${px(card.x)}; --y: ${px(card.y)}; --w: ${px(card.w)}; --media: ${card.media}; --media-w: ${card.w - 40}; --reveal-delay: ${(i % 2) * 110}ms`}
-          >
-            <div class="play-card__media">
-              {card.image && <img src={card.image.src} alt="" loading="lazy" decoding="async" />}
-              <span class="play-card__badge">{card.badge}</span>
-            </div>
-            <h3 class="play-card__title">{card.title}</h3>
-          </article>
-        ))
-      }
+    <div
+      class="play-canvas"
+      data-play-canvas
+      tabindex="0"
+      role="region"
+      aria-label="Playground board. Drag, or use the arrow keys, to explore."
+      style={`--min-x: ${b.minX}; --max-x: ${b.maxX}; --min-y: ${b.minY}; --max-y: ${b.maxY};`}
+    >
+      <div class="play-board" data-play-board>
+        {
+          playground.map((card) => (
+            <article class="play-card" style={`--x: ${card.x}; --y: ${card.y}; --w: ${card.w}; --media-h: ${card.mediaH};`}>
+              <div class="play-card__media">
+                {card.image && <img src={card.image.src} alt="" loading="lazy" decoding="async" draggable="false" />}
+              </div>
+              <p class="play-card__tags text-meta-lg">
+                {card.tags.map((tag, i) => (
+                  <>
+                    {i > 0 && <span aria-hidden="true">·</span>}
+                    <span>{tag}</span>
+                  </>
+                ))}
+              </p>
+            </article>
+          ))
+        }
+      </div>
     </div>
   </section>
 </SiteLayout>
+
+<script>
+  /* Drag to pan (mouse, pen or touch), with a little glide on release. Arrow keys pan when the board
+     has focus. The pan is clamped so the cards can never all leave the screen. */
+  const canvas = document.querySelector<HTMLElement>('[data-play-canvas]');
+  const board = canvas?.querySelector<HTMLElement>('[data-play-board]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (canvas && board) {
+    const css = getComputedStyle(canvas);
+    const bound = (name: string) => parseFloat(css.getPropertyValue(name));
+    const PAD = 48;
+    let x = 0;
+    let y = 0;
+    let vx = 0;
+    let vy = 0;
+    let glide = 0;
+
+    const scale = () => parseFloat(getComputedStyle(board).getPropertyValue('--s')) || 1;
+    /* The board's origin sits where the 1440 frame's left edge would be, centred on the screen. */
+    const origin = () => (canvas.clientWidth - 1440 * scale()) / 2;
+
+    function clamp() {
+      const s = scale();
+      const o = origin();
+      const w = canvas!.clientWidth;
+      const h = canvas!.clientHeight;
+      const minX = w - PAD - (o + bound('--max-x') * s);
+      const maxX = PAD - (o + bound('--min-x') * s);
+      const minY = h - PAD - bound('--max-y') * s;
+      const maxY = PAD - bound('--min-y') * s;
+      x = Math.min(Math.max(x, Math.min(minX, 0)), Math.max(maxX, 0));
+      y = Math.min(Math.max(y, Math.min(minY, 0)), Math.max(maxY, 0));
+    }
+
+    function apply() {
+      clamp();
+      board!.style.translate = `${x}px ${y}px`;
+    }
+
+    let startX = 0;
+    let startY = 0;
+    let lastX = 0;
+    let lastY = 0;
+    let lastT = 0;
+    let pointer: number | null = null;
+
+    canvas.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      cancelAnimationFrame(glide);
+      pointer = event.pointerId;
+      startX = event.clientX - x;
+      startY = event.clientY - y;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      lastT = event.timeStamp;
+      vx = vy = 0;
+      canvas.setPointerCapture(event.pointerId);
+      canvas.classList.add('is-dragging');
+    });
+
+    canvas.addEventListener('pointermove', (event) => {
+      if (event.pointerId !== pointer) return;
+      const dt = Math.max(1, event.timeStamp - lastT);
+      vx = (event.clientX - lastX) / dt;
+      vy = (event.clientY - lastY) / dt;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      lastT = event.timeStamp;
+      x = event.clientX - startX;
+      y = event.clientY - startY;
+      apply();
+    });
+
+    const release = (event: PointerEvent) => {
+      if (event.pointerId !== pointer) return;
+      pointer = null;
+      canvas.classList.remove('is-dragging');
+      if (reduced.matches || event.timeStamp - lastT > 80) return;
+      let last = performance.now();
+      const step = (now: number) => {
+        const dt = now - last;
+        last = now;
+        x += vx * dt;
+        y += vy * dt;
+        const decay = Math.pow(0.94, dt / 16);
+        vx *= decay;
+        vy *= decay;
+        apply();
+        if (Math.abs(vx) + Math.abs(vy) > 0.02) glide = requestAnimationFrame(step);
+      };
+      glide = requestAnimationFrame(step);
+    };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+
+    canvas.addEventListener('keydown', (event) => {
+      const step = event.shiftKey ? 240 : 80;
+      const moves: Record<string, [number, number]> = {
+        ArrowLeft: [step, 0],
+        ArrowRight: [-step, 0],
+        ArrowUp: [0, step],
+        ArrowDown: [0, -step],
+      };
+      const move = moves[event.key];
+      if (!move) return;
+      event.preventDefault();
+      cancelAnimationFrame(glide);
+      x += move[0];
+      y += move[1];
+      board.classList.add('is-easing');
+      apply();
+    });
+    board.addEventListener('transitionend', () => board.classList.remove('is-easing'));
+
+    new ResizeObserver(apply).observe(canvas);
+    apply();
+  }
+</script>

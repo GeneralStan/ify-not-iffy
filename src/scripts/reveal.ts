@@ -5,7 +5,6 @@
  *
  * - Elements stay hidden only under html.reveal-ready, which BaseLayout sets before first paint
  *   (motion allowed + IntersectionObserver available), so without JS everything is visible.
- * - Page bodies swap on navigation (ClientRouter), so new elements are picked up after each swap.
  * - Each element plays once. The persisted footer therefore plays once per visit.
  */
 
@@ -35,4 +34,3 @@ function arm() {
 }
 
 arm();
-document.addEventListener('astro:after-swap', arm);

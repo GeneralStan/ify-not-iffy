@@ -1,7 +1,6 @@
 ---
 /**
- * Footer shared by every page (Figma Footer 4058:2991, Mobile Footer 4058:2464). Persisted across
- * page changes. Display headline (Heading/H1 on phones) with the mooncake polaroid tucked at the top
+ * Footer on every page (Figma Footer 4068:6036, Mobile Footer 4058:2464). Display headline (Heading/H1 on phones) with the mooncake polaroid tucked at the top
  * left of "Thanks", then Let's Chat (Secondary) and two Link buttons.
  */
 import Button from './Button.astro';
@@ -13,7 +12,7 @@ import { cal, contact } from '../data/site';
 const titleWords = 'Thanks for stopping by my corner of the internet.'.split(' ');
 ---
 
-<footer class="site-footer" transition:persist="footer">
+<footer class="site-footer">
   <div class="footer-bg" aria-hidden="true">
     <div class="footer-blobs"></div>
     <div class="footer-grain"></div>
