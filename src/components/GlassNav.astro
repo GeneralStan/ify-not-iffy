@@ -4,8 +4,7 @@
  * with ?nav=flaps; the choice is remembered, see BaseLayout.astro).
  * - A glass capsule pinned to the top right holds Work, Playground and About. A brighter glass pill
  *   marks the current page and slides to whichever item is hovered or pressed.
- * - Glass: the tooltip's material (Lime/800 at 35%, blur 20% stronger), near-clear white on
- *   Playground and About; a specular rim that catches light at the edges, a faint inner glow, and a
+ * - Glass: an almost clear white over the tooltip's blur (20% stronger), on every page; a specular rim that catches light at the edges, a faint inner glow, and a
  *   thin alpha stroke so it holds its edge on light pages.
  *   In Chromium the rim also refracts what is behind it (an SVG displacement map, glass-nav.ts);
  *   other browsers keep the blur and the rim light.
@@ -77,20 +76,11 @@ const CLOSE =
     display: flex;
     justify-content: flex-end;
     --glass-h: 40px;
-    /* The tooltip's material (Figma Tooltip 4042:3946): Lime/800 at 35% over a 17.5px blur. */
-    --tint: color-mix(in srgb, var(--color-lime-800) 35%, transparent);
-    /* Light pages: Lime/900 text so it reads on the pale surface. */
-    --ink: var(--color-lime-900);
-    --ink-soft: color-mix(in srgb, var(--color-lime-900) 78%, transparent);
-    --stroke: rgba(13, 18, 2, 0.12);
-    --rim: rgba(255, 255, 255, 0.7);
-  }
-
-  /* Playground and About: the lime tint fights the plum and blue pages, so the glass is an almost
-     clear white there, with the page's own dark ink. */
-  :global(html[data-page='playground']) .glass-nav,
-  :global(html[data-page='about']) .glass-nav {
+    /* An almost clear white glass over a 21px blur (the tooltip's frost, 20% stronger), with the
+       page's own dark ink: stone on Home and Work, plum on Playground, blue on About. */
     --tint: rgba(255, 255, 255, 0.14);
+    --ink: var(--color-stone-950);
+    --ink-soft: color-mix(in srgb, var(--color-stone-950) 78%, transparent);
     --stroke: rgba(10, 10, 10, 0.1);
     --rim: rgba(255, 255, 255, 0.8);
   }
