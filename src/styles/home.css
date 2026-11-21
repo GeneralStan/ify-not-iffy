@@ -313,19 +313,19 @@
     display: block;
   }
 
-  /* Hero, Mobile: the 334x74 row (Figma, for a 390 frame) is stretched edge to edge on phones,
-     keeping its aspect ratio. The bushes tuck 14px behind the flaps so the letters show. */
+  /* Hero, Mobile (Figma Mobile Hero 4058:2783): the 534x157 row starts 72 left of the screen and
+     runs 43 below the hero's bottom edge on a 390 frame; it scales with the screen width. */
   .hedges--hero .hedge-row--mobile {
-    bottom: calc(var(--flap-h) - 14px);
-    left: 0;
-    width: 100%;
+    bottom: calc(-43.44 / 390 * 100vw);
+    left: calc(-72 / 390 * 100vw);
+    width: calc(533.95 / 390 * 100vw);
   }
 
-  /* Footer, Mobile: 435x105, wider than the screen, centred and cut by the bottom edge like desktop. */
+  /* Footer, Mobile (Figma Mobile Footer 4058:2464): 507x182, 53 left of the screen, 46 below. */
   .hedges--footer .hedge-row--mobile {
-    bottom: calc(-35 / 390 * 100vw);
-    left: calc(50% - 217.5 / 390 * 100vw);
-    width: calc(435 / 390 * 100vw);
+    bottom: calc(-45.72 / 390 * 100vw);
+    left: calc(-53.03 / 390 * 100vw);
+    width: calc(506.59 / 390 * 100vw);
   }
 }
 
