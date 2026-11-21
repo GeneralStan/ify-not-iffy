@@ -1,13 +1,7 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import Polaroid from '../../components/Polaroid.astro';
-import { aboutIntro, aboutPolaroids, aboutStrip, experience } from '../../data/about';
-
-// The exported polaroid PNGs are 512x576 with the card filling 56.6% of the width, so the PNG box is
-// the Figma card width / 0.566 (and 576/512 of that tall). Desktop positions are on the 1440 frame.
-const box = (w: number) => w / 0.566;
-const desktopStyle = (p: (typeof aboutPolaroids)[number]) =>
-  `--cx: ${p.cx - 720}; --cy: ${p.cy}; --bw: ${box(p.w).toFixed(1)}; --pol-rotate: ${p.rot}deg;`;
+import { aboutIntro, aboutStrip, experience } from '../../data/about';
 ---
 
 <SiteLayout
@@ -21,8 +15,8 @@ const desktopStyle = (p: (typeof aboutPolaroids)[number]) =>
       <p class="section-lead text-h3" data-reveal="soft" style="--reveal-delay: 100ms">{aboutIntro.lead}</p>
     </header>
 
-    <!-- Phones and tablets: the row drifts left to right in an endless loop (three copies of the six
-         photos, so the screen is always covered); it pauses while a pointer or finger is on it. -->
+    <!-- The row drifts left to right in an endless loop (three copies of the six photos, so the
+         screen is always covered); it pauses while a pointer or finger is on it. -->
     <div class="about-strip" aria-hidden="true" data-about-strip>
       <div class="about-strip__track">
         {
@@ -43,19 +37,6 @@ const desktopStyle = (p: (typeof aboutPolaroids)[number]) =>
     </div>
 
     <div class="about-intro">
-      <div class="about-stage" aria-hidden="true">
-        {
-          aboutPolaroids.map((p, i) => (
-            <Polaroid
-              photo={p.photo}
-              class="about-polaroid"
-              displayWidth={Math.round(box(p.w))}
-              revealDelay={150 + i * 90}
-              style={desktopStyle(p)}
-            />
-          ))
-        }
-      </div>
       <div class="about-copy">
         {
           aboutIntro.paragraphs.map((text) => (

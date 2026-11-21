@@ -188,7 +188,7 @@ if (root.dataset.navstyle === 'glass') {
     displace.setAttribute('yChannelSelector', 'G');
     filter.append(feImage, displace);
     defs.append(filter);
-    const value = `blur(4px) url(#${id}) blur(13.5px) saturate(1.2)`;
+    const value = `blur(4px) url(#${id}) blur(17px) saturate(1.2)`;
     el.style.setProperty('backdrop-filter', value);
     el.style.setProperty('-webkit-backdrop-filter', value);
   }

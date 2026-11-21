@@ -220,9 +220,11 @@ html.has-play-zoom body {
 }
 
 /* ===== About: intro with polaroids =====
-   Desktop (1024+, Figma About 4068:7754): six polaroids around the 720-wide copy at their Figma spots
-   on the 1440 frame, scaled with the screen below 1440.
-   Phones and tablets (Figma 4074:8017): heading 100 from the top (title and lead 4 apart), 24, one row
+   Every size now has the same order (Figma About 4068:7902 desktop, 4074:8017 phones): heading, a row
+   of six polaroids drifting left to right in a loop, the copy, then Experience.
+   Desktop: heading 200 from the top (title and lead 16 apart), 56, a 302 tall row of 230x280 cards
+   about 264 apart running past both edges, 56, the copy (Heading/H3, 48 between paragraphs).
+   Phones and tablets: heading 100 from the top (title and lead 4 apart), 24, one row
    of six polaroids running off both edges, 24, the copy in Body/Default (16 between paragraphs). */
 .about {
   padding-top: 100px;
@@ -241,7 +243,9 @@ html.has-play-zoom body {
   position: relative;
   height: 129px;
   margin-bottom: 24px;
-  overflow: hidden;
+  /* Clip the sides only, so a hovered (1.1x) or tapped photo is not cut at the top or bottom. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 /* Three copies of the six 126px slots (756 per copy). The track starts 900px left of the screen and
@@ -314,10 +318,6 @@ html.has-play-zoom body {
   }
 }
 
-.about-stage {
-  display: none;
-}
-
 @media (min-width: 1024px) {
   .about {
     padding-top: var(--section-top);
@@ -333,28 +333,39 @@ html.has-play-zoom body {
   }
 
   .about-strip {
-    display: none;
+    height: 302px;
+    margin-bottom: 56px;
+  }
+
+  /* Six 264 slots per copy (1584). Starts 1800 left so screens up to ~3000 wide stay covered;
+     the same speed as on phones (about 19px a second). */
+  .about-strip__track {
+    left: -1800px;
+    animation: about-drift-lg 84s linear infinite;
+  }
+
+  .about-strip__slot {
+    width: 264px;
+  }
+
+  .about-strip .about-strip__photo {
+    --pol-w: 406.4px;
+    --pol-h: 457.2px;
   }
 
   .about-copy {
     gap: 48px;
   }
+}
 
-  .about-stage {
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: 0;
-    width: 0;
-    height: 0;
-  }
+@keyframes about-drift-lg {
+  from { translate: 0 0; }
+  to { translate: 1584px 0; }
+}
 
-  .about-stage .about-polaroid {
-    --u: min(1px, 100vw / 1440);
-    --pol-w: calc(var(--bw) * var(--u));
-    --pol-h: calc(var(--pol-w) * 576 / 512);
-    left: calc(var(--cx) * var(--u) - var(--pol-w) / 2);
-    top: calc(var(--cy) * var(--u) - var(--pol-h) / 2);
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+  .about-strip__track {
+    left: calc(50% - 2376px);
   }
 }
 

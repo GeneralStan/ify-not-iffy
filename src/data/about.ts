@@ -22,30 +22,9 @@ export const aboutIntro = {
 };
 
 /**
- * Polaroids around the intro copy. `cx`/`cy` are the card centre on the 1440 frame, measured from
- * the top of the copy block (Figma y 320); `w` is the card (Frame) width; `rot` its tilt.
- * `side` and `pair` place them on phones, where each pair sits in the gap before a paragraph.
- */
-export const aboutPolaroids: Array<{
-  photo: Photo;
-  cx: number;
-  cy: number;
-  w: number;
-  rot: number;
-  side: 'left' | 'right';
-  pair: 0 | 1 | 2;
-}> = [
-  { photo: 'user-research', cx: 111.6, cy: -129.9, w: 180.2, rot: -14, side: 'left', pair: 0 },
-  { photo: 'at-dinner', cx: 1401.3, cy: -111.3, w: 154.6, rot: 14, side: 'right', pair: 0 },
-  { photo: 'tennis-backhand', cx: 61.9, cy: 134.8, w: 163.8, rot: 19.8, side: 'left', pair: 1 },
-  { photo: 'cat-maisha', cx: 1380.8, cy: 133.1, w: 144.8, rot: -19.8, side: 'right', pair: 1 },
-  { photo: 'race-trophy', cx: 149.8, cy: 361, w: 152.2, rot: -13.2, side: 'left', pair: 2 },
-  { photo: 'tennis-forehand', cx: 1329, cy: 351.3, w: 167.2, rot: 13.2, side: 'right', pair: 2 },
-];
-
-/**
- * Phones and tablets (Figma About mobile 4074:8017): one row of polaroids under the heading, 98.8x120
- * cards about 126 apart, drifting left to right in a loop. `rot` is each card's tilt.
+ * The row of polaroids under the heading (Figma About 4068:7902, mobile 4074:8017), drifting left to
+ * right in a loop: 98.8x120 cards about 126 apart on phones, 230x280 about 264 apart on desktop.
+ * `rot` is each card's tilt.
  */
 export const aboutStrip: Array<{ photo: Photo; rot: number }> = [
   { photo: 'tennis-backhand', rot: 2.3 },

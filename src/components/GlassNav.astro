@@ -4,8 +4,9 @@
  * with ?nav=flaps; the choice is remembered, see BaseLayout.astro).
  * - A glass capsule pinned to the top right holds Work, Playground and About. A brighter glass pill
  *   marks the current page and slides to whichever item is hovered or pressed.
- * - Glass: background blur and saturation with a light tint, a specular rim that catches light along
- *   the top edge, an inner edge glow, and a thin alpha stroke so it holds its edge on light pages.
+ * - Glass: the tooltip's material (Lime/800 at 35%, blur 20% stronger), near-clear white on
+ *   Playground and About; a specular rim that catches light at the edges, a faint inner glow, and a
+ *   thin alpha stroke so it holds its edge on light pages.
  *   In Chromium the rim also refracts what is behind it (an SVG displacement map, glass-nav.ts);
  *   other browsers keep the blur and the rim light.
  * - Over the dark hero and footer the glass and text switch to their dark-background style.
@@ -85,6 +86,25 @@ const CLOSE =
     --rim: rgba(255, 255, 255, 0.7);
   }
 
+  /* Playground and About: the lime tint fights the plum and blue pages, so the glass is an almost
+     clear white there, with the page's own dark ink. */
+  :global(html[data-page='playground']) .glass-nav,
+  :global(html[data-page='about']) .glass-nav {
+    --tint: rgba(255, 255, 255, 0.14);
+    --stroke: rgba(10, 10, 10, 0.1);
+    --rim: rgba(255, 255, 255, 0.8);
+  }
+
+  :global(html[data-page='playground']) .glass-nav {
+    --ink: var(--color-plum-950);
+    --ink-soft: color-mix(in srgb, var(--color-plum-950) 78%, transparent);
+  }
+
+  :global(html[data-page='about']) .glass-nav {
+    --ink: var(--color-blue-950);
+    --ink-soft: color-mix(in srgb, var(--color-blue-950) 78%, transparent);
+  }
+
   /* Over the dark hero and footer (set by glass-nav.ts): white text, as on the tooltip. */
   :global(html.glass-on-dark) .glass-nav {
     --ink: var(--color-neutral-0);
@@ -109,8 +129,9 @@ const CLOSE =
     border: 0;
     border-radius: 999px;
     background: var(--tint);
-    -webkit-backdrop-filter: blur(17.5px) saturate(1.2);
-    backdrop-filter: blur(17.5px) saturate(1.2);
+    /* 20% more frost than the tooltip's 17.5px. */
+    -webkit-backdrop-filter: blur(21px) saturate(1.2);
+    backdrop-filter: blur(21px) saturate(1.2);
     text-shadow: 0 1px 2px rgba(23, 31, 9, 0.1);
     box-shadow:
       0 0 0 0.5px var(--stroke),
@@ -145,18 +166,6 @@ const CLOSE =
     mask:
       linear-gradient(#000 0 0) content-box exclude,
       linear-gradient(#000 0 0);
-    pointer-events: none;
-  }
-
-  /* Soft lensing light along the top inner edge. */
-  .glass::after {
-    content: '';
-    position: absolute;
-    inset: 1px 12% auto;
-    z-index: -1;
-    height: 45%;
-    border-radius: 999px 999px 40% 40%;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
     pointer-events: none;
   }
 
