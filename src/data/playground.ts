@@ -1,6 +1,7 @@
 /**
  * Playground canvas (Figma "Playground" 4068:7511, board 4068:7643).
- * A board larger than the screen that visitors drag to explore. Placeholders until the real work is in:
+ * A board wider than the screen that drifts sideways in an endless loop; visitors can drag it
+ * sideways, and tap a card to zoom in on it. Placeholders until the real work is in:
  * add `image` (an imported asset) per card.
  * Geometry is the Figma frame: x / y are the card's top-left on the 1440 frame, y measured from the
  * top of the board (frame y 376); w is the card width; mediaW / mediaH the image area inside it
@@ -13,8 +14,13 @@ export const playgroundHead = {
   lead: '1M+ tokens burnt, 7,000 Github commits & counting',
 };
 
-/** Content bounds on the 1440 frame (board coordinates), for clamping the pan. */
-export const PLAYGROUND_BOUNDS = { minX: -346, maxX: 1860, minY: 3, maxY: 1773 };
+/**
+ * The board repeats sideways every PERIOD px (board coordinates) so it can drift and be dragged
+ * forever: the cards span x -346 to 1860, so each repeat leaves a 94px gap. HEIGHT is the board's
+ * height below the heading: the lowest card ends at 1775, plus 64.
+ */
+export const PLAYGROUND_PERIOD = 2300;
+export const PLAYGROUND_HEIGHT = 1840;
 
 export const playground: Array<{
   tags: string[];

@@ -21,18 +21,25 @@ const desktopStyle = (p: (typeof aboutPolaroids)[number]) =>
       <p class="section-lead text-h3" data-reveal="soft" style="--reveal-delay: 100ms">{aboutIntro.lead}</p>
     </header>
 
-    <div class="about-strip" aria-hidden="true">
-      {
-        aboutStrip.map((p, i) => (
-          <Polaroid
-            photo={p.photo}
-            class="about-strip__photo"
-            displayWidth={175}
-            revealDelay={100 + i * 70}
-            style={`--dx: ${p.dx}; --pol-rotate: ${p.rot}deg;`}
-          />
-        ))
-      }
+    <!-- Phones and tablets: the row drifts left to right in an endless loop (three copies of the six
+         photos, so the screen is always covered); it pauses while a pointer or finger is on it. -->
+    <div class="about-strip" aria-hidden="true" data-about-strip>
+      <div class="about-strip__track">
+        {
+          [0, 1, 2].map((copy) =>
+            aboutStrip.map((p) => (
+              <span class="about-strip__slot">
+                <Polaroid
+                  photo={p.photo}
+                  class="about-strip__photo"
+                  displayWidth={175}
+                  style={`--pol-rotate: ${p.rot}deg;`}
+                />
+              </span>
+            )),
+          )
+        }
+      </div>
     </div>
 
     <div class="about-intro">
@@ -87,3 +94,13 @@ const desktopStyle = (p: (typeof aboutPolaroids)[number]) =>
     </div>
   </section>
 </SiteLayout>
+
+<script>
+  /* Touch has no hover: hold a finger on the row to pause it (pointer hover pauses it in CSS). */
+  const strip = document.querySelector<HTMLElement>('[data-about-strip]');
+  if (strip) {
+    const hold = (on: boolean) => () => strip.classList.toggle('is-held', on);
+    strip.addEventListener('pointerdown', hold(true));
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => strip.addEventListener(type, hold(false)));
+  }
+</script>

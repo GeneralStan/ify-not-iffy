@@ -13,28 +13,36 @@
 
 /* ===== Playground canvas (Figma Playground 4068:7511) =====
    The canvas fills the page from the top; the heading floats over it (it lets drags through), and
-   the board starts just below the heading, so dragged cards slide under the title, the lead and the
-   nav bar. The board keeps the Figma frame's coordinates (origin at the 1440 frame's left edge,
-   centred on the screen) and is scaled down below 1200. Wheel and trackpad scrolling still scroll
-   the page. On phones the canvas stays shorter than the screen so there is always page to swipe. */
+   the board starts just below it, so cards pass under the title, the lead and the nav bar. The board
+   keeps the Figma frame's coordinates (origin at the 1440 frame's left edge, centred on the screen),
+   repeats sideways every --period px and drifts; it is as tall as the Figma board. Cards are 45% on
+   phones, 85% on tablets and small laptops, full size from 1200. Up and down swipes scroll the page;
+   sideways drags pan the board. */
 .playground {
   padding: 0;
 }
 
 .play-canvas {
   --board-top: calc(var(--section-top) + 176px);
+  --s: 0.45;
   position: relative;
-  height: calc(var(--board-top) + clamp(480px, 70svh, 1616px));
+  height: calc(var(--board-top) + var(--board-h) * 1px * var(--s));
   overflow: hidden;
   cursor: grab;
-  touch-action: none;
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
 
-@media (max-width: 767px) {
+@media (min-width: 768px) {
   .play-canvas {
-    height: min(calc(var(--board-top) + 50svh), 80svh);
+    --s: 0.85;
+  }
+}
+
+@media (min-width: 1200px) {
+  .play-canvas {
+    --s: 1;
   }
 }
 
@@ -59,7 +67,6 @@
 }
 
 .play-board {
-  --s: 0.62;
   position: absolute;
   top: var(--board-top);
   left: calc(50% - 720px * var(--s));
@@ -89,9 +96,26 @@
   border: 1.5px solid rgba(227, 227, 227, 0.8);
   border-radius: var(--radius-md);
   color: var(--color-neutral-700);
+  font: inherit;
+  text-align: inherit;
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .play-card:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+.play-card:focus-visible {
+  outline: 2px solid var(--color-plum-700);
+  outline-offset: 4px;
 }
 
 .play-card__media {
+  display: block;
   height: calc(var(--media-h) * 1px);
   overflow: hidden;
   background: var(--color-stone-50);
@@ -114,15 +138,84 @@
   margin: 0;
 }
 
-@media (min-width: 768px) {
-  .play-board {
-    --s: 0.85;
-  }
+/* ===== Playground zoom =====
+   The tapped card grows from its spot to fit the screen (never past its real size) over a frosted,
+   darkened backdrop; the outlined close button sits top-left, like the case study sheet's. */
+.play-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
 }
 
-@media (min-width: 1200px) {
-  .play-board {
-    --s: 1;
+.play-zoom__backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-plum-950) 35%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.play-zoom.is-open .play-zoom__backdrop {
+  opacity: 1;
+}
+
+.play-zoom .play-zoom__card {
+  position: fixed;
+  left: 0;
+  top: 0;
+  scale: none;
+  transform-origin: 0 0;
+  cursor: zoom-out;
+  box-shadow: 0 16px 48px rgba(10, 10, 10, 0.25);
+  transition: transform 0.4s var(--motion-ease-enter);
+}
+
+.play-zoom__close {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  left: 16px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--color-neutral-0);
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--color-neutral-0);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.play-zoom.is-open .play-zoom__close {
+  opacity: 1;
+}
+
+.play-zoom__close:hover {
+  background: color-mix(in srgb, var(--color-neutral-0) 12%, transparent);
+}
+
+.play-zoom__close:focus-visible {
+  outline: 2px solid var(--color-neutral-0);
+  outline-offset: 3px;
+}
+
+html.has-play-zoom,
+html.has-play-zoom body {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-zoom__backdrop,
+  .play-zoom .play-zoom__card,
+  .play-zoom__close {
+    transition: none;
   }
 }
 
@@ -148,14 +241,51 @@
   position: relative;
   height: 129px;
   margin-bottom: 24px;
+  overflow: hidden;
+}
+
+/* Three copies of the six 126px slots (756 per copy). The track starts 900px left of the screen and
+   moves 756 to the right per loop, so the screen (up to 1023 wide) is always covered and each loop
+   ends exactly where the next copy began. */
+.about-strip__track {
+  position: absolute;
+  top: 0;
+  left: -900px;
+  display: flex;
+  height: 100%;
+  animation: about-drift 40s linear infinite;
+}
+
+.about-strip:hover .about-strip__track,
+.about-strip.is-held .about-strip__track {
+  animation-play-state: paused;
+}
+
+@keyframes about-drift {
+  from { translate: 0 0; }
+  to { translate: 756px 0; }
+}
+
+.about-strip__slot {
+  position: relative;
+  flex: none;
+  width: 126px;
+  height: 100%;
 }
 
 .about-strip .about-strip__photo {
   /* Card 98.8x120; the PNG box is the card / 0.566 wide and 576/512 of that tall. */
   --pol-w: 174.6px;
   --pol-h: 196.4px;
-  left: calc(50% + var(--dx) * 1px - var(--pol-w) / 2);
+  left: calc(50% - var(--pol-w) / 2);
   top: calc(50% - var(--pol-h) / 2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-strip__track {
+    animation: none;
+    left: calc(50% - 1134px);
+  }
 }
 
 .about-intro {

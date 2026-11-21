@@ -45,15 +45,15 @@ export const aboutPolaroids: Array<{
 
 /**
  * Phones and tablets (Figma About mobile 4074:8017): one row of polaroids under the heading, 98.8x120
- * cards, centred on the screen. `dx` is the card centre from the screen centre; `rot` the tilt.
+ * cards about 126 apart, drifting left to right in a loop. `rot` is each card's tilt.
  */
-export const aboutStrip: Array<{ photo: Photo; dx: number; rot: number }> = [
-  { photo: 'tennis-backhand', dx: -317.5, rot: 2.3 },
-  { photo: 'user-research', dx: -193, rot: -3.3 },
-  { photo: 'race-trophy', dx: -65, rot: 5.7 },
-  { photo: 'tennis-forehand', dx: 61, rot: -1.5 },
-  { photo: 'cat-maisha', dx: 187.2, rot: 5.8 },
-  { photo: 'at-dinner', dx: 315.9, rot: -4 },
+export const aboutStrip: Array<{ photo: Photo; rot: number }> = [
+  { photo: 'tennis-backhand', rot: 2.3 },
+  { photo: 'user-research', rot: -3.3 },
+  { photo: 'race-trophy', rot: 5.7 },
+  { photo: 'tennis-forehand', rot: -1.5 },
+  { photo: 'cat-maisha', rot: 5.8 },
+  { photo: 'at-dinner', rot: -4 },
 ];
 
 export const experience: Array<{

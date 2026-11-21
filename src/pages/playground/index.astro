@@ -1,9 +1,13 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import { PLAYGROUND_BOUNDS, playground, playgroundHead } from '../../data/playground';
+import { PLAYGROUND_HEIGHT, PLAYGROUND_PERIOD, playground, playgroundHead } from '../../data/playground';
 
-// Figma Playground 4068:7511: the board scrolls in every direction; drag it to explore.
-const b = PLAYGROUND_BOUNDS;
+// Figma Playground 4068:7511. The board repeats every PLAYGROUND_PERIOD px; four copies (-1 to 2) keep
+// the screen covered while it drifts or is dragged. Only copy 0 is in the tab order and the
+// accessibility tree.
+const copies = [-1, 0, 1, 2];
+const CLOSE =
+  'M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z';
 ---
 
 <SiteLayout
@@ -17,8 +21,8 @@ const b = PLAYGROUND_BOUNDS;
       data-play-canvas
       tabindex="0"
       role="region"
-      aria-label="Playground board. Drag, or use the arrow keys, to explore."
-      style={`--min-x: ${b.minX}; --max-x: ${b.maxX}; --min-y: ${b.minY}; --max-y: ${b.maxY};`}
+      aria-label="Playground board. It drifts sideways; drag it, or use the left and right arrow keys, to explore. Select a card to zoom in."
+      style={`--period: ${PLAYGROUND_PERIOD}; --board-h: ${PLAYGROUND_HEIGHT};`}
     >
       <header class="section-head play-head" data-play-head>
         <h2 class="section-title text-h1" data-reveal="soft">{playgroundHead.title}</h2>
@@ -26,152 +30,253 @@ const b = PLAYGROUND_BOUNDS;
       </header>
       <div class="play-board" data-play-board>
         {
-          playground.map((card) => (
-            <article class="play-card" style={`--x: ${card.x}; --y: ${card.y}; --w: ${card.w}; --media-h: ${card.mediaH};`}>
-              <div class="play-card__media">
-                {card.image && <img src={card.image.src} alt="" loading="lazy" decoding="async" draggable="false" />}
-              </div>
-              <p class="play-card__tags text-meta-lg">
-                {card.tags.map((tag, i) => (
-                  <>
-                    {i > 0 && <span aria-hidden="true">·</span>}
-                    <span>{tag}</span>
-                  </>
-                ))}
-              </p>
-            </article>
-          ))
+          copies.map((copy) =>
+            playground.map((card, i) => (
+              <button
+                type="button"
+                class="play-card"
+                data-play-card
+                aria-hidden={copy === 0 ? undefined : 'true'}
+                tabindex={copy === 0 ? undefined : -1}
+                aria-label={copy === 0 ? `Zoom in on project ${i + 1}: ${card.tags.join(', ')}` : undefined}
+                style={`--x: ${card.x + copy * PLAYGROUND_PERIOD}; --y: ${card.y}; --w: ${card.w}; --media-h: ${card.mediaH};`}
+              >
+                <span class="play-card__media">
+                  {card.image && <img src={card.image.src} alt="" loading="lazy" decoding="async" draggable="false" />}
+                </span>
+                <span class="play-card__tags text-meta-lg">
+                  {card.tags.map((tag, t) => (
+                    <>
+                      {t > 0 && <span aria-hidden="true">·</span>}
+                      <span>{tag}</span>
+                    </>
+                  ))}
+                </span>
+              </button>
+            )),
+          )
         }
       </div>
     </div>
   </section>
+
+  <template id="play-zoom-close">
+    <button type="button" class="play-zoom__close" aria-label="Close" data-zoom-close>
+      <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
+    </button>
+  </template>
 </SiteLayout>
 
 <script>
-  /* Drag to pan (mouse, pen or touch), with a little glide on release. Arrow keys pan when the board
-     has focus. The pan is clamped so the cards can never all leave the screen.
-     The heading floats over the top of the canvas; the board starts just below it, and cards slide
-     under it when dragged up. */
+  /*
+   * Playground board.
+   * - Drifts left to right in an endless loop (about 30px a second), like the About polaroids.
+   * - Pauses while the pointer is over the board or a finger/button is held on it, while a card is
+   *   zoomed, while the board is off screen, and for reduced motion.
+   * - Drag sideways to pan (with a little glide); up and down swipes scroll the page.
+   * - Tap or select a card: it zooms to fit the screen (never past its real size) over a frosted
+   *   backdrop; close with the outlined ×, Escape, or a tap on the backdrop.
+   */
   const canvas = document.querySelector<HTMLElement>('[data-play-canvas]');
   const board = canvas?.querySelector<HTMLElement>('[data-play-board]');
   const head = canvas?.querySelector<HTMLElement>('[data-play-head]');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const DRIFT = 30; // px per second, on screen
 
   if (canvas && board) {
-    const css = getComputedStyle(canvas);
-    const bound = (name: string) => parseFloat(css.getPropertyValue(name));
-    const PAD = 48;
-    let top = 0;
+    const period = parseFloat(getComputedStyle(canvas).getPropertyValue('--period'));
+    const scale = () => parseFloat(getComputedStyle(board).getPropertyValue('--s')) || 1;
+
+    let x = 0;
+    let hovering = false;
+    let holding = false;
+    let zoomed = false;
+    let onScreen = true;
+    let glideV = 0;
+    let last = performance.now();
 
     /* Board top: the heading's bottom plus Figma's 56 gap (32 on phones). */
     function measure() {
       if (!head) return;
       const gap = canvas!.clientWidth < 768 ? 32 : 56;
-      top = head.offsetTop + head.offsetHeight + gap;
-      canvas!.style.setProperty('--board-top', `${top}px`);
-    }
-    let x = 0;
-    let y = 0;
-    let vx = 0;
-    let vy = 0;
-    let glide = 0;
-
-    const scale = () => parseFloat(getComputedStyle(board).getPropertyValue('--s')) || 1;
-    /* The board's origin sits where the 1440 frame's left edge would be, centred on the screen. */
-    const origin = () => (canvas.clientWidth - 1440 * scale()) / 2;
-
-    function clamp() {
-      const s = scale();
-      const o = origin();
-      const w = canvas!.clientWidth;
-      const h = canvas!.clientHeight;
-      const minX = w - PAD - (o + bound('--max-x') * s);
-      const maxX = PAD - (o + bound('--min-x') * s);
-      const minY = h - PAD - (top + bound('--max-y') * s);
-      const maxY = PAD - (top + bound('--min-y') * s);
-      x = Math.min(Math.max(x, Math.min(minX, 0)), Math.max(maxX, 0));
-      y = Math.min(Math.max(y, Math.min(minY, 0)), Math.max(maxY, 0));
+      canvas!.style.setProperty('--board-top', `${head.offsetTop + head.offsetHeight + gap}px`);
     }
 
     function apply() {
-      clamp();
-      board!.style.translate = `${x}px ${y}px`;
+      const span = period * scale();
+      x = ((x % span) + span) % span - span; // keep x in [-span, 0): copies -1..2 cover the screen
+      board!.style.translate = `${x}px 0`;
     }
 
-    let startX = 0;
-    let startY = 0;
-    let lastX = 0;
-    let lastY = 0;
-    let lastT = 0;
+    function tick(now: number) {
+      const dt = Math.min(64, now - last);
+      last = now;
+      if (glideV && !holding) {
+        x += glideV * dt;
+        glideV *= Math.pow(0.94, dt / 16);
+        if (Math.abs(glideV) < 0.02) glideV = 0;
+      } else if (!hovering && !holding && !zoomed && onScreen && !reduced.matches) {
+        x += (DRIFT * dt) / 1000;
+      }
+      apply();
+      requestAnimationFrame(tick);
+    }
+
+    /* ----- Hover and hold pause the drift ----- */
+    canvas.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') hovering = true;
+    });
+    canvas.addEventListener('pointerleave', () => (hovering = false));
+
+    /* ----- Sideways drag ----- */
     let pointer: number | null = null;
+    let startX = 0;
+    let startPan = 0;
+    let lastX = 0;
+    let lastT = 0;
+    let velocity = 0;
+    let dragging = false;
+    let dragged = false;
 
     canvas.addEventListener('pointerdown', (event) => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
-      cancelAnimationFrame(glide);
       pointer = event.pointerId;
-      startX = event.clientX - x;
-      startY = event.clientY - y;
-      lastX = event.clientX;
-      lastY = event.clientY;
+      holding = true;
+      dragging = false;
+      dragged = false;
+      glideV = 0;
+      startX = lastX = event.clientX;
+      startPan = x;
       lastT = event.timeStamp;
-      vx = vy = 0;
-      canvas.setPointerCapture(event.pointerId);
-      canvas.classList.add('is-dragging');
+      velocity = 0;
     });
 
     canvas.addEventListener('pointermove', (event) => {
       if (event.pointerId !== pointer) return;
+      const dx = event.clientX - startX;
+      if (!dragging) {
+        if (Math.abs(dx) < 6) return;
+        dragging = dragged = true;
+        try {
+          canvas.setPointerCapture(event.pointerId);
+        } catch {
+          /* capture is a nicety */
+        }
+        canvas.classList.add('is-dragging');
+      }
       const dt = Math.max(1, event.timeStamp - lastT);
-      vx = (event.clientX - lastX) / dt;
-      vy = (event.clientY - lastY) / dt;
+      velocity = (event.clientX - lastX) / dt;
       lastX = event.clientX;
-      lastY = event.clientY;
       lastT = event.timeStamp;
-      x = event.clientX - startX;
-      y = event.clientY - startY;
+      x = startPan + dx;
       apply();
     });
 
     const release = (event: PointerEvent) => {
       if (event.pointerId !== pointer) return;
       pointer = null;
+      holding = false;
       canvas.classList.remove('is-dragging');
-      if (reduced.matches || event.timeStamp - lastT > 80) return;
-      let last = performance.now();
-      const step = (now: number) => {
-        const dt = now - last;
-        last = now;
-        x += vx * dt;
-        y += vy * dt;
-        const decay = Math.pow(0.94, dt / 16);
-        vx *= decay;
-        vy *= decay;
-        apply();
-        if (Math.abs(vx) + Math.abs(vy) > 0.02) glide = requestAnimationFrame(step);
-      };
-      glide = requestAnimationFrame(step);
+      if (dragging && !reduced.matches && event.timeStamp - lastT < 80) glideV = velocity;
+      dragging = false;
     };
     canvas.addEventListener('pointerup', release);
     canvas.addEventListener('pointercancel', release);
 
     canvas.addEventListener('keydown', (event) => {
+      if (event.target !== canvas) return;
       const step = event.shiftKey ? 240 : 80;
-      const moves: Record<string, [number, number]> = {
-        ArrowLeft: [step, 0],
-        ArrowRight: [-step, 0],
-        ArrowUp: [0, step],
-        ArrowDown: [0, -step],
-      };
-      const move = moves[event.key];
-      if (!move) return;
+      if (event.key === 'ArrowLeft') x += step;
+      else if (event.key === 'ArrowRight') x -= step;
+      else return;
       event.preventDefault();
-      cancelAnimationFrame(glide);
-      x += move[0];
-      y += move[1];
       board.classList.add('is-easing');
       apply();
     });
     board.addEventListener('transitionend', () => board.classList.remove('is-easing'));
+
+    /* ----- Zoom in on a card ----- */
+    const closeTemplate = document.querySelector<HTMLTemplateElement>('#play-zoom-close');
+
+    canvas.addEventListener('click', (event) => {
+      if (dragged) return;
+      const card = (event.target as Element).closest<HTMLElement>('[data-play-card]');
+      if (card) zoom(card);
+    });
+
+    function zoom(card: HTMLElement) {
+      if (zoomed) return;
+      zoomed = true;
+      const from = card.getBoundingClientRect();
+      const overlay = document.createElement('div');
+      overlay.className = 'play-zoom';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', card.getAttribute('aria-label')?.replace('Zoom in on ', '') ?? 'Project');
+      const backdrop = document.createElement('div');
+      backdrop.className = 'play-zoom__backdrop';
+      const clone = card.cloneNode(true) as HTMLElement;
+      clone.removeAttribute('data-play-card');
+      clone.removeAttribute('aria-hidden');
+      clone.removeAttribute('aria-label');
+      clone.setAttribute('tabindex', '-1');
+      clone.classList.add('play-zoom__card');
+      const close = closeTemplate!.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
+      overlay.append(backdrop, clone, close);
+      document.body.append(overlay);
+      document.documentElement.classList.add('has-play-zoom');
+
+      const w = clone.offsetWidth;
+      const h = clone.offsetHeight;
+      const vw = document.documentElement.clientWidth;
+      const vh = window.innerHeight;
+      const fit = Math.min(1, (vw - 32) / w, (vh - 144) / h);
+      const to = `translate(${(vw - w * fit) / 2}px, ${(vh - h * fit) / 2 + 24}px) scale(${fit})`;
+      const start = (r: DOMRect) => `translate(${r.left}px, ${r.top}px) scale(${r.width / w})`;
+
+      card.style.visibility = 'hidden';
+      clone.style.transform = start(from);
+      clone.getBoundingClientRect(); // commit the start before animating
+      requestAnimationFrame(() => {
+        overlay.classList.add('is-open');
+        clone.style.transform = to;
+      });
+      close.focus({ preventScroll: true });
+
+      let closing = false;
+      function done() {
+        if (closing) return;
+        closing = true;
+        overlay.classList.remove('is-open');
+        clone.style.transform = start(card.getBoundingClientRect());
+        const finish = () => {
+          overlay.remove();
+          card.style.visibility = '';
+          document.documentElement.classList.remove('has-play-zoom');
+          document.removeEventListener('keydown', onKey);
+          zoomed = false;
+          (card.getAttribute('tabindex') === '-1' ? canvas! : card).focus({ preventScroll: true });
+        };
+        if (reduced.matches) finish();
+        else window.setTimeout(finish, 400);
+      }
+      const onKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') done();
+        if (event.key === 'Tab') {
+          event.preventDefault();
+          close.focus();
+        }
+      };
+      close.addEventListener('click', done);
+      backdrop.addEventListener('click', done);
+      clone.addEventListener('click', done);
+      document.addEventListener('keydown', onKey);
+    }
+
+    /* ----- Only drift while the board is on screen ----- */
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => (onScreen = entries.some((entry) => entry.isIntersecting))).observe(canvas);
+    }
 
     new ResizeObserver(() => {
       measure();
@@ -179,5 +284,9 @@ const b = PLAYGROUND_BOUNDS;
     }).observe(canvas);
     measure();
     apply();
+    requestAnimationFrame((now) => {
+      last = now;
+      requestAnimationFrame(tick);
+    });
   }
 </script>
