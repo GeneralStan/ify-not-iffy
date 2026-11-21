@@ -1,0 +1,330 @@
+---
+/**
+ * Nav variation: an iOS 26-style glass toolbar in place of the flaps (turn on with ?nav=glass, off
+ * with ?nav=flaps; the choice is remembered, see BaseLayout.astro).
+ * - A glass capsule pinned to the top right holds Work, Playground and About. A brighter glass pill
+ *   marks the current page and slides to whichever item is hovered or pressed.
+ * - Glass: background blur and saturation with a light tint, a specular rim that catches light along
+ *   the top edge, an inner edge glow, and a thin alpha stroke so it holds its edge on light pages.
+ *   In Chromium the rim also refracts what is behind it (an SVG displacement map, glass-nav.ts);
+ *   other browsers keep the blur and the rim light.
+ * - Over the dark hero and footer the glass and text switch to their dark-background style.
+ * - Phones and tablets (below 1024): only a glass "Menu" button. It morphs leftwards into the
+ *   capsule [ × | Work | Playground | About ]; the name and role slide out meanwhile.
+ */
+import { withBase } from '../lib/url';
+import type { NavPage } from './SiteNav.astro';
+
+interface Props {
+  current: NavPage;
+}
+
+const { current } = Astro.props;
+
+const items = [
+  { id: 'work', href: withBase('/work/'), label: 'Work' },
+  { id: 'playground', href: withBase('/playground/'), label: 'Playground' },
+  { id: 'about', href: withBase('/about/'), label: 'About' },
+] as const;
+
+const CLOSE =
+  'M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z';
+---
+
+<div class="glass-nav" data-glass-nav>
+  <nav class="glass-nav__capsule glass" aria-label="Primary" id="glass-menu" data-glass-capsule data-glass>
+    <button class="glass-nav__close" type="button" aria-label="Close menu" data-glass-close>
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
+    </button>
+    <span class="glass-nav__pill" aria-hidden="true" data-glass-pill></span>
+    {
+      items.map((item) => (
+        <a
+          class="glass-nav__item"
+          href={item.href}
+          aria-current={current === item.id ? 'page' : undefined}
+          data-glass-item
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+  <button
+    class="glass-nav__menu glass"
+    type="button"
+    aria-expanded="false"
+    aria-controls="glass-menu"
+    data-glass-open
+    data-glass
+  >
+    Menu
+  </button>
+</div>
+
+<script>
+  import '../scripts/glass-nav';
+</script>
+
+<style>
+  /* ===== Placement: pinned top right, lined up with the nav bar's right edge ===== */
+  .glass-nav {
+    position: fixed;
+    z-index: 60;
+    top: 10px;
+    right: 16px;
+    display: flex;
+    justify-content: flex-end;
+    --glass-h: 40px;
+    --tint: rgba(255, 255, 255, 0.42);
+    --ink: var(--color-neutral-950);
+    --ink-soft: color-mix(in srgb, var(--color-neutral-950) 72%, transparent);
+    --pill: rgba(255, 255, 255, 0.72);
+    --stroke: rgba(10, 10, 10, 0.1);
+    --rim: rgba(255, 255, 255, 0.85);
+  }
+
+  /* Over the dark hero and footer (set by glass-nav.ts). */
+  :global(html.glass-on-dark) .glass-nav {
+    --tint: rgba(255, 255, 255, 0.1);
+    --ink: var(--color-neutral-0);
+    --ink-soft: color-mix(in srgb, var(--color-neutral-0) 72%, transparent);
+    --pill: rgba(255, 255, 255, 0.2);
+    --stroke: rgba(255, 255, 255, 0.16);
+    --rim: rgba(255, 255, 255, 0.5);
+  }
+
+  @media (min-width: 768px) {
+    .glass-nav {
+      top: 20px;
+      right: max(32px, calc((100vw - 1200px) / 2));
+      --glass-h: 48px;
+    }
+  }
+
+  /* ===== The glass ===== */
+  .glass {
+    position: relative;
+    isolation: isolate;
+    height: var(--glass-h);
+    border: 0;
+    border-radius: 999px;
+    background: var(--tint);
+    -webkit-backdrop-filter: blur(16px) saturate(1.7) brightness(1.04);
+    backdrop-filter: blur(16px) saturate(1.7) brightness(1.04);
+    box-shadow:
+      0 0 0 0.5px var(--stroke),
+      0 8px 24px rgba(10, 10, 10, 0.12),
+      0 1px 2px rgba(10, 10, 10, 0.08),
+      inset 0 0 14px rgba(255, 255, 255, 0.14);
+    transition:
+      background-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  /* Specular rim: a 1px ring that catches light at the top left and bottom right, as a curved
+     glass edge would. Drawn as a gradient masked to the border box minus the padding box. */
+  .glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      150deg,
+      var(--rim) 0%,
+      rgba(255, 255, 255, 0.12) 28%,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, 0.1) 72%,
+      color-mix(in srgb, var(--rim) 70%, transparent) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    pointer-events: none;
+  }
+
+  /* Soft lensing light along the top inner edge. */
+  .glass::after {
+    content: '';
+    position: absolute;
+    inset: 1px 12% auto;
+    z-index: -1;
+    height: 45%;
+    border-radius: 999px 999px 40% 40%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
+
+  /* ===== Capsule ===== */
+  .glass-nav__capsule {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    gap: 0;
+  }
+
+  .glass-nav__item {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    height: calc(var(--glass-h) - 8px);
+    padding: 0 16px;
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-family: var(--type-nav-family);
+    font-size: 15px;
+    line-height: 17px;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .glass-nav__item[aria-current='page'],
+  .glass-nav__item:hover,
+  .glass-nav__item.is-target {
+    color: var(--ink);
+  }
+
+  .glass-nav__item[aria-current='page'] {
+    font-weight: 500;
+  }
+
+  .glass-nav__item:focus-visible,
+  .glass-nav__close:focus-visible,
+  .glass-nav__menu:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* The selection: a brighter glass pill behind the current (or hovered) item. */
+  .glass-nav__pill {
+    position: absolute;
+    z-index: 0;
+    top: 4px;
+    left: 0;
+    width: 0;
+    height: calc(var(--glass-h) - 8px);
+    border-radius: 999px;
+    background: var(--pill);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+      0 0 0 0.5px var(--stroke),
+      0 2px 8px rgba(10, 10, 10, 0.08);
+    opacity: 0;
+    transition:
+      translate 0.42s cubic-bezier(0.3, 1.25, 0.5, 1),
+      width 0.42s cubic-bezier(0.3, 1.25, 0.5, 1),
+      opacity 0.2s ease,
+      background-color 0.3s ease;
+  }
+
+  .glass-nav__pill.is-placed {
+    opacity: 1;
+  }
+
+  .glass-nav__close {
+    display: none;
+    place-items: center;
+    flex: none;
+    width: calc(var(--glass-h) - 8px);
+    height: calc(var(--glass-h) - 8px);
+    margin-right: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .glass-nav__menu {
+    display: none;
+    padding: 0 18px;
+    color: var(--ink);
+    font-family: var(--type-nav-family);
+    font-size: 15px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (min-width: 1024px) {
+    .glass-nav__item {
+      font-size: 17px;
+      line-height: 20px;
+      padding: 0 20px;
+    }
+  }
+
+  /* ===== Phones and tablets: Menu button that morphs into the capsule ===== */
+  @media (max-width: 1023px) {
+    .glass-nav__menu {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      transition:
+        opacity 0.2s ease,
+        scale 0.3s ease;
+    }
+
+    .glass-nav__close {
+      display: grid;
+    }
+
+    /* Closed: the capsule is clipped down to the Menu button's size at its right end, and hidden. */
+    .glass-nav__capsule {
+      clip-path: inset(0 0 0 calc(100% - var(--menu-w, 80px)) round 999px);
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        clip-path 0.45s cubic-bezier(0.3, 1.15, 0.5, 1),
+        opacity 0.2s ease,
+        visibility 0s linear 0.45s;
+    }
+
+    .glass-nav__capsule > * {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    :global(.site-nav.is-open) .glass-nav__capsule {
+      clip-path: inset(0 0 0 0 round 999px);
+      opacity: 1;
+      visibility: visible;
+      transition:
+        clip-path 0.45s cubic-bezier(0.3, 1.15, 0.5, 1),
+        opacity 0.12s ease,
+        visibility 0s linear 0s;
+    }
+
+    :global(.site-nav.is-open) .glass-nav__capsule > * {
+      opacity: 1;
+      transition: opacity 0.25s ease 0.12s;
+    }
+
+    :global(.site-nav.is-open) .glass-nav__menu {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass,
+    .glass-nav__pill,
+    .glass-nav__capsule,
+    .glass-nav__capsule > *,
+    .glass-nav__menu {
+      transition: none !important;
+    }
+  }
+</style>

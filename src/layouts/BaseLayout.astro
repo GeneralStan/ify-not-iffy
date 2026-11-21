@@ -48,6 +48,17 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
       }
     </script>}
     <script is:inline>
+      // Nav variation: ?nav=glass shows the iOS-style glass toolbar, ?nav=flaps the flaps (default).
+      // The choice is remembered in this browser so it sticks while browsing.
+      try {
+        var navParam = new URLSearchParams(location.search).get('nav');
+        if (navParam === 'glass' || navParam === 'flaps') localStorage.setItem('ify-nav', navParam);
+        if (localStorage.getItem('ify-nav') === 'glass') document.documentElement.dataset.navstyle = 'glass';
+      } catch (e) {
+        if (/[?&]nav=glass/.test(location.search)) document.documentElement.dataset.navstyle = 'glass';
+      }
+    </script>
+    <script is:inline>
       // Scroll reveals (src/scripts/reveal.ts): content waits hidden only when motion is allowed and
       // the observer exists. Set before first paint so nothing flashes.
       if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {

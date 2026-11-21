@@ -9,8 +9,11 @@
  * right-aligned above a close button, over the page.
  * Flaps: the shape is one path, stretched to each size (Figma's mobile and tall shapes are exact
  * stretches of the 200x48 desktop one). Hover and press grow it from 48 to 64 (36 to 48 on phones).
+ * Variation: with the glass nav on (?nav=glass, see BaseLayout.astro) the flaps hide and GlassNav
+ * takes their place.
  */
 import { withBase } from '../lib/url';
+import GlassNav from './GlassNav.astro';
 
 export type NavPage = 'home' | 'work' | 'playground' | 'about';
 
@@ -76,6 +79,8 @@ const CLOSE =
         <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
       </button>
     </nav>
+
+    <GlassNav current={current} />
   </div>
 </header>
 
@@ -88,7 +93,8 @@ const CLOSE =
 
   /* Phone and tablet menu: the flaps pop in from the right over the page; close with ×, Escape,
      a tap outside, or by following a link. */
-  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const flaps = root.dataset.navstyle !== 'glass';
+  const nav = flaps ? document.querySelector<HTMLElement>('[data-nav]') : null;
   const openButton = nav?.querySelector<HTMLButtonElement>('[data-menu-open]');
   const panel = nav?.querySelector<HTMLElement>('[data-menu]');
 
@@ -115,6 +121,16 @@ const CLOSE =
 </script>
 
 <style>
+  /* ===== Glass variation: the flaps step aside ===== */
+  :global(html[data-navstyle='glass']) .site-nav__menu,
+  :global(html[data-navstyle='glass']) .site-nav__menu-panel {
+    display: none !important;
+  }
+
+  :global(html:not([data-navstyle='glass'])) .site-nav__bar > :global(.glass-nav) {
+    display: none;
+  }
+
   /* ===== Blur strip (fixed at the top of the screen) ===== */
   .nav-edge {
     position: fixed;
