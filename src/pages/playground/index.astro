@@ -71,8 +71,9 @@ const CLOSE =
   /*
    * Playground board.
    * - Drifts left to right in an endless loop (about 30px a second), like the About polaroids.
-   * - Pauses while the pointer is over the board or a finger/button is held on it, while a card is
-   *   zoomed, while the board is off screen, and for reduced motion.
+   * - Pauses while the pointer is over a card or a card is held (touch or mouse), while a card is
+   *   zoomed, while the board is off screen, and for reduced motion. The empty board keeps drifting,
+   *   even while it is being dragged.
    * - Drag sideways to pan (with a little glide); up and down swipes scroll the page.
    * - Tap or select a card: it zooms to fit the screen (never past its real size) over a frosted
    *   backdrop; close with the outlined ×, Escape, or a tap on the backdrop.
@@ -88,8 +89,9 @@ const CLOSE =
     const scale = () => parseFloat(getComputedStyle(board).getPropertyValue('--s')) || 1;
 
     let x = 0;
-    let hovering = false;
-    let holding = false;
+    let hovering = false; // pointer over a card
+    let holding = false; // a card is pressed
+    let dragHold = false; // the board is being dragged
     let zoomed = false;
     let onScreen = true;
     let glideV = 0;
@@ -111,7 +113,9 @@ const CLOSE =
     function tick(now: number) {
       const dt = Math.min(64, now - last);
       last = now;
-      if (glideV && !holding) {
+      if (dragHold) {
+        /* x follows the pointer */
+      } else if (glideV) {
         x += glideV * dt;
         glideV *= Math.pow(0.94, dt / 16);
         if (Math.abs(glideV) < 0.02) glideV = 0;
@@ -122,9 +126,9 @@ const CLOSE =
       requestAnimationFrame(tick);
     }
 
-    /* ----- Hover and hold pause the drift ----- */
-    canvas.addEventListener('pointerenter', (event) => {
-      if (event.pointerType === 'mouse') hovering = true;
+    /* ----- Hovering or holding a card pauses the drift ----- */
+    canvas.addEventListener('pointerover', (event) => {
+      if (event.pointerType === 'mouse') hovering = !!(event.target as Element).closest('[data-play-card]');
     });
     canvas.addEventListener('pointerleave', () => (hovering = false));
 
@@ -141,7 +145,7 @@ const CLOSE =
     canvas.addEventListener('pointerdown', (event) => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       pointer = event.pointerId;
-      holding = true;
+      holding = !!(event.target as Element).closest('[data-play-card]');
       dragging = false;
       dragged = false;
       glideV = 0;
@@ -156,7 +160,8 @@ const CLOSE =
       const dx = event.clientX - startX;
       if (!dragging) {
         if (Math.abs(dx) < 6) return;
-        dragging = dragged = true;
+        dragging = dragged = dragHold = true;
+        startPan = x - dx; // pick up from wherever the drift has moved it
         try {
           canvas.setPointerCapture(event.pointerId);
         } catch {
@@ -176,6 +181,7 @@ const CLOSE =
       if (event.pointerId !== pointer) return;
       pointer = null;
       holding = false;
+      dragHold = false;
       canvas.classList.remove('is-dragging');
       if (dragging && !reduced.matches && event.timeStamp - lastT < 80) glideV = velocity;
       dragging = false;
