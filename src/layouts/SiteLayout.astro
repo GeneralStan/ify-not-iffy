@@ -12,25 +12,20 @@ import type { PageId } from '../data/site';
 import '../styles/home.css';
 import '../styles/reveal.css';
 import '../styles/pages.css';
-import '../styles/case-study.css';
 
 interface Props {
   page: PageId;
   title: string;
   description: string;
-  /** Open scrolled past the hero with the flaps docked (case study pages). */
-  land?: 'docked';
-  /** Extra class on <main>. */
-  bodyClass?: string;
 }
 
-const { page, title, description, land, bodyClass } = Astro.props;
+const { page, title, description } = Astro.props;
 ---
 
-<BaseLayout intro page={page} land={land} title={title} description={description}>
+<BaseLayout intro page={page} title={title} description={description}>
   <SiteHero />
   <FlapNav current={page} />
-  <main id="content" class:list={['page-body', `page-body--${page}`, bodyClass]} transition:animate="fade">
+  <main id="content" class={`page-body page-body--${page}`} transition:animate="fade">
     <slot />
   </main>
   <SiteFooter />

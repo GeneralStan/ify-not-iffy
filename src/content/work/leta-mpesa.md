@@ -1,54 +1,50 @@
 ---
 title: "[TBD: title, 15 words max]"
-name: "Leta M-Pesa Mini App"
+name: Leta M-Pesa Mini App
 summary: "[TBD: Leta M-Pesa Mini App summary]"
 order: 2
 tags:
   - Leta Technologies
   - Mobile
-role: "[TBD: role]"
-scope: "[TBD: scope]"
-timeline: "[TBD: timeline]"
+facts:
+  timeline: "[TBD: timeline]"
+  role: "[TBD: role]"
+  platform: Mobile
+  team: "[TBD: team, e.g. 1 PM, 3 engineers]"
 hero:
   kind: placeholder
   label: "[TBD: hero image or video]"
+overview:
+  body: "[TBD: one short paragraph: the product, the duration and scope, the main problem as a negative signal (with its number), and what you did]"
+  outcome: "[TBD: one-line outcome, actual or projected (mark projected)]"
 problem:
   body: "[TBD: why it mattered, in one short paragraph]"
-  visual:
-    kind: placeholder
-    label: "[TBD: problem visual]"
-actions:
+  visuals:
+    - kind: placeholder
+      label: "[TBD: problem visual]"
+decisions:
   - title: "[TBD: action 1]"
-    problem: "[TBD: what was broken, and the evidence]"
-    options:
+    wrong: "[TBD: what was broken, and the evidence]"
+    considered:
       - name: "[TBD: option considered]"
         reason: "[TBD: why it was dropped]"
-    action: "[TBD: what was chosen]"
-    impact: "[TBD: result or feedback]"
+    did: "[TBD: what was chosen]"
+    result: "[TBD: result or feedback]"
   - title: "[TBD: action 2]"
-    problem: "[TBD: what was broken, and the evidence]"
-    options:
+    wrong: "[TBD: what was broken, and the evidence]"
+    considered:
       - name: "[TBD: option considered]"
         reason: "[TBD: why it was dropped]"
-    action: "[TBD: what was chosen]"
-    impact: "[TBD: result or feedback]"
+    did: "[TBD: what was chosen]"
+    result: "[TBD: result or feedback]"
   - title: "[TBD: action 3]"
-    problem: "[TBD: what was broken, and the evidence]"
-    options:
+    wrong: "[TBD: what was broken, and the evidence]"
+    considered:
       - name: "[TBD: option considered]"
         reason: "[TBD: why it was dropped]"
-    action: "[TBD: what was chosen]"
-    impact: "[TBD: result or feedback]"
-impact:
-  metrics:
-    - value: "[TBD]"
-      label: "[TBD: measured result]"
-      projected: false
-    - value: "[TBD]"
-      label: "[TBD: projected number]"
-      projected: true
-  quotes:
-    - text: "[TBD: feedback quote]"
-      source: "[TBD: who said it]"
-  reflection: "[TBD: one reflection]"
+    did: "[TBD: what was chosen]"
+    result: "[TBD: result or feedback]"
+learnings:
+  - "[TBD: what you learned, tied to a real moment from the project]"
+  - "[TBD: what did not work, and what you would change if you did it again]"
 ---

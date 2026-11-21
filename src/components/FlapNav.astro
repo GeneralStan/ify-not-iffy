@@ -150,17 +150,12 @@ const items = [
   };
 
   let landDocked = false;
-  // Case study pages (<html data-land="docked">) always open docked, hero just above.
-  const wantsDocked = () => document.documentElement.dataset.land === 'docked';
-  const dock = () => {
-    if (!slot) return;
-    const line = slot.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: line, behavior: 'instant' });
-  };
-  if (wantsDocked() && !location.hash) dock();
   document.addEventListener('astro:after-swap', () => {
     syncCurrent();
-    if (landDocked || wantsDocked()) dock();
+    if (landDocked && slot) {
+      const line = slot.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: line, behavior: 'instant' });
+    }
     landDocked = false;
   });
 

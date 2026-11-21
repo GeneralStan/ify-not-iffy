@@ -2,6 +2,12 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
+/**
+ * Case studies, one Markdown file each under src/content/work.
+ * Structure: docs/case-study-structure.md (Header, Overview, Defining the problem,
+ * Design decisions, Learnings & reflections). Template: src/layouts/CaseStudy.astro.
+ * Anything still "[TBD: …]" renders as a marked placeholder.
+ */
 const visual = z.object({
   kind: z.enum(['image', 'video', 'placeholder']),
   src: z.string().optional(),
@@ -9,66 +15,53 @@ const visual = z.object({
   poster: z.string().optional(),
   alt: z.string().default(''),
   label: z.string().optional(),
+  caption: z.string().optional(),
 });
 
-const option = z.object({
-  name: z.string(),
-  reason: z.string(),
-});
-
-const action = z.object({
+const decision = z.object({
   title: z.string(),
-  problem: z.string(),
-  options: z.array(option).min(1),
-  action: z.string(),
-  impact: z.string(),
+  /** What was wrong: the problem this decision answers, with its evidence (or the friction a detail removes). */
+  wrong: z.string(),
+  /** What I considered: only when there were real alternatives. */
+  considered: z.array(z.object({ name: z.string(), reason: z.string() })).optional(),
+  /** What I did: the choice and the design moves that followed. */
+  did: z.string(),
+  /** Result: measured result, feedback, or projected impact (say "projected"). */
+  result: z.string(),
   visual: visual.optional(),
 });
 
-/**
- * Case studies. One Markdown file per study under src/content/work.
- * The page template is src/layouts/CaseStudy.astro.
- * Titles stay at 15 words or fewer.
- */
 const work = defineCollection({
-  loader: glob({
-    pattern: '**/*.md',
-    base: './src/content/work',
-  }),
+  loader: glob({ pattern: '**/*.md', base: './src/content/work' }),
   schema: z.object({
     title: z.string().refine((value) => value.trim().split(/\s+/).length <= 15, {
       message: 'Title is 15 words max',
     }),
     name: z.string(),
+    /** Work card and meta description. */
     summary: z.string(),
     order: z.number(),
     tags: z.array(z.string()).default([]),
-    role: z.string(),
-    scope: z.string(),
-    timeline: z.string(),
+    facts: z.object({
+      timeline: z.string(),
+      role: z.string(),
+      platform: z.string(),
+      team: z.string(),
+    }),
     hero: visual,
+    overview: z.object({
+      body: z.string(),
+      outcome: z.string(),
+    }),
     problem: z.object({
       body: z.string(),
       hmw: z.string().optional(),
-      visual: visual,
+      /** "What we uncovered": findings that define the problem, with their evidence. */
+      findings: z.array(z.object({ title: z.string(), body: z.string() })).optional(),
+      visuals: z.array(visual).default([]),
     }),
-    actions: z.array(action).min(3).max(5),
-    impact: z.object({
-      metrics: z.array(
-        z.object({
-          value: z.string(),
-          label: z.string(),
-          projected: z.boolean().default(false),
-        }),
-      ),
-      quotes: z.array(
-        z.object({
-          text: z.string(),
-          source: z.string(),
-        }),
-      ),
-      reflection: z.string(),
-    }),
+    decisions: z.array(decision).min(3).max(6),
+    learnings: z.array(z.string()).min(1),
   }),
 });
 

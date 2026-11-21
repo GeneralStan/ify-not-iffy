@@ -10,11 +10,9 @@ interface Props {
   intro?: boolean;
   /** Sets <html data-page>, which drives the page colour and the current flap. */
   page?: string;
-  /** "docked": the page opens scrolled past the hero, with the flaps docked (case studies). */
-  land?: 'docked';
 }
 
-const { title, description, intro = false, page, land } = Astro.props;
+const { title, description, intro = false, page } = Astro.props;
 const exatExtraLight = withBase('/fonts/exatcyr-extralight.otf');
 const exatLight = withBase('/fonts/exatcyr-light.otf');
 const exatRegular = withBase('/fonts/exatcyr-regular.otf');
@@ -25,7 +23,7 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
 ---
 
 <!doctype html>
-<html lang="en" data-page={page} data-land={land}>
+<html lang="en" data-page={page}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
