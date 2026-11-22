@@ -102,6 +102,15 @@
   color: var(--color-neutral-0);
 }
 
+.hero-title .amber {
+  color: var(--color-amber-400);
+}
+
+/* Figma uses a raw #D6A1DF here (no variable): a lilac between Plum/300 and Plum/400. */
+.hero-title .lilac {
+  color: #d6a1df;
+}
+
 .hero-title .lime {
   color: var(--color-lime-400);
 }

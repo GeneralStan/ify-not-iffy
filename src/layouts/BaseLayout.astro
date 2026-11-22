@@ -48,14 +48,14 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
       }
     </script>}
     <script is:inline>
-      // Nav variation: ?nav=glass shows the iOS-style glass toolbar, ?nav=flaps the flaps (default).
-      // The choice is remembered in this browser so it sticks while browsing.
+      // Nav: the glass toolbar is the default. ?nav=flaps shows the original flaps instead and
+      // ?nav=glass switches back; the choice is remembered in this browser.
       try {
         var navParam = new URLSearchParams(location.search).get('nav');
         if (navParam === 'glass' || navParam === 'flaps') localStorage.setItem('ify-nav', navParam);
-        if (localStorage.getItem('ify-nav') === 'glass') document.documentElement.dataset.navstyle = 'glass';
+        if (localStorage.getItem('ify-nav') !== 'flaps') document.documentElement.dataset.navstyle = 'glass';
       } catch (e) {
-        if (/[?&]nav=glass/.test(location.search)) document.documentElement.dataset.navstyle = 'glass';
+        if (!/[?&]nav=flaps/.test(location.search)) document.documentElement.dataset.navstyle = 'glass';
       }
     </script>
     <script is:inline>

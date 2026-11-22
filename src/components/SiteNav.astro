@@ -9,8 +9,7 @@
  * right-aligned above a close button, over the page.
  * Flaps: the shape is one path, stretched to each size (Figma's mobile and tall shapes are exact
  * stretches of the 200x48 desktop one). Hover and press grow it from 48 to 64 (36 to 48 on phones).
- * Variation: with the glass nav on (?nav=glass, see BaseLayout.astro) the flaps hide and GlassNav
- * takes their place.
+ * The glass nav (GlassNav) is the default; the flaps show only with ?nav=flaps (see BaseLayout.astro).
  */
 import { withBase } from '../lib/url';
 import GlassNav from './GlassNav.astro';

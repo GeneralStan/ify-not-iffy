@@ -10,10 +10,11 @@ import HedgeRow from './HedgeRow.astro';
 import Polaroid from './Polaroid.astro';
 import ampersand from '../assets/home/hero-ampersand.png';
 
-// [tone, text] runs per line: Neutral/0 and Lime/400.
-const lines: Array<Array<['paper' | 'lime', string]>> = [
-  [['paper', 'I design'], ['lime', 'experiences']],
-  [['paper', 'engineer'], ['lime', 'systems']],
+// [tone, text] runs per line (Figma Hero 4094:794): Neutral/0, then each highlight in its own colour:
+// experiences Amber/400, systems #D6A1DF (a lilac between Plum/300 and Plum/400), products Lime/400.
+const lines: Array<Array<['paper' | 'amber' | 'lilac' | 'lime', string]>> = [
+  [['paper', 'I design'], ['amber', 'experiences']],
+  [['paper', 'engineer'], ['lilac', 'systems']],
   [['paper', 'build'], ['lime', 'products']],
 ];
 
