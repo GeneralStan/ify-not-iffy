@@ -103,12 +103,13 @@
 }
 
 .hero-title .amber {
-  color: var(--color-amber-400);
+  /* Figma uses a raw #FDC45E (no variable): a light amber between Amber/200 and Amber/300. */
+  color: #fdc45e;
 }
 
-/* Figma uses a raw #D6A1DF here (no variable): a lilac between Plum/300 and Plum/400. */
+/* Figma uses a raw #DA9BE5 here (no variable): a lilac between Plum/300 and Plum/400. */
 .hero-title .lilac {
-  color: #d6a1df;
+  color: #da9be5;
 }
 
 .hero-title .lime {
