@@ -258,9 +258,12 @@ const CLOSE =
       display: grid;
     }
 
-    /* Closed: the capsule is clipped down to the Menu button's size at its right end, and hidden. */
+    /* Closed: the capsule is clipped down to the Menu button's size at its right end, and hidden.
+       The clip reaches past the capsule's other edges (16 above and to the sides, 32 below) so the
+       0.5px outline and the drop shadow, which sit outside the capsule, are not cut off once open.
+       Clipping exactly to the capsule hid both, so the open menu blended into the page. */
     .glass-nav__capsule {
-      clip-path: inset(0 0 0 calc(100% - var(--menu-w, 80px)) round 999px);
+      clip-path: inset(-16px -16px -32px calc(100% - var(--menu-w, 80px)) round 999px);
       opacity: 0;
       visibility: hidden;
       transition:
@@ -275,7 +278,7 @@ const CLOSE =
     }
 
     :global(.site-nav.is-open) .glass-nav__capsule {
-      clip-path: inset(0 0 0 0 round 999px);
+      clip-path: inset(-16px -16px -32px -16px round 999px);
       opacity: 1;
       visibility: visible;
       transition:
