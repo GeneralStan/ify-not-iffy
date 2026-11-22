@@ -124,9 +124,6 @@
   --pol-rotate: 14deg;
   left: -0.99em;
   top: -1.468em;
-  filter:
-    drop-shadow(0 2px 1px var(--color-shadow-25))
-    drop-shadow(0 2px 25px var(--color-highlight-10));
 }
 
 /* Ampersand sticker by "build": 38x52, centred 30px left of the word and 43.5px below the line top,

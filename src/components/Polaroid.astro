@@ -84,6 +84,14 @@ const revealStyle = revealDelay !== undefined ? `--reveal-delay: ${revealDelay}m
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    /* No selection box or image callout when the photo is tapped or held on phones. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .polaroid img {
+    -webkit-user-drag: none;
   }
 
   .polaroid:hover,
@@ -122,6 +130,7 @@ const revealStyle = revealDelay !== undefined ? `--reveal-delay: ${revealDelay}m
     overflow: hidden;
     border-radius: 3%;
     pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .polaroid__shine::before {

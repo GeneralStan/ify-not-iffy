@@ -48,6 +48,32 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
       }
     </script>}
     <script is:inline>
+      // Open at the top. Safari (and in-app browsers like WhatsApp's) restore the last scroll position
+      // when a link reopens a page or on reload, which landed visitors at Selected projects instead of
+      // the hero. Fresh visits and reloads start at the top; Back/Forward still restore, and links
+      // with a #section still jump to it. Restoration is switched back on after load so leaving and
+      // returning with Back keeps working.
+      (function () {
+        try {
+          var entry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+          if (location.hash || (entry && entry.type === 'back_forward')) return;
+          if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+          // Stop forcing the top as soon as the visitor scrolls on their own.
+          var moved = false;
+          ['wheel', 'touchstart', 'keydown'].forEach(function (type) {
+            window.addEventListener(type, function () { moved = true; }, { once: true, passive: true });
+          });
+          var top = function () { if (!moved) window.scrollTo(0, 0); };
+          top();
+          window.addEventListener('DOMContentLoaded', top, { once: true });
+          window.addEventListener('load', function () {
+            top();
+            setTimeout(function () { if ('scrollRestoration' in history) history.scrollRestoration = 'auto'; }, 0);
+          }, { once: true });
+        } catch (e) {}
+      })();
+    </script>
+    <script is:inline>
       // Nav: the glass toolbar is the default. ?nav=flaps shows the original flaps instead and
       // ?nav=glass switches back; the choice is remembered in this browser.
       try {
