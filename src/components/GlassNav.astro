@@ -25,7 +25,7 @@ interface Props {
 const { current } = Astro.props;
 
 const items = [
-  { id: 'work', href: withBase('/work/'), label: 'Work' },
+  { id: 'work', href: withBase('/#work'), label: 'Work' },
   { id: 'playground', href: withBase('/playground/'), label: 'Playground' },
   { id: 'about', href: withBase('/about/'), label: 'About' },
 ] as const;
@@ -74,6 +74,10 @@ const CLOSE =
   .glass-nav {
     position: fixed;
     z-index: 60;
+    /* The wrapper spans the open capsule's width even while the menu is closed, which covered the
+       name and role on phones and swallowed taps meant for them. Only the visible controls take
+       pointer events. */
+    pointer-events: none;
     top: 10px;
     right: 16px;
     display: flex;
@@ -119,6 +123,7 @@ const CLOSE =
 
   /* ===== The glass (same on every background) ===== */
   .glass {
+    pointer-events: auto;
     position: relative;
     border: 0;
     border-radius: 999px;
@@ -272,7 +277,9 @@ const CLOSE =
         visibility 0s linear 0.45s;
     }
 
-    .glass-nav__capsule > * {
+    /* The tabs and close fade with the morph. The pill is left out: it shows only when a page is
+       selected (.is-placed); forcing it visible drew its outline as a thin line at the left edge. */
+    .glass-nav__capsule > :not(.glass-nav__pill) {
       opacity: 0;
       transition: opacity 0.15s ease;
     }
@@ -287,7 +294,7 @@ const CLOSE =
         visibility 0s linear 0s;
     }
 
-    :global(.site-nav.is-open) .glass-nav__capsule > * {
+    :global(.site-nav.is-open) .glass-nav__capsule > :not(.glass-nav__pill) {
       opacity: 1;
       transition: opacity 0.25s ease 0.12s;
     }
@@ -332,7 +339,7 @@ const CLOSE =
   @media (prefers-reduced-motion: reduce) {
     .glass-nav__pill,
     .glass-nav__capsule,
-    .glass-nav__capsule > *,
+    .glass-nav__capsule > :not(.glass-nav__pill),
     .glass-nav__menu {
       transition: none !important;
     }

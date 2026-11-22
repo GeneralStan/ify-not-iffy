@@ -22,7 +22,19 @@ if (root.dataset.navstyle === 'glass') {
   const items = [...(wrap?.querySelectorAll<HTMLElement>('[data-glass-item]') ?? [])];
   const pageItem = items.find((item) => item.getAttribute('aria-current') === 'page') ?? null;
   /* Home has no page item; once Selected projects reaches the toolbar, Work is selected. */
-  const workItem = items.find((item) => item.getAttribute('href')?.endsWith('/work/')) ?? null;
+  const workItem = items.find((item) => item.getAttribute('href')?.endsWith('#work')) ?? null;
+
+  /* Work lives on Home (Selected projects). On Home the Work tab glides down to it instead of
+     reloading; from any other page it opens Home already scrolled there. */
+  workItem?.addEventListener('click', (event) => {
+    const target = root.dataset.page === 'home' ? document.querySelector<HTMLElement>('#work') : null;
+    if (!target) return;
+    event.preventDefault();
+    if (nav?.classList.contains('is-open')) setOpen(false, false);
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+    history.replaceState(history.state, '', '#work');
+  });
   const projects = root.dataset.page === 'home' ? document.querySelector<HTMLElement>('#work') : null;
   let current = pageItem;
   const compact = window.matchMedia('(max-width: 1023px)');

@@ -109,6 +109,39 @@ const orderOf = (set: HedgeSet) => {
   document.addEventListener('animationend', (event) => {
     const plant = event.target;
     if (!(plant instanceof HTMLElement) || !plant.classList.contains('hedge__plant')) return;
-    plant.classList.remove('is-shaking', 'is-rustling', 'is-settling');
+    plant.classList.remove('is-shaking', 'is-rustling', 'is-settling', 'is-idling');
   });
+
+  /* Hero idle: every 6s while the hero is on screen, one bush sways gently (softer than the tap
+     shake) so the row feels alive and hints that it can be tapped. Bushes take turns in a shuffled
+     order, never the same one twice in a row. Skipped for reduced motion, while the tab is hidden,
+     during the load-in, and while a case study or image is open over the page. */
+  const heroHedges = document.querySelector<HTMLElement>('[data-hedges="hero"]');
+  if (heroHedges && !reducedQuery.matches) {
+    let onScreen = false;
+    let bag: HTMLElement[] = [];
+    let last: HTMLElement | null = null;
+
+    new IntersectionObserver((entries) => (onScreen = entries.some((entry) => entry.isIntersecting))).observe(heroHedges);
+
+    const plants = () => {
+      const row = [...heroHedges.querySelectorAll<HTMLElement>('[data-hedge-row]')].find((r) => r.offsetParent !== null);
+      return row ? [...row.querySelectorAll<HTMLElement>('.hedge__plant')] : [];
+    };
+
+    window.setInterval(() => {
+      const root = document.documentElement;
+      if (!onScreen || document.hidden) return;
+      if (root.classList.contains('intro-wait') || root.classList.contains('intro-play')) return;
+      if (root.classList.contains('has-case-sheet') || root.classList.contains('has-play-zoom')) return;
+      if (!bag.length) {
+        bag = plants().sort(() => Math.random() - 0.5);
+        if (bag[0] === last && bag.length > 1) bag.push(bag.shift()!);
+      }
+      const plant = bag.shift();
+      if (!plant || plant.classList.contains('is-shaking') || plant.classList.contains('is-rustling')) return;
+      last = plant;
+      plant.classList.add('is-idling');
+    }, 6000);
+  }
 </script>

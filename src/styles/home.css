@@ -146,19 +146,8 @@
   font-size: clamp(16px, calc(16px + (100vw - 390px) * 0.007619), 24px);
   line-height: clamp(24px, calc(24px + (100vw - 390px) * 0.007619), 32px);
   letter-spacing: -0.02em;
+  margin: 0;
   color: var(--color-stone-500);
-  text-decoration: none;
-  border-radius: 4px;
-  transition: color 0.3s ease;
-}
-
-.hero-scroll:hover {
-  color: var(--color-stone-300);
-}
-
-.hero-scroll:focus-visible {
-  outline: 2px solid var(--color-lime-300);
-  outline-offset: 4px;
 }
 
 @media (max-width: 767px) {
@@ -308,19 +297,19 @@
     display: block;
   }
 
-  /* Hero, Mobile (Figma Mobile Hero 4068:7252): the 550x161 row starts 72 left of the screen and
-     runs 64 below the hero's bottom edge on a 390 frame; it scales with the screen width. */
+  /* Hero, Mobile (Figma Mobile Hero 4094:1637): the 550x161 row starts 72 left of the screen and
+     runs 48 below the hero's bottom edge on a 390 frame; it scales with the screen width. */
   .hedges--hero .hedge-row--mobile {
-    bottom: calc(-64.22 / 390 * 100vw);
-    left: calc(-72 / 390 * 100vw);
+    bottom: calc(-48.19 / 390 * 100vw);
+    left: calc(-71.98 / 390 * 100vw);
     width: calc(549.95 / 390 * 100vw);
   }
 
-  /* Footer, Mobile (Figma Mobile Footer 4058:2464): 507x192, 60 left of the screen, 36 below. */
+  /* Footer, Mobile (Figma Mobile / Footer 4094:1237): 550x161, 76 left of the screen, 31 below. */
   .hedges--footer .hedge-row--mobile {
-    bottom: calc(-35.72 / 390 * 100vw);
-    left: calc(-60.03 / 390 * 100vw);
-    width: calc(506.56 / 390 * 100vw);
+    bottom: calc(-31.47 / 390 * 100vw);
+    left: calc(-76 / 390 * 100vw);
+    width: calc(549.95 / 390 * 100vw);
   }
 }
 
@@ -356,6 +345,10 @@
 
 .hedge__plant.is-rustling {
   animation: hedge-rustle var(--motion-duration-hedge) linear 48ms both;
+}
+
+.hedge__plant.is-idling {
+  animation: hedge-idle 1100ms ease-in-out both;
 }
 
 .hedge__plant.is-settling {
@@ -409,6 +402,15 @@
   78% { transform: translate3d(1px, 0, 0) rotate(0.3deg) skewX(-0.3deg); }
 }
 
+/* Idle sway: one gentle back-and-forth, about a third of the tap shake. */
+@keyframes hedge-idle {
+  0%,
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25% { transform: translate3d(0.5px, -1px, 0) rotate(1.4deg); }
+  55% { transform: translate3d(-0.5px, 0, 0) rotate(-1.1deg); }
+  80% { transform: translate3d(0, 0, 0) rotate(0.4deg); }
+}
+
 @keyframes hedge-settle {
   0%,
   100% { opacity: 1; }
@@ -445,28 +447,13 @@
 }
 
 /* ===== Page body =====
-   Each page has its own body colour and heading inks (Figma Home/Work 4026:926, Playground 4068:7511,
-   About 4068:7754), set on <html data-page>. */
-:root[data-page='home'],
-:root[data-page='work'] {
+   Every page shares the Work look (Figma Home/Work 4026:926): Stone/0 background, Stone/950 titles,
+   Stone/600 leads. Set on <html data-page>. */
+:root {
   --page-bg: var(--color-stone-0);
   --page-ink: var(--color-neutral-950);
   --head-ink: var(--color-stone-950);
   --lead-ink: var(--color-stone-600);
-}
-
-:root[data-page='playground'] {
-  --page-bg: var(--color-plum-150);
-  --page-ink: var(--color-plum-950);
-  --head-ink: var(--color-plum-950);
-  --lead-ink: var(--color-plum-600);
-}
-
-:root[data-page='about'] {
-  --page-bg: var(--color-blue-150);
-  --page-ink: var(--color-blue-900);
-  --head-ink: var(--color-blue-950);
-  --lead-ink: var(--color-blue-600);
 }
 
 .page-body {

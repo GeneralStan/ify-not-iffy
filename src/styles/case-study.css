@@ -1,46 +1,18 @@
 /* ===== Case study (src/layouts/CaseStudy.astro, Figma "Inner Page draft 1" 4058:1340) =====
-   Desktop 1440: 56 rail (close button) | 240 side nav | 1144 content.
-   Content: 480 Lime/900 header (title Heading/Title Neutral/50; facts Meta Neutral/200 over
-   Body/Large Neutral/50, 40 apart, 80 below the title), then 944 sections: 120 above each,
-   56 between blocks. Section titles Heading/H1 Neutral/950; text Neutral/700; eyebrows Meta/Large
-   Lime/800; sub-heads Heading/H2 Lead Neutral/950; findings Heading/H4 + Body Stone/900;
-   image blocks Stone/100, 1px Stone/150, radius 8 (12 for decision visuals). */
-.case-page {
-  min-height: 100svh;
+   Drawn as an overlay over Home: a drawer from the right on desktop, a bottom sheet below 1024.
+   Inside: the 240 side nav (desktop) beside the content column. Content: Lime/900 header (title
+   Heading/Title Neutral/50; facts Meta Neutral/200 over Body/Large Neutral/50), then 944 sections:
+   120 above each, 56 between blocks. Section titles Heading/H1 Neutral/950; text Neutral/700;
+   eyebrows Meta/Large Lime/800; findings Heading/H4 + Body Stone/900; image blocks Stone/100. */
+.case-layout {
+  min-height: 100%;
   background: var(--color-stone-0);
   color: var(--color-neutral-700);
 }
 
-/* ===== Rail and close button =====
-   Figma draws the rail transparent with a white-outlined, white close button: the page is a sheet over
-   the dark site. The rail takes the hero's Lime/900 so the button reads the same. */
-.case-rail {
-  position: fixed;
-  z-index: 20;
-  top: 16px;
-  left: 16px;
-}
-
-.case-close {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 100px;
-  border: 1px solid var(--color-neutral-0);
-  background: none;
-  color: var(--color-neutral-0);
-  transition: background-color 0.3s ease;
-}
-
-/* Outline only: it sits on the dark strip above the sheet. */
-.case-close:hover {
-  background: color-mix(in srgb, var(--color-neutral-0) 12%, transparent);
-}
-
-.case-close:focus-visible {
-  outline: 2px solid var(--color-lime-300);
-  outline-offset: 3px;
+.case-main {
+  display: block;
+  min-width: 0;
 }
 
 /* ===== Side nav (Figma: Body/Small Neutral/700, current Label/Medium Neutral/950, 8 apart) ===== */
@@ -78,36 +50,18 @@
 }
 
 @media (min-width: 1024px) {
-  .case-page {
+  .case-layout {
     display: grid;
-    grid-template-columns: 56px minmax(180px, 240px) minmax(0, 1144px);
-    justify-content: start;
+    grid-template-columns: 240px minmax(0, 1fr);
   }
 
-  .case-rail {
-    position: sticky;
-    top: 0;
-    left: auto;
-    height: 100svh;
-    background: var(--color-lime-900);
-    padding-top: 80px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-
-  .case-close {
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
+  /* Sticks inside the drawer's scroll area, level with the content below the header. */
   .case-toc {
     display: block;
     position: sticky;
-    top: 216px;
+    top: 0;
     align-self: start;
-    padding-left: 17px;
+    padding: 120px 16px 0 32px;
   }
 }
 
@@ -368,11 +322,47 @@
   background: color-mix(in srgb, var(--color-lime-300) 22%, transparent);
 }
 
-/* ===== Phone and tablet bottom sheet (< 1024px) =====
-   Case studies open over the page you came from (src/scripts/case-sheet.ts): the site stays visible,
-   dimmed, in a 56px strip above the sheet (tap it to close). The close button sits in that strip,
-   8px above the sheet's top-left corner, and moves with the sheet when it is dragged. The sheet has
-   rounded top corners and a grab handle. Drag it down to close. */
+/* ===== Shared overlay close (case studies, Playground images) =====
+   The menu's × (Figma Glass Menu close): round, an 8% fill and a 20px ×, at 40px so it is easy to
+   hit on its own. Dark ink on light pages; white over the dark hero and footer (html.glass-on-dark). */
+.overlay-close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(13, 13, 5, 0.08);
+  color: var(--color-neutral-950);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.overlay-close:hover {
+  background: rgba(13, 13, 5, 0.14);
+}
+
+html.glass-on-dark .overlay-close {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-neutral-0);
+}
+
+html.glass-on-dark .overlay-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.overlay-close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* ===== Case study overlay (src/scripts/case-sheet.ts) =====
+   Frosted backdrop (Stone/950 at 20% over a 14px blur, as on Playground images). Phones and
+   tablets: a bottom sheet 56 from the top with rounded top corners, a grab handle, and the × in the
+   strip, 8 above the sheet. Desktop: a drawer from the right with the × 24 to its left.
+   Motion (transform and opacity only): in on the enter ease, out a little quicker on an ease-in. */
 .case-sheet {
   position: fixed;
   inset: 0;
@@ -384,10 +374,12 @@
   inset: 0;
   border: 0;
   padding: 0;
-  background: color-mix(in srgb, var(--color-lime-950) 55%, transparent);
+  background: color-mix(in srgb, var(--color-stone-950) 20%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   opacity: 0;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.4s var(--motion-ease-fade);
 }
 
 .case-sheet__panel {
@@ -397,10 +389,9 @@
   flex-direction: column;
   border-radius: 20px 20px 0 0;
   background: var(--color-stone-0);
-  box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.25);
+  box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.18);
   translate: 0 100%;
-  transition: translate 0.3s ease;
-  touch-action: pan-y;
+  transition: translate 480ms var(--motion-ease-enter);
 }
 
 .case-sheet.is-open .case-sheet__backdrop {
@@ -409,6 +400,14 @@
 
 .case-sheet.is-open .case-sheet__panel {
   translate: 0 0;
+}
+
+.case-sheet.is-closing .case-sheet__panel {
+  transition: translate 320ms cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+.case-sheet.is-closing .case-sheet__backdrop {
+  transition-duration: 0.3s;
 }
 
 .case-sheet__panel.is-dragging {
@@ -430,7 +429,8 @@
   width: 40px;
   height: 5px;
   border-radius: 100px;
-  background: color-mix(in srgb, var(--color-neutral-0) 55%, transparent);
+  /* Mid-grey so it reads on the dark header and on light content once scrolled. */
+  background: color-mix(in srgb, var(--color-neutral-500) 70%, transparent);
 }
 
 .case-sheet__close {
@@ -443,9 +443,9 @@
 .case-sheet__scroll {
   flex: 1;
   overflow-y: auto;
-  border-radius: 20px 20px 0 0;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  border-radius: inherit;
 }
 
 .case-sheet__loading {
@@ -455,78 +455,53 @@
   color: var(--color-neutral-700);
 }
 
-/* The header clears the close button and handle inside the sheet. */
+/* The header clears the handle inside the sheet. */
 .case-sheet .case-header {
-  padding-top: 80px;
+  padding-top: 56px;
 }
 
+/* Desktop: a drawer from the right. */
+@media (min-width: 1024px) {
+  .case-sheet__panel {
+    inset: 0 0 0 auto;
+    width: min(1384px, calc(100vw - 96px));
+    border-radius: 24px 0 0 24px;
+    box-shadow: -12px 0 40px rgba(10, 10, 10, 0.16);
+    translate: 100% 0;
+    transition-duration: 560ms;
+  }
+
+  .case-sheet.is-closing .case-sheet__panel {
+    transition: translate 380ms cubic-bezier(0.7, 0, 0.84, 0);
+  }
+
+  .case-sheet__grab {
+    display: none;
+  }
+
+  .case-sheet__close {
+    top: 24px;
+    left: -64px;
+  }
+
+  .case-sheet .case-header {
+    padding-top: 90px;
+  }
+}
+
+/* The page underneath stays put while the overlay is open; its pinned blur band is not needed. */
 html.has-case-sheet,
 html.has-case-sheet body {
   overflow: hidden;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .case-sheet__panel,
-  .case-sheet__backdrop {
-    transition: none;
-  }
-}
-
-/* Direct visits on phones and tablets get the same sheet look: the site's dark colour above, the page as a
-   rounded sheet with the handle and close button (src/layouts/CaseStudy.astro). */
-.case-sheet-backdrop,
-.case-page .case-sheet__grab {
+html.has-case-sheet .nav-edge {
   display: none;
 }
 
-@media (max-width: 1023px) {
-  /* On the root, not just body: the sheet's top margin collapses through body, so body's own
-     background would start below the strip. */
-  html:has(.case-page),
-  html:has(.case-page) body {
-    background: var(--color-lime-900);
-  }
-
-  .case-sheet-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0 0 auto;
-    height: 56px;
-    z-index: 0;
-  }
-
-  .case-page {
-    position: relative;
-    z-index: 1;
-    margin-top: 56px;
-    border-radius: 20px 20px 0 0;
-    overflow: clip;
-    box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.25);
-  }
-
-  .case-page .case-sheet__grab {
-    display: grid;
-  }
-
-  /* In the 56px strip, 8px above the sheet's top-left corner; pinned there so it is always in reach. */
-  .case-page .case-rail {
-    position: fixed;
-    z-index: 4;
-    top: 8px;
-    left: 16px;
-  }
-
-  .case-page .case-header {
-    padding-top: 80px;
-  }
-}
-
-@media (max-width: 1023px) {
-  .case-page {
-    transition: translate 0.3s ease;
-  }
-
-  .case-page.is-dragging {
-    transition: none;
+@media (prefers-reduced-motion: reduce) {
+  .case-sheet__panel,
+  .case-sheet__backdrop {
+    transition: none !important;
   }
 }

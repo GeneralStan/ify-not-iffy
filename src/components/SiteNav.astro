@@ -23,7 +23,7 @@ interface Props {
 const { current } = Astro.props;
 
 const items = [
-  { id: 'work', href: withBase('/work/'), label: 'Work' },
+  { id: 'work', href: withBase('/#work'), label: 'Work' },
   { id: 'playground', href: withBase('/playground/'), label: 'Playground' },
   { id: 'about', href: withBase('/about/'), label: 'About' },
 ] as const;
@@ -227,18 +227,6 @@ const CLOSE =
     --nav-name: var(--color-lime-0);
     --nav-role: var(--color-stone-500);
     --nav-close: var(--color-neutral-0);
-  }
-
-  .site-nav--playground {
-    --nav-name: var(--color-plum-950);
-    --nav-role: var(--color-plum-700);
-    --nav-close: var(--color-plum-950);
-  }
-
-  .site-nav--about {
-    --nav-name: var(--color-blue-950);
-    --nav-role: var(--color-blue-500);
-    --nav-close: var(--color-blue-950);
   }
 
   .site-nav__bar {

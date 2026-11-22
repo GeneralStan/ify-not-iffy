@@ -1,16 +1,19 @@
 ---
 /**
- * Case study page, from Figma "Inner Page draft 1" (4058:1340). A page of its own (no site hero,
- * flaps or footer): a 56px rail with a close button back to Work, a 240px side nav, and a 1144px
- * content column (dark 480px header, then 944px sections).
+ * Case study page, from Figma "Inner Page draft 1" (4058:1340). It is its own page with its own
+ * address, drawn as an overlay over Home: a drawer sliding in from the right on desktop (1024+), a
+ * bottom sheet on phones and tablets, over a frosted Stone/950 20% backdrop. Inside: the 240px side
+ * nav (desktop) and the content column (dark header, then 944px sections).
+ * Opening a card on Home loads the same overlay in place (src/scripts/case-sheet.ts); opening the
+ * address directly renders Home underneath with the overlay already in place, then slides it in.
  * Structure: docs/case-study-structure.md (Header, Overview, Defining the problem,
  * Design decisions, Learnings & reflections). Anything still "[TBD: …]" gets .is-tbd.
  */
 import type { CollectionEntry } from 'astro:content';
-import BaseLayout from './BaseLayout.astro';
+import SiteLayout from './SiteLayout.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
 import StudyMedia from '../components/StudyMedia.astro';
 import { withBase } from '../lib/url';
-import '../styles/case-study.css';
 
 interface Neighbor {
   id: string;
@@ -41,21 +44,32 @@ const sections = [
   ['learnings', 'Learnings & reflections'],
 ] as const;
 
-const workHref = withBase('/work/');
+const workHref = withBase('/#work');
+const CLOSE =
+  'M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z';
 ---
 
-<BaseLayout page="work" title={`${data.name} — Ifeanyi Ulasika`} description={data.summary}>
-  <a class="case-sheet-backdrop" href={workHref} data-astro-reload aria-label="Close, back to Work"></a>
-  <div class="case-page" data-case-page>
-    <div class="case-sheet__grab" data-sheet-grab aria-hidden="true"><span class="case-sheet__handle"></span></div>
-    <div class="case-rail">
-      <a class="case-close" href={workHref} data-astro-reload aria-label="Close, back to Work">
-        <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-          <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
-        </svg>
-      </a>
-    </div>
+<SiteLayout page="home" overlay title={`${data.name} — Ifeanyi Ulasika`} description={data.summary}>
+  <ProjectGrid />
 
+  <div
+    class="case-sheet is-static"
+    slot="overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label={data.name}
+    data-case-static
+    data-home-href={workHref}
+    data-home-title="Ifeanyi Ulasika — Design Engineer"
+  >
+    <a class="case-sheet__backdrop" href={workHref} data-sheet-close aria-label="Close case study"></a>
+    <div class="case-sheet__panel">
+      <div class="case-sheet__grab" data-sheet-grab aria-hidden="true"><span class="case-sheet__handle"></span></div>
+      <a class="overlay-close case-sheet__close" href={workHref} data-sheet-close aria-label="Close case study">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
+      </a>
+      <div class="case-sheet__scroll" data-sheet-scroll>
+        <div class="case-layout" data-case-layout>
     <nav class="case-toc" aria-label="On this page">
       <ol class="case-toc__list">
         {sections.map(([id, label]) => (
@@ -66,7 +80,7 @@ const workHref = withBase('/work/');
       </ol>
     </nav>
 
-    <main class="case-main" id="content">
+    <article class="case-main">
       <header class="case-header">
         <h1 class:list={['case-title text-title', tbd(data.title) && 'is-tbd']}>{data.title}</h1>
         <dl class="case-facts">
@@ -204,41 +218,16 @@ const workHref = withBase('/work/');
           )}
         </nav>
       </div>
-    </main>
+    </article>
+        </div>
+      </div>
+    </div>
   </div>
-</BaseLayout>
+</SiteLayout>
 
-<script>
-  /* Phones and tablets: the page is a sheet; drag it down (from the handle, or anywhere at the top of the page)
-     to close it and go back to Work. */
-  import { attachDrag } from '../scripts/case-sheet';
-
-  const page = document.querySelector<HTMLElement>('[data-case-page]');
-  const close = document.querySelector<HTMLAnchorElement>('.case-close');
-  if (page && close && window.matchMedia('(max-width: 1023px)').matches) {
-    attachDrag(page, window, () => {
-      page.style.translate = '0 100vh';
-      window.setTimeout(() => (location.href = close.href), 250);
-    });
-  }
-
-  /* Side nav: the section in view is the current link (Figma: Label/Medium, Neutral/950). */
-  function bindToc() {
-    const links = new Map<string, HTMLElement>();
-    document.querySelectorAll<HTMLElement>('[data-toc-link]').forEach((link) => links.set(link.dataset.tocLink!, link));
-    const sections = document.querySelectorAll<HTMLElement>('[data-toc-section]');
-    if (!links.size || !sections.length || !('IntersectionObserver' in window)) return;
-    const setCurrent = (id: string) =>
-      links.forEach((link, key) => (key === id ? link.setAttribute('aria-current', 'true') : link.removeAttribute('aria-current')));
-    setCurrent(sections[0].id);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (visible.length) setCurrent(visible[0].target.id);
-      },
-      { rootMargin: '-30% 0px -60% 0px' },
-    );
-    sections.forEach((section) => observer.observe(section));
-  }
-  bindToc();
-</script>
+<noscript>
+  <style>
+    .case-sheet.is-static .case-sheet__panel { translate: none; }
+    .case-sheet.is-static .case-sheet__backdrop { opacity: 1; }
+  </style>
+</noscript>

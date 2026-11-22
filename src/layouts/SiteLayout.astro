@@ -18,18 +18,21 @@ interface Props {
   page: PageId;
   title: string;
   description: string;
+  /** A case study page: Home is drawn underneath an overlay, so no load-in. */
+  overlay?: boolean;
 }
 
-const { page, title, description } = Astro.props;
+const { page, title, description, overlay = false } = Astro.props;
 ---
 
-<BaseLayout intro={page === 'home'} page={page} title={title} description={description}>
+<BaseLayout intro={page === 'home' && !overlay} page={page} title={title} description={description}>
   <SiteNav current={page} />
   {page === 'home' && <SiteHero />}
   <main id="content" class={`page-body page-body--${page}`}>
     <slot />
   </main>
   <SiteFooter />
+  <slot name="overlay" />
 </BaseLayout>
 
 <script>

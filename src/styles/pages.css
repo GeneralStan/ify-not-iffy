@@ -51,7 +51,7 @@
 }
 
 .play-canvas:focus-visible {
-  outline: 2px solid var(--color-plum-700);
+  outline: 2px solid var(--color-stone-700);
   outline-offset: -4px;
 }
 
@@ -110,7 +110,7 @@
 }
 
 .play-card:focus-visible {
-  outline: 2px solid var(--color-plum-700);
+  outline: 2px solid var(--color-stone-700);
   outline-offset: 4px;
 }
 
@@ -139,8 +139,8 @@
 }
 
 /* ===== Playground zoom =====
-   The tapped card grows from its spot to fit the screen (never past its real size) over a frosted,
-   darkened backdrop; the outlined close button sits top-left, like the case study sheet's. */
+   The tapped card grows from its spot to fit the screen (never past its real size) over the frosted
+   Stone/950 20% backdrop shared with case studies; the shared round × sits top-left. */
 .play-zoom {
   position: fixed;
   inset: 0;
@@ -150,7 +150,7 @@
 .play-zoom__backdrop {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--color-plum-950) 35%, transparent);
+  background: color-mix(in srgb, var(--color-stone-950) 20%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   opacity: 0;
@@ -177,16 +177,6 @@
   z-index: 2;
   top: 16px;
   left: 16px;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--color-neutral-0);
-  border-radius: var(--radius-full);
-  background: none;
-  color: var(--color-neutral-0);
-  cursor: pointer;
   opacity: 0;
   transition:
     opacity 0.3s ease,
@@ -195,15 +185,6 @@
 
 .play-zoom.is-open .play-zoom__close {
   opacity: 1;
-}
-
-.play-zoom__close:hover {
-  background: color-mix(in srgb, var(--color-neutral-0) 12%, transparent);
-}
-
-.play-zoom__close:focus-visible {
-  outline: 2px solid var(--color-neutral-0);
-  outline-offset: 3px;
 }
 
 html.has-play-zoom,
@@ -307,7 +288,7 @@ html.has-play-zoom body {
 
 .about-copy__p {
   margin: 0;
-  color: var(--color-blue-800);
+  color: var(--color-stone-800);
 }
 
 @media (max-width: 1023px) {
@@ -415,7 +396,7 @@ html.has-play-zoom body {
   gap: 16px;
 }
 
-/* Figma divider (Vector 6921/6922): a 1.5px Blue/800 line (stroke 60% x layer 20% = 12% alpha) across the
+/* Figma divider (Vector 6921/6922): a 1.5px Stone/800 line (stroke 60% x layer 20% = 12% alpha) across the
    full row with round caps, 48px from the rows on either side (24 on phones). Drawn as a pill so the 1.5px weight and caps survive
    (a 1.5px border is floored to 1px and has square ends). */
 .job + .job {
@@ -431,7 +412,7 @@ html.has-play-zoom body {
   right: 0;
   height: 1.5px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-blue-800) 12%, transparent);
+  background: color-mix(in srgb, var(--color-stone-800) 12%, transparent);
 }
 
 .job__head {
@@ -442,7 +423,7 @@ html.has-play-zoom body {
 
 .job__title {
   margin: 0;
-  color: var(--color-blue-950);
+  color: var(--color-stone-950);
 }
 
 .job__note {
@@ -455,10 +436,10 @@ html.has-play-zoom body {
   letter-spacing: 0;
 }
 
-/* Meta/Medium, Blue/600. */
+/* Meta/Medium, Stone/600. */
 .job__meta {
   margin: 0;
-  color: var(--color-blue-600);
+  color: var(--color-stone-600);
 }
 
 .job__points {
@@ -468,7 +449,7 @@ html.has-play-zoom body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  color: var(--color-blue-900);
+  color: var(--color-stone-900);
 }
 
 .job__points li {
