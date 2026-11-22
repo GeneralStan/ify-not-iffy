@@ -5,20 +5,22 @@ import { withBase } from '../lib/url';
 interface Props {
   title: string;
   description: string;
-  /** Home: the hero is hidden until hero-intro.ts plays the load-in. */
+  /** Home: the nav and hero are hidden until the load-in plays (inline script below). */
   intro?: boolean;
   /** Sets <html data-page>, which drives the page colour. */
   page?: string;
 }
 
 const { title, description, intro = false, page } = Astro.props;
-const exatExtraLight = withBase('/fonts/exatcyr-extralight.otf');
-const exatLight = withBase('/fonts/exatcyr-light.otf');
-const exatRegular = withBase('/fonts/exatcyr-regular.otf');
-const exatMedium = withBase('/fonts/exatcyr-medium.otf');
-const exatBold = withBase('/fonts/exatcyr-bold.otf');
-const exatExtraBold = withBase('/fonts/exatcyr-extrabold.otf');
-const exatBlack = withBase('/fonts/exatcyr-black.otf');
+const exatExtraLight = withBase('/fonts/exatcyr-extralight.woff2');
+const exatLight = withBase('/fonts/exatcyr-light.woff2');
+const exatRegular = withBase('/fonts/exatcyr-regular.woff2');
+const exatMedium = withBase('/fonts/exatcyr-medium.woff2');
+const exatBold = withBase('/fonts/exatcyr-bold.woff2');
+const exatExtraBold = withBase('/fonts/exatcyr-extrabold.woff2');
+const exatBlack = withBase('/fonts/exatcyr-black.woff2');
+// Body font (nav name, "Scroll to view work"): the same hashed file fonts.css points at.
+import geistSans from '../../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2?url';
 ---
 
 <!doctype html>
@@ -30,22 +32,48 @@ const exatBlack = withBase('/fonts/exatcyr-black.otf');
     <meta name="theme-color" content="#FEFFFA" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <!-- Fetch the fonts the first screen needs straight away (Latin-only WOFF2, ~15KB each). -->
+    <link rel="preload" href={exatRegular} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={geistSans} as="font" type="font/woff2" crossorigin />
     <style is:inline set:html={`
-      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Extra Light"), url("${exatExtraLight}") format("opentype"); font-weight: 200; font-style: normal; font-display: swap; }
-      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Light"), url("${exatLight}") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
-      @font-face { font-family: "Exat CYR"; src: local("Exat CYR"), local("Exat CYR Regular"), url("${exatRegular}") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
-      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Medium"), url("${exatMedium}") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
-      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Bold"), url("${exatBold}") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
-      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Extra Bold"), url("${exatExtraBold}") format("opentype"); font-weight: 800; font-style: normal; font-display: swap; }
-      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Black"), url("${exatBlack}") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Extra Light"), url("${exatExtraLight}") format("woff2"); font-weight: 200; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Light"), url("${exatLight}") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR"), local("Exat CYR Regular"), url("${exatRegular}") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Medium"), url("${exatMedium}") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Bold"), url("${exatBold}") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Extra Bold"), url("${exatExtraBold}") format("woff2"); font-weight: 800; font-style: normal; font-display: swap; }
+      @font-face { font-family: "Exat CYR"; src: local("Exat CYR Black"), url("${exatBlack}") format("woff2"); font-weight: 900; font-style: normal; font-display: swap; }
     `}></style>
     {intro && <script is:inline>
-      // Hide the hero for its load-in only when motion is allowed and JS runs.
-      // hero-intro.ts removes the class; the timeout is a safety net.
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.classList.add('intro-wait');
-        setTimeout(function () { document.documentElement.classList.remove('intro-wait'); }, 3000);
-      }
+      // Home load-in (see "Hero load-in" in home.css). It runs from here, in the page itself, so it
+      // never waits for the script bundle: everything starts hidden, then the nav slides down from
+      // the top and the hero follows. It starts once the display font is ready (or after 1.2s at most),
+      // and a 2.5s fallback plays the same animation rather than just showing things, so nothing pops.
+      // Reduced motion: no intro.
+      (function () {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var root = document.documentElement;
+        root.classList.add('intro-wait');
+        var started = false;
+        function start() {
+          if (started) return;
+          started = true;
+          root.classList.add('intro-play');
+          root.classList.remove('intro-wait');
+          setTimeout(function () {
+            var hedges = document.querySelector('[data-hedges="hero"]');
+            if (hedges) hedges.classList.add('is-popped');
+          }, 1150);
+          setTimeout(function () { root.classList.remove('intro-play'); }, 2700);
+        }
+        function whenParsed() {
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+          else start();
+        }
+        var font = document.fonts && document.fonts.load ? document.fonts.load('400 56px "Exat CYR"') : Promise.resolve();
+        Promise.race([font, new Promise(function (r) { setTimeout(r, 1200); })]).then(whenParsed, whenParsed);
+        setTimeout(start, 2500);
+      })();
     </script>}
     <script is:inline>
       // Open at the top. Safari (and in-app browsers like WhatsApp's) restore the last scroll position

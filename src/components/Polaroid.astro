@@ -59,6 +59,7 @@ const revealStyle = revealDelay !== undefined ? `--reveal-delay: ${revealDelay}m
       sizes={`${displayWidth}px`}
       alt=""
       loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : undefined}
       decoding="async"
     />
     <span class="polaroid__shine"></span>

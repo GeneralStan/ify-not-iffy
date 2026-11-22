@@ -181,20 +181,36 @@
   }
 }
 
-/* ===== Hero load-in =====
-   html.intro-wait: hidden until the font and polaroid are ready (BaseLayout + hero-intro.ts).
-   html.intro-play: the sequence below, timed from the moment the fonts are ready.
-     0      the six runs rise one by one from a bottom-edge mask, 70ms apart
-     450    polaroid grows 0 → 120% → 100%
-     800    "Scroll to view work" rises
-     900    the hedges pop up from behind the hero's bottom edge, all at once (hero-intro.ts)
-     1150   once every word has landed, the ampersand grows like the polaroid
+/* ===== Hero load-in (Home) =====
+   html.intro-wait: the nav and hero wait hidden (set and cleared by the inline script in
+   BaseLayout.astro, which starts as soon as the display font is ready, 1.2s at most).
+   html.intro-play: the sequence, all transform and opacity so it stays smooth on phones:
+     0      the name and role, then the nav toolbar (60ms later), slide down from the top
+     280    the six runs rise one by one from a bottom-edge mask, 70ms apart
+     700    polaroid grows 0 → 120% → 100%
+     1050   "Scroll to view work" rises
+     1150   the hedges pop up from behind the hero's bottom edge, all at once
+     1400   once every word has landed, the ampersand grows like the polaroid
    The polaroid and the ampersand sit outside the words' masks, so nothing cuts them. */
+.intro-wait .site-nav__lead,
+.intro-wait .glass-nav,
+.intro-wait .site-nav__menu,
+.intro-wait .site-nav__menu-panel,
 .intro-wait .hero-word__inner,
 .intro-wait .hero-polaroid,
 .intro-wait .hero-amp,
 .intro-wait .hero-scroll {
   opacity: 0;
+}
+
+.intro-play .site-nav__lead,
+.intro-play .site-nav__menu,
+.intro-play .site-nav__menu-panel {
+  animation: intro-nav 640ms var(--motion-ease-enter) both;
+}
+
+.intro-play .glass-nav {
+  animation: intro-nav 640ms var(--motion-ease-enter) 60ms both;
 }
 
 .intro-wait .hedges--hero .hedge,
@@ -209,19 +225,24 @@
 
 .intro-play .hero-word__inner {
   animation: intro-word 760ms var(--motion-ease-enter) both;
-  animation-delay: calc(var(--w) * 70ms);
+  animation-delay: calc(280ms + var(--w) * 70ms);
 }
 
 .intro-play .hero-polaroid {
-  animation: intro-polaroid 760ms 450ms both;
+  animation: intro-polaroid 760ms 700ms both;
 }
 
 .intro-play .hero-amp {
-  animation: intro-polaroid 760ms 1150ms both;
+  animation: intro-polaroid 760ms 1400ms both;
 }
 
 .intro-play .hero-scroll {
-  animation: intro-rise 700ms var(--motion-ease-enter) 800ms both;
+  animation: intro-rise 700ms var(--motion-ease-enter) 1050ms both;
+}
+
+@keyframes intro-nav {
+  from { opacity: 0; transform: translateY(-28px); }
+  to { opacity: 1; transform: none; }
 }
 
 @keyframes intro-word {
