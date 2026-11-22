@@ -1,8 +1,8 @@
 /**
  * Glass toolbar (src/components/GlassNav.astro). Only runs when the glass nav is on.
- * - Phones and tablets: Menu morphs into the capsule; × (on its left), Escape, a tap outside or
+ * - Phones and tablets: Menu morphs into the capsule; × (at its right end), Escape, a tap outside or
  *   following a link closes it. The header's .is-open also slides the name and role out.
- * - The selection pill sits behind the current page and slides to a hovered or pressed item. On
+ * - The selection pill sits behind the current page (hover only changes tab colours, in CSS). On
  *   Home it appears behind Work once Selected projects reaches the toolbar.
  * - Over the dark hero or footer, html.glass-on-dark switches the glass to its dark style.
  * - Chromium: each glass shape gets an SVG displacement map that bends what is behind it near the
@@ -73,15 +73,6 @@ if (root.dataset.navstyle === 'glass') {
     }
   }
 
-  items.forEach((item) => {
-    item.addEventListener('pointerenter', () => placePill(item));
-    item.addEventListener('pointerdown', () => placePill(item));
-    item.addEventListener('focus', () => placePill(item));
-  });
-  capsule?.addEventListener('pointerleave', () => placePill(current));
-  capsule?.addEventListener('focusout', (event) => {
-    if (!capsule.contains(event.relatedTarget as Node)) placePill(current);
-  });
 
   /* ---------- Dark backgrounds under the toolbar ---------- */
   const darkZones = [...document.querySelectorAll<HTMLElement>('.hero, .site-footer')];
@@ -98,7 +89,7 @@ if (root.dataset.navstyle === 'glass') {
       const next = inWork ? workItem : null;
       if (next !== current) {
         current = next;
-        if (!capsule?.matches(':hover')) placePill(current);
+        placePill(current);
       }
     }
   }
@@ -188,7 +179,7 @@ if (root.dataset.navstyle === 'glass') {
     displace.setAttribute('yChannelSelector', 'G');
     filter.append(feImage, displace);
     defs.append(filter);
-    const value = `blur(4px) url(#${id}) blur(17px) saturate(1.2)`;
+    const value = `blur(4px) url(#${id}) blur(17px)`;
     el.style.setProperty('backdrop-filter', value);
     el.style.setProperty('-webkit-backdrop-filter', value);
   }

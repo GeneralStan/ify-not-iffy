@@ -2,16 +2,18 @@
 /**
  * Nav variation: an iOS 26-style glass toolbar in place of the flaps (turn on with ?nav=glass, off
  * with ?nav=flaps; the choice is remembered, see BaseLayout.astro).
- * - A glass capsule pinned to the top right holds Work, Playground and About. A brighter glass pill
- *   marks the current page and slides to whichever item is hovered or pressed.
- * - Glass: an almost clear white over the tooltip's blur (20% stronger), on every page; a specular rim that catches light at the edges, a faint inner glow, and a
- *   thin alpha stroke so it holds its edge on light pages.
- *   In Chromium the rim also refracts what is behind it (an SVG displacement map, glass-nav.ts);
- *   other browsers keep the blur and the rim light.
- * - Over the dark hero and footer the glass and text switch to their dark-background style.
+ * Figma "Glass nav components" (4096:1748): Tab(Body) / Tab(Hero), Glass Menu (Desktop) and
+ * Glass Menu (Mobile), Mobile Nav Bar (Glass / Desktop).
+ * - A glass capsule pinned to the top right holds the Work, Playground and About tabs.
+ * - Tabs: Nav/Default. Body (light pages): Idle Neutral/950, Hover Neutral/600, Pressed Neutral/800.
+ *   Hero (over the dark hero and footer): Idle Neutral/0, Hover Neutral/400, Pressed Neutral/600.
+ *   Selected: a raised bright pill (Lime/0 72% + highlights) with Nav/Active Neutral/950 text. Hover
+ *   only changes the text colour; the pill stays on the selected page.
+ * - Glass: #ECECEC at 20% over a 21px blur, a 0.5px dark 10% outline, a white top highlight and inner
+ *   glow, a soft shadow. Chromium also bends what is behind the edge (glass-nav.ts).
  * - The name and role stay pinned top left on every screen (plain text), over a blur band.
  * - Phones and tablets (below 1024): only a glass "Menu" button. It morphs leftwards into the
- *   capsule [ × | Work | Playground | About ]; the name and role slide out meanwhile.
+ *   capsule [ Work | Playground | About | × ]; the name and role slide out meanwhile.
  */
 import { withBase } from '../lib/url';
 import type { NavPage } from './SiteNav.astro';
@@ -34,9 +36,6 @@ const CLOSE =
 
 <div class="glass-nav" data-glass-nav>
   <nav class="glass-nav__capsule glass" aria-label="Primary" id="glass-menu" data-glass-capsule data-glass>
-    <button class="glass-nav__close" type="button" aria-label="Close menu" data-glass-close>
-      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
-    </button>
     <span class="glass-nav__pill" aria-hidden="true" data-glass-pill></span>
     {
       items.map((item) => (
@@ -50,6 +49,9 @@ const CLOSE =
         </a>
       ))
     }
+    <button class="glass-nav__close" type="button" aria-label="Close menu" data-glass-close>
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
+    </button>
   </nav>
   <button
     class="glass-nav__menu glass"
@@ -76,201 +78,170 @@ const CLOSE =
     right: 16px;
     display: flex;
     justify-content: flex-end;
-    --glass-h: 40px;
-    /* An almost clear white glass over a 21px blur (the tooltip's frost, 20% stronger), with the
-       page's own dark ink: stone on Home and Work, plum on Playground, blue on About. */
-    --tint: rgba(255, 255, 255, 0.14);
-    --ink: var(--color-stone-950);
-    --ink-soft: color-mix(in srgb, var(--color-stone-950) 78%, transparent);
-    --stroke: rgba(10, 10, 10, 0.1);
-    --rim: rgba(255, 255, 255, 0.8);
+    /* Phones (Glass Menu (Mobile)): capsule padding 4, tabs 6 apart and 33 tall, Menu button 40. */
+    --pad: 4px;
+    --gap: 6px;
+    --tab-h: 33px;
+    --menu-h: 40px;
+    /* Body tabs (light pages). */
+    --tab-idle: var(--color-neutral-950);
+    --tab-hover: var(--color-neutral-600);
+    --tab-press: var(--color-neutral-800);
+    --menu-ink: var(--color-stone-950);
+    --close-bg: rgba(13, 13, 5, 0.08);
+    --close-ink: var(--color-neutral-950);
   }
 
-  :global(html[data-page='playground']) .glass-nav {
-    --ink: var(--color-plum-950);
-    --ink-soft: color-mix(in srgb, var(--color-plum-950) 78%, transparent);
-  }
-
-  :global(html[data-page='about']) .glass-nav {
-    --ink: var(--color-blue-950);
-    --ink-soft: color-mix(in srgb, var(--color-blue-950) 78%, transparent);
-  }
-
-  /* Over the dark hero and footer (set by glass-nav.ts): white text, as on the tooltip. */
+  /* Hero tabs: over the dark hero and footer (set by glass-nav.ts). */
   :global(html.glass-on-dark) .glass-nav {
-    --ink: var(--color-neutral-0);
-    --ink-soft: color-mix(in srgb, var(--color-neutral-0) 82%, transparent);
-    --stroke: rgba(255, 255, 255, 0.14);
-    --rim: rgba(255, 255, 255, 0.45);
+    --tab-idle: var(--color-neutral-0);
+    --tab-hover: var(--color-neutral-400);
+    --tab-press: var(--color-neutral-600);
+    --menu-ink: var(--color-neutral-0);
+    --close-bg: rgba(255, 255, 255, 0.08);
+    --close-ink: var(--color-neutral-0);
   }
 
   @media (min-width: 768px) {
     .glass-nav {
-      top: 20px;
+      top: 18px;
       right: max(32px, calc((100vw - 1200px) / 2));
-      --glass-h: 48px;
     }
   }
 
-  /* ===== The glass ===== */
-  .glass {
-    position: relative;
-    isolation: isolate;
-    height: var(--glass-h);
-    border: 0;
-    border-radius: 999px;
-    background: var(--tint);
-    /* 20% more frost than the tooltip's 17.5px. */
-    -webkit-backdrop-filter: blur(21px) saturate(1.2);
-    backdrop-filter: blur(21px) saturate(1.2);
-    text-shadow: 0 1px 2px rgba(23, 31, 9, 0.1);
-    box-shadow:
-      0 0 0 0.5px var(--stroke),
-      0 6px 20px rgba(10, 10, 10, 0.08),
-      inset 0 0 12px rgba(255, 255, 255, 0.08);
-    transition:
-      background-color 0.3s ease,
-      box-shadow 0.3s ease;
+  /* Desktop (Glass Menu (Desktop)): padding 6, tabs 6 apart and 40 tall, 52 overall. */
+  @media (min-width: 1024px) {
+    .glass-nav {
+      --pad: 6px;
+      --tab-h: 40px;
+    }
   }
 
-  /* Specular rim: a 1px ring that catches light at the top left and bottom right, as a curved
-     glass edge would. Drawn as a gradient masked to the border box minus the padding box. */
-  .glass::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    padding: 1px;
-    border-radius: inherit;
-    background: linear-gradient(
-      150deg,
-      var(--rim) 0%,
-      rgba(255, 255, 255, 0.12) 28%,
-      rgba(255, 255, 255, 0) 50%,
-      rgba(255, 255, 255, 0.1) 72%,
-      color-mix(in srgb, var(--rim) 70%, transparent) 100%
-    );
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#000 0 0) content-box exclude,
-      linear-gradient(#000 0 0);
-    pointer-events: none;
+  /* ===== The glass (same on every background) ===== */
+  .glass {
+    position: relative;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(236, 236, 236, 0.2);
+    -webkit-backdrop-filter: blur(21px);
+    backdrop-filter: blur(21px);
+    box-shadow:
+      0 0 0 0.5px rgba(10, 10, 10, 0.1),
+      0 6px 20px rgba(10, 10, 10, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 0 12px rgba(255, 255, 255, 0.08);
   }
 
   /* ===== Capsule ===== */
   .glass-nav__capsule {
     display: flex;
     align-items: center;
-    padding: 4px;
-    gap: 0;
+    gap: var(--gap);
+    padding: var(--pad);
   }
 
+  /* Tab: Nav/Default, 8 x 20 padding. */
   .glass-nav__item {
     position: relative;
     z-index: 1;
     display: grid;
     place-items: center;
-    height: calc(var(--glass-h) - 8px);
-    padding: 0 16px;
+    height: var(--tab-h);
+    padding: 0 20px;
     border-radius: 999px;
-    color: var(--ink-soft);
+    color: var(--tab-idle);
     font-family: var(--type-nav-family);
-    font-size: 15px;
-    line-height: 17px;
-    letter-spacing: -0.01em;
+    font-size: var(--type-nav-size);
+    line-height: var(--type-nav-line-height);
+    letter-spacing: var(--type-nav-tracking);
+    font-weight: 400;
     text-decoration: none;
     white-space: nowrap;
     transition: color 0.3s ease;
     -webkit-tap-highlight-color: transparent;
   }
 
-  .glass-nav__item:hover {
-    color: var(--ink);
+  @media (hover: hover) and (pointer: fine) {
+    .glass-nav__item:hover {
+      color: var(--tab-hover);
+    }
   }
 
-  /* The item over the bright pill: Lime/900, Medium, on any background. */
+  .glass-nav__item:active {
+    color: var(--tab-press);
+  }
+
+  /* Selected: Nav/Active (Regular) Neutral/950 on the bright pill, on any background. */
   .glass-nav__item.is-target {
-    color: var(--color-lime-900);
-    font-weight: 500;
-    text-shadow: none;
+    color: var(--color-neutral-950);
   }
 
   .glass-nav__item:focus-visible,
   .glass-nav__close:focus-visible,
   .glass-nav__menu:focus-visible {
-    outline: 2px solid var(--ink);
+    outline: 2px solid var(--tab-idle);
     outline-offset: 2px;
   }
 
-  /* The selection: a raised, near-white glass pill, as if closer to the light. A bright top edge and
-     rim, a faint lower highlight, and a soft shadow lift it off the toolbar. */
+  /* The selected pill (Tab(Body), Selected): raised, near-white glass, as if closer to the light. */
   .glass-nav__pill {
     position: absolute;
     z-index: 0;
-    top: 4px;
+    top: var(--pad);
     left: 0;
     width: 0;
-    height: calc(var(--glass-h) - 8px);
+    height: var(--tab-h);
     border-radius: 999px;
     background:
       linear-gradient(to bottom, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 60%),
       color-mix(in srgb, var(--color-lime-0) 72%, transparent);
-    -webkit-backdrop-filter: blur(8px) saturate(1.4) brightness(1.15);
-    backdrop-filter: blur(8px) saturate(1.4) brightness(1.15);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.35),
       inset 0 0 8px rgba(255, 255, 255, 0.45),
       0 0 0 0.5px rgba(255, 255, 255, 0.6),
-      0 0 0 1px rgba(13, 18, 2, 0.06),
       0 4px 12px rgba(10, 10, 10, 0.16),
       0 1px 2px rgba(10, 10, 10, 0.12);
     opacity: 0;
     transition:
       translate 0.42s cubic-bezier(0.3, 1.25, 0.5, 1),
       width 0.42s cubic-bezier(0.3, 1.25, 0.5, 1),
-      opacity 0.2s ease,
-      background-color 0.3s ease;
+      opacity 0.25s ease;
   }
 
   .glass-nav__pill.is-placed {
     opacity: 1;
   }
 
+  /* Close (phones and tablets): 32 round, at the right end of the open capsule. */
   .glass-nav__close {
     display: none;
     place-items: center;
     flex: none;
-    width: calc(var(--glass-h) - 8px);
-    height: calc(var(--glass-h) - 8px);
-    margin-right: 4px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     border: 0;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--ink) 8%, transparent);
-    color: var(--ink);
-    cursor: pointer;
-  }
-
-  .glass-nav__menu {
-    display: none;
-    padding: 0 18px;
-    color: var(--ink);
-    font-family: var(--type-nav-family);
-    font-size: 15px;
+    background: var(--close-bg);
+    color: var(--close-ink);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
 
-  @media (min-width: 1024px) {
-    .glass-nav__item {
-      font-size: 17px;
-      line-height: 20px;
-      padding: 0 20px;
-    }
+  /* Menu button (Glass Menu (Mobile), Collapsed): Nav/Default, 18 side padding, 40 tall. */
+  .glass-nav__menu {
+    display: none;
+    height: var(--menu-h);
+    padding: 0 18px;
+    color: var(--menu-ink);
+    font-family: var(--type-nav-family);
+    font-size: var(--type-nav-size);
+    line-height: var(--type-nav-line-height);
+    letter-spacing: var(--type-nav-tracking);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* ===== Phones and tablets: Menu button that morphs into the capsule ===== */
@@ -280,9 +251,7 @@ const CLOSE =
       position: absolute;
       top: 0;
       right: 0;
-      transition:
-        opacity 0.2s ease,
-        scale 0.3s ease;
+      transition: opacity 0.2s ease;
     }
 
     .glass-nav__close {
@@ -358,7 +327,6 @@ const CLOSE =
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .glass,
     .glass-nav__pill,
     .glass-nav__capsule,
     .glass-nav__capsule > *,
