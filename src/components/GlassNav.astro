@@ -127,14 +127,11 @@ const CLOSE =
     position: relative;
     border: 0;
     border-radius: 999px;
-    background: rgba(236, 236, 236, 0.2);
-    -webkit-backdrop-filter: blur(21px);
-    backdrop-filter: blur(21px);
-    box-shadow:
-      0 0 0 0.5px rgba(10, 10, 10, 0.1),
-      0 6px 20px rgba(10, 10, 10, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      inset 0 0 12px rgba(255, 255, 255, 0.08);
+    /* The design system's glass material (base.css). */
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--glass-shadow);
   }
 
   /* ===== Capsule ===== */
@@ -229,10 +226,27 @@ const CLOSE =
     padding: 0;
     border: 0;
     border-radius: 999px;
-    background: var(--close-bg);
+    /* The shared glass × (as .overlay-close), so it stands out inside the capsule too. */
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--glass-shadow);
     color: var(--close-ink);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 0.3s ease,
+      scale 0.16s var(--motion-ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .glass-nav__close:hover {
+      background: var(--glass-fill-hover);
+    }
+  }
+
+  .glass-nav__close:active {
+    scale: 0.94;
   }
 
   /* Menu button (Glass Menu (Mobile), Collapsed): Nav/Default, 18 side padding, 40 tall. */

@@ -1,7 +1,7 @@
 ---
 /**
  * Polaroid (Figma "Components" 4031:3204, frames Polaroid-*).
- * The exported PNGs are 512x576 with a soft shadow baked in; the card itself fills
+ * The exported PNGs are 931x1047 (4x) with a soft shadow baked in; the card itself fills
  * x 21.7–78.3%, y 18.4–79.9% of the image. The shine is clipped to that card.
  * Size it with font-size or the --pol-w / --pol-h custom properties on the parent.
  * Interactions (hover 1.1x, tap pop 1.2x + shimmer) live in src/scripts/polaroid.ts.
@@ -30,7 +30,8 @@ const photos = {
 
 interface Props {
   photo: keyof typeof photos;
-  /** Rendered width of the whole PNG box in CSS px, used for the srcset `sizes` hint. */
+  /** Rendered width of the whole PNG box in CSS px, used for the srcset `sizes` hint
+      (raised 20% so the tap pop to 1.2x stays sharp). */
   displayWidth?: number;
   class?: string;
   eager?: boolean;
@@ -55,8 +56,8 @@ const revealStyle = revealDelay !== undefined ? `--reveal-delay: ${revealDelay}m
       class="polaroid__img"
       src={photos[photo]}
       formats={['avif', 'webp']}
-      widths={[128, 192, 256, 384, 512]}
-      sizes={`${displayWidth}px`}
+      widths={[192, 256, 384, 512, 768, 931]}
+      sizes={`${Math.round(displayWidth * 1.2)}px`}
       alt=""
       loading={eager ? 'eager' : 'lazy'}
       fetchpriority={eager ? 'high' : undefined}

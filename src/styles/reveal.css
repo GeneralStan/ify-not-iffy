@@ -156,56 +156,59 @@
   to { transform: translateX(100%); }
 }
 
-/* Case study placeholder while it loads in place (case-sheet.ts). Mirrors the inner page: hero image,
-   title, facts, then a block of text. */
-.case-skeleton {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  width: min(1024px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 72px 0 120px;
-}
-
-.case-skeleton .skel {
+/* Case study skeleton while it loads in place (case-sheet.ts). Built from the inner page's own
+   layout classes (rail, main, hero), so the hero box matches the real one; these only size the
+   grey blocks. */
+.case-layout--loading .skel {
   border-radius: 8px;
 }
 
-.case-skeleton .skel--hero {
-  width: 100%;
-  aspect-ratio: 1024 / 400;
+.case-layout--loading .study-media--hero.skel {
   border-radius: 20px;
 }
 
-.case-skeleton .skel--title {
+.case-layout--loading .skel--toc {
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+}
+
+.case-layout--loading .skel--toc:nth-child(2n) {
+  width: 70%;
+}
+
+.case-layout--loading .skel--title {
   width: min(720px, 90%);
   height: 40px;
-  margin-top: 16px;
 }
 
-.case-skeleton .skel--title-2 {
+.case-layout--loading .skel--title-2 {
   width: min(480px, 70%);
   height: 40px;
+  margin-top: -16px;
 }
 
-.case-skeleton .skel--facts {
+.case-layout--loading .skel--facts {
   width: min(520px, 90%);
   height: 52px;
 }
 
-.case-skeleton .skel--line {
+.case-skeleton__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding-top: 72px;
+}
+
+.case-layout--loading .skel--line {
   width: min(720px, 100%);
   height: 16px;
 }
 
-.case-skeleton .skel--line-short {
+.case-layout--loading .skel--line-short {
   width: min(520px, 75%);
   height: 16px;
-}
-
-.case-skeleton .skel--gap {
-  margin-top: 56px;
 }
 
 @media (prefers-reduced-motion: reduce) {

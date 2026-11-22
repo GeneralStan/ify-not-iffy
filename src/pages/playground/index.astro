@@ -75,8 +75,9 @@ const CLOSE =
    *   zoomed, while the board is off screen, and for reduced motion. The empty board keeps drifting,
    *   even while it is being dragged.
    * - Drag sideways to pan (with a little glide); up and down swipes scroll the page.
-   * - Tap or select a card: it zooms to fit the screen (never past its real size) over a frosted
-   *   backdrop; close with the outlined ×, Escape, or a tap on the backdrop.
+   * - Tap or select a card: it grows to fit the screen (never past its real size), then a frosted
+   *   backdrop fades in behind it; closing runs it backwards (backdrop first, then the card goes
+   *   home). Close with the glass ×, Escape, or a tap on the backdrop or the card.
    */
   const canvas = document.querySelector<HTMLElement>('[data-play-canvas]');
   const board = canvas?.querySelector<HTMLElement>('[data-play-board]');
@@ -231,6 +232,9 @@ const CLOSE =
       overlay.append(backdrop, clone, close);
       document.body.append(overlay);
       document.documentElement.classList.add('has-play-zoom');
+      const swallow = (event: Event) => event.preventDefault();
+      overlay.addEventListener('wheel', swallow, { passive: false });
+      overlay.addEventListener('touchmove', swallow, { passive: false });
 
       const w = clone.offsetWidth;
       const h = clone.offsetHeight;
@@ -267,7 +271,7 @@ const CLOSE =
           );
         };
         if (reduced.matches) finish();
-        else window.setTimeout(finish, 400);
+        else window.setTimeout(finish, 600); // 160ms behind the backdrop, then 420ms home
       }
       const onKey = (event: KeyboardEvent) => {
         if (event.key === 'Escape') done();

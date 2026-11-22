@@ -442,8 +442,10 @@
 }
 
 /* ===== Shared overlay close (case studies, Playground images) =====
-   The menu's × (Figma Glass Menu close): round, an 8% fill and a 20px ×, at 40px so it is easy to
-   hit on its own. Dark ink on light pages; white over the dark hero and footer (html.glass-on-dark). */
+   The round × in the design system's glass material (base.css; the phone Menu button's look): a
+   light fill over a blur, a hairline, a soft shadow and a bright top edge, 40px with a 20px ×, so
+   it stands out over any backdrop. Dark ink on light pages; white over the dark hero and footer
+   (html.glass-on-dark). Presses in slightly. */
 .overlay-close {
   display: grid;
   place-items: center;
@@ -452,24 +454,30 @@
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: rgba(13, 13, 5, 0.08);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
   color: var(--color-neutral-950);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    scale 0.16s var(--motion-ease-out);
 }
 
-.overlay-close:hover {
-  background: rgba(13, 13, 5, 0.14);
+@media (hover: hover) and (pointer: fine) {
+  .overlay-close:hover {
+    background: var(--glass-fill-hover);
+  }
+}
+
+.overlay-close:active {
+  scale: 0.94;
 }
 
 html.glass-on-dark .overlay-close {
-  background: rgba(255, 255, 255, 0.08);
   color: var(--color-neutral-0);
-}
-
-html.glass-on-dark .overlay-close:hover {
-  background: rgba(255, 255, 255, 0.16);
 }
 
 .overlay-close:focus-visible {
@@ -566,13 +574,6 @@ html.glass-on-dark .overlay-close:hover {
   border-radius: inherit;
 }
 
-.case-sheet__loading {
-  margin: 0;
-  padding: 120px 16px;
-  text-align: center;
-  color: var(--color-neutral-700);
-}
-
 /* The hero clears the handle inside the sheet. */
 .case-sheet .case-hero {
   padding-top: 40px;
@@ -597,7 +598,6 @@ html.glass-on-dark .overlay-close:hover {
   html.glass-on-dark .case-sheet__close {
     top: 40px;
     left: 40px;
-    background: rgba(13, 13, 5, 0.08);
     color: var(--color-neutral-950);
   }
 
@@ -606,14 +606,139 @@ html.glass-on-dark .overlay-close:hover {
   }
 }
 
-/* The page underneath stays put while the overlay is open; its pinned blur band is not needed. */
-html.has-case-sheet,
-html.has-case-sheet body {
-  overflow: hidden;
-}
-
+/* While the overlay is open the page underneath is not scroll-locked with overflow:hidden (that
+   dropped the scrollbar and reflowed Home on desktop, and moved Safari's toolbar mid-slide);
+   case-sheet.ts swallows scrolling outside the sheet instead. Home's own motion pauses, so the
+   frosted backdrop is not re-blurred every frame, and its pinned blur band is not needed. */
 html.has-case-sheet .nav-edge {
   display: none;
+}
+
+html.has-case-sheet :is(.hero, main, .site-footer) *,
+html.has-case-sheet :is(.hero, main, .site-footer) *::before,
+html.has-case-sheet :is(.hero, main, .site-footer) *::after {
+  animation-play-state: paused !important;
+}
+
+/* The backdrop only gets its own layer while it fades; once a desktop drawer has settled it covers
+   the whole window, so the blur under it is switched off until the close starts. */
+.case-sheet:not(.is-settled) .case-sheet__backdrop {
+  will-change: opacity;
+}
+
+@media (min-width: 1024px) {
+  .case-sheet.is-settled .case-sheet__backdrop {
+    visibility: hidden;
+  }
+}
+
+/* Swallow touch scrolling on the backdrop, handle and × (the sheet's scroller keeps its own). */
+.case-sheet__backdrop,
+.case-sheet__close {
+  touch-action: none;
+}
+
+.case-sheet__scroll:focus {
+  outline: none;
+}
+
+/* ===== Scroll edges inside the drawer and sheet =====
+   As on the pinned nav band: a soft Stone/0 wash over two masked blur layers, so content passing
+   under the top (handle, ×) and bottom edges softens instead of being cut. Each edge shows only
+   when there is content beyond it (case-sheet.ts sets .has-above / .has-below on the panel). */
+.sheet-edge {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  height: 64px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms var(--motion-ease-fade);
+}
+
+.sheet-edge--top {
+  top: 0;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, rgba(254, 253, 251, 0.85), rgba(254, 253, 251, 0.55) 45%, transparent);
+}
+
+.sheet-edge--bottom {
+  bottom: 0;
+  height: 56px;
+  background: linear-gradient(to top, rgba(254, 253, 251, 0.85), rgba(254, 253, 251, 0.55) 45%, transparent);
+}
+
+.sheet-edge span {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.sheet-edge span:first-child {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.sheet-edge span:last-child {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.sheet-edge--top span:first-child {
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+
+.sheet-edge--top span:last-child {
+  mask-image: linear-gradient(to bottom, #000 25%, transparent 70%);
+}
+
+.sheet-edge--bottom span:first-child {
+  mask-image: linear-gradient(to top, #000 55%, transparent);
+}
+
+.sheet-edge--bottom span:last-child {
+  mask-image: linear-gradient(to top, #000 25%, transparent 70%);
+}
+
+.case-sheet__panel.has-above .sheet-edge--top,
+.case-sheet__panel.has-below .sheet-edge--bottom {
+  opacity: 1;
+}
+
+/* Desktop: only over the content column; the Stone/50 rail and its nav stay crisp. */
+@media (min-width: 1024px) {
+  .sheet-edge {
+    left: 216px;
+  }
+
+  .sheet-edge--top {
+    height: 96px;
+  }
+}
+
+/* ===== Card image glide (case-sheet.ts fly()) =====
+   A fixed copy of the card's media flies between the card and the hero box. The box grows into
+   the hero's shape; the content inside keeps its size and only scales uniformly, centred. */
+.case-ghost {
+  position: fixed;
+  z-index: 101;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--color-stone-100);
+  contain: layout paint;
+}
+
+.case-ghost .case-ghost__media {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  aspect-ratio: auto;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
 }
 
 @media (prefers-reduced-motion: reduce) {

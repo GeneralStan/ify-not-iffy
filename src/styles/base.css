@@ -1,3 +1,17 @@
+/* ===== Glass material (design system default; Figma Button set 2064:3578, Material=Glass) =====
+   Taken from the phone Menu button: a 20% light fill over a 21px blur, a 0.5px hairline, a soft
+   drop shadow and a bright top-edge highlight. Used by the glass nav and every round ×. */
+:root {
+  --glass-fill: rgba(236, 236, 236, 0.2);
+  --glass-fill-hover: rgba(236, 236, 236, 0.38);
+  --glass-blur: 21px;
+  --glass-shadow:
+    0 0 0 0.5px rgba(10, 10, 10, 0.1),
+    0 6px 20px rgba(10, 10, 10, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
 html {
   background: var(--color-bg);
   color: var(--color-text);
