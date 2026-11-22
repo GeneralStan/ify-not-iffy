@@ -41,7 +41,7 @@ const CLOSE =
                 aria-label={copy === 0 ? `Zoom in on project ${i + 1}: ${card.tags.join(', ')}` : undefined}
                 style={`--x: ${card.x + copy * PLAYGROUND_PERIOD}; --y: ${card.y}; --w: ${card.w}; --media-h: ${card.mediaH};`}
               >
-                <span class="play-card__media">
+                <span class="play-card__media" data-skeleton>
                   {card.image && <img src={card.image.src} alt="" loading="lazy" decoding="async" draggable="false" />}
                 </span>
                 <span class="play-card__tags text-meta-lg">
@@ -247,7 +247,7 @@ const CLOSE =
         overlay.classList.add('is-open');
         clone.style.transform = to;
       });
-      close.focus({ preventScroll: true });
+      (window as unknown as { __ifyFocus?: (c: HTMLElement | null, k?: HTMLElement | null) => void }).__ifyFocus?.(close, overlay);
 
       let closing = false;
       function done() {
@@ -261,7 +261,10 @@ const CLOSE =
           document.documentElement.classList.remove('has-play-zoom');
           document.removeEventListener('keydown', onKey);
           zoomed = false;
-          (card.getAttribute('tabindex') === '-1' ? canvas! : card).focus({ preventScroll: true });
+          (window as unknown as { __ifyFocus?: (c: HTMLElement | null, k?: HTMLElement | null) => void }).__ifyFocus?.(
+            card.getAttribute('tabindex') === '-1' ? canvas! : card,
+            null,
+          );
         };
         if (reduced.matches) finish();
         else window.setTimeout(finish, 400);

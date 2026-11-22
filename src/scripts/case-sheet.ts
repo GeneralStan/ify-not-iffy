@@ -25,6 +25,9 @@ const CLOSE_PATH =
 declare global {
   interface Window {
     __caseSheet?: { open: boolean; close: (fromHistory?: boolean) => void };
+    /** BaseLayout.astro: focus the control for keyboard users, else the container (no ring). */
+    __ifyFocus?: (control: HTMLElement | null, container?: HTMLElement | null) => void;
+    __ifySkeleton?: (scope?: ParentNode) => void;
   }
 }
 
@@ -34,8 +37,14 @@ let lastFocus: HTMLElement | null = null;
 let pageTitle = document.title;
 let tocCleanup: (() => void) | null = null;
 
-/** Exit takes a little less time than entry (matches the CSS in case-study.css). */
-const exitMs = () => (reduced.matches ? 0 : desktop.matches ? 380 : 320);
+/** Matches the 500ms drawer transition in case-study.css. */
+const exitMs = () => (reduced.matches ? 0 : 500);
+
+/* Safari's top bar can't show a translucent colour, so while the overlay is open it gets the
+   overlay pre-blended over the page: Stone/950 at 20% over Stone/0. */
+const themeMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+const themeDefault = themeMeta?.content ?? '';
+const setTheme = (open: boolean) => themeMeta && (themeMeta.content = open ? '#CECDCA' : themeDefault);
 
 /* ---------- Drag the sheet down by its handle (phones and tablets) ---------- */
 function attachDrag(panel: HTMLElement, onClose: () => void) {
@@ -47,10 +56,13 @@ function attachDrag(panel: HTMLElement, onClose: () => void) {
   let velocity = 0;
   let dragging = false;
 
+  let pointer: number | null = null;
+
   const onMove = (event: PointerEvent) => {
+    if (event.pointerId !== pointer) return;
     const dy = event.clientY - startY;
     if (!dragging) {
-      if (dy < 4) return;
+      if (Math.abs(dy) < 4) return;
       dragging = true;
       panel.classList.add('is-dragging');
     }
@@ -58,10 +70,15 @@ function attachDrag(panel: HTMLElement, onClose: () => void) {
     velocity = (event.clientY - lastY) / dt;
     lastY = event.clientY;
     lastT = event.timeStamp;
-    panel.style.translate = `0 ${Math.max(0, dy)}px`;
+    // Down follows the finger; up (the wrong way) is damped, moving less the further you pull.
+    const y = dy >= 0 ? dy : -8 * Math.log1p(-dy / 8);
+    // Set the transform directly (no CSS variable), so a drag never restyles the content.
+    panel.style.translate = `0 ${y}px`;
   };
 
   const onUp = (event: PointerEvent) => {
+    if (event.pointerId !== pointer) return;
+    pointer = null;
     grab.removeEventListener('pointermove', onMove);
     if (!dragging) return;
     dragging = false;
@@ -73,6 +90,8 @@ function attachDrag(panel: HTMLElement, onClose: () => void) {
 
   grab.addEventListener('pointerdown', (event) => {
     if (desktop.matches || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    if (pointer !== null) return; // a second finger mid-drag is ignored
+    pointer = event.pointerId;
     startY = lastY = event.clientY;
     lastT = event.timeStamp;
     velocity = 0;
@@ -82,8 +101,8 @@ function attachDrag(panel: HTMLElement, onClose: () => void) {
       /* capture is a nicety */
     }
     grab.addEventListener('pointermove', onMove);
-    grab.addEventListener('pointerup', onUp, { once: true });
-    grab.addEventListener('pointercancel', onUp, { once: true });
+    grab.addEventListener('pointerup', onUp);
+    grab.addEventListener('pointercancel', onUp);
   });
 }
 
@@ -161,8 +180,11 @@ function chrome() {
   grab.append(el('span', 'case-sheet__handle'));
   const scroll = el('div', 'case-sheet__scroll');
   scroll.dataset.sheetScroll = '';
-  const loading = el('p', 'case-sheet__loading text-body');
-  loading.textContent = 'Loading…';
+  // Skeleton of the inner page until the content arrives (reveal.css).
+  const loading = el('div', 'case-skeleton', { role: 'status', 'aria-label': 'Loading case study' });
+  ['hero', 'title', 'title-2', 'facts', 'line skel--gap', 'line', 'line', 'line-short'].forEach((kind) =>
+    loading.append(el('div', `skel ${kind.split(' ').map((k) => (k.startsWith('skel') ? k : `skel--${k}`)).join(' ')}`)),
+  );
   scroll.append(loading);
   panel.append(grab, closeButton(), scroll);
   node.append(backdrop, panel);
@@ -173,6 +195,7 @@ function chrome() {
 function wire(node: HTMLElement) {
   sheet = node;
   root.classList.add('has-case-sheet');
+  setTheme(true);
   window.__caseSheet = { open: true, close };
   node.querySelectorAll<HTMLElement>('[data-sheet-close]').forEach((control) =>
     control.addEventListener('click', (event) => {
@@ -183,7 +206,7 @@ function wire(node: HTMLElement) {
   const panel = node.querySelector<HTMLElement>('.case-sheet__panel');
   if (panel) attachDrag(panel, () => close());
   requestAnimationFrame(() => requestAnimationFrame(() => node.classList.add('is-open')));
-  node.querySelector<HTMLElement>('.case-sheet__close')?.focus({ preventScroll: true });
+  window.__ifyFocus?.(node.querySelector<HTMLElement>('.case-sheet__close'), node.querySelector<HTMLElement>('.case-sheet__panel'));
 }
 
 function finishClose() {
@@ -194,6 +217,7 @@ function finishClose() {
   sheet?.remove();
   sheet = null;
   root.classList.remove('has-case-sheet');
+  setTheme(false);
   if (window.__caseSheet) window.__caseSheet.open = false;
   if (wasStatic) {
     // Opened by its own address: what's left is Home, so the address and title become Home's.
@@ -213,7 +237,6 @@ function close(fromHistory = false) {
     history.back();
     return;
   }
-  sheet.classList.add('is-closing');
   sheet.classList.remove('is-open');
   window.setTimeout(finishClose, exitMs());
 }
@@ -236,6 +259,7 @@ async function open(url: string, push = true) {
     node.setAttribute('aria-label', doc.title.split(' — ')[0] || 'Case study');
     document.title = doc.title;
     scroll.replaceChildren(document.importNode(layout, true));
+    window.__ifySkeleton?.(scroll);
     bindToc(scroll, scroll);
     scroll.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]').forEach((video) => {
       if (reduced.matches) return;

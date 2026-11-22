@@ -64,7 +64,7 @@ import geistSans from '../../node_modules/geist/dist/fonts/geist-sans/Geist-Vari
             var hedges = document.querySelector('[data-hedges="hero"]');
             if (hedges) hedges.classList.add('is-popped');
           }, 1150);
-          setTimeout(function () { root.classList.remove('intro-play'); }, 2700);
+          setTimeout(function () { root.classList.remove('intro-play'); }, 4600);
         }
         function whenParsed() {
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
@@ -75,6 +75,24 @@ import geistSans from '../../node_modules/geist/dist/fonts/geist-sans/Geist-Vari
         setTimeout(start, 2500);
       })();
     </script>}
+    <script is:inline>
+      // Input modality: remember whether the last interaction was the keyboard, so scripts that move
+      // focus (opening a menu, sheet or image) only put it on a control (with its ring) for keyboard
+      // users. After a tap or click they focus the overlay itself instead: screen readers still land
+      // inside it, and no focus ring appears.
+      (function () {
+        var keys = /^(Tab|Enter| |Escape|Arrow)/;
+        window.__ifyKeyboard = false;
+        addEventListener('keydown', function (e) { if (keys.test(e.key)) window.__ifyKeyboard = true; }, true);
+        addEventListener('pointerdown', function () { window.__ifyKeyboard = false; }, true);
+        window.__ifyFocus = function (control, container) {
+          var target = window.__ifyKeyboard || !container ? control : container;
+          if (!target) return;
+          if (target === container && !container.hasAttribute('tabindex')) container.setAttribute('tabindex', '-1');
+          target.focus({ preventScroll: true });
+        };
+      })();
+    </script>
     <script is:inline>
       // Open at the top. Safari (and in-app browsers like WhatsApp's) restore the last scroll position
       // when a link reopens a page or on reload, which landed visitors at Selected projects instead of

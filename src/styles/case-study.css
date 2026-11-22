@@ -1,25 +1,28 @@
-/* ===== Case study (src/layouts/CaseStudy.astro, Figma "Inner Page draft 1" 4058:1340) =====
-   Drawn as an overlay over Home: a drawer from the right on desktop, a bottom sheet below 1024.
-   Inside: the 240 side nav (desktop) beside the content column. Content: Lime/900 header (title
-   Heading/Title Neutral/50; facts Meta Neutral/200 over Body/Large Neutral/50), then 944 sections:
-   120 above each, 56 between blocks. Section titles Heading/H1 Neutral/950; text Neutral/700;
-   eyebrows Meta/Large Lime/800; findings Heading/H4 + Body Stone/900; image blocks Stone/100. */
+/* ===== Case study content (src/layouts/CaseStudy.astro, Figma "Inner Page" 4110:3586) =====
+   Desktop: a 216 Stone/50 side column (the × sits at 40,40; the section nav from 120) beside the
+   content column, whose content is 1024 wide (100 each side). Sections start 120 below the one
+   before, 56 between blocks, a 720 divider between sections. Type uses the token classes, which
+   follow each style's Mobile mode on phones (H1 32/36, H2 Lead 24/32, H3 18/28, H4 18/24, Meta
+   14/20). Colours: titles Neutral/950 or Stone/900-950, text Neutral/700, labels Stone/600. */
 .case-layout {
   min-height: 100%;
   background: var(--color-stone-0);
   color: var(--color-neutral-700);
 }
 
-.case-main {
-  display: block;
-  min-width: 0;
-}
-
-/* ===== Side nav (Figma: Body/Small Neutral/700, current Label/Medium Neutral/950, 8 apart) ===== */
-.case-toc {
+.case-rail {
   display: none;
 }
 
+.case-main {
+  display: block;
+  min-width: 0;
+  width: min(1024px, calc(100% - 32px));
+  margin: 0 auto;
+  padding-bottom: 120px;
+}
+
+/* ===== Side nav (Label/Medium; current Stone/900, others Stone/600, 8 apart) ===== */
 .case-toc__list {
   list-style: none;
   margin: 0;
@@ -29,75 +32,100 @@
 }
 
 .case-toc__link {
-  font-family: var(--type-body-sm-family);
-  font-size: var(--type-body-sm-size);
-  line-height: var(--type-body-sm-line-height);
-  color: var(--color-neutral-700);
+  display: block;
+  color: var(--color-stone-600);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.case-toc__link:hover {
-  color: var(--color-neutral-950);
-}
-
+.case-toc__link:hover,
 .case-toc__link[aria-current] {
-  font-weight: var(--font-weight-medium);
-  font-size: var(--type-label-md-size);
-  line-height: var(--type-label-md-line-height);
-  letter-spacing: var(--type-label-md-tracking);
-  color: var(--color-neutral-950);
+  color: var(--color-stone-900);
 }
 
 @media (min-width: 1024px) {
   .case-layout {
     display: grid;
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: 216px minmax(0, 1fr);
+    background: linear-gradient(to right, var(--color-stone-50) 216px, var(--color-stone-0) 216px);
   }
 
-  /* Sticks inside the drawer's scroll area, level with the content below the header. */
-  .case-toc {
+  .case-rail {
     display: block;
     position: sticky;
     top: 0;
     align-self: start;
-    padding: 120px 16px 0 32px;
+    padding: 120px 40px 40px;
+  }
+
+  .case-main {
+    width: min(1024px, calc(100% - 200px));
   }
 }
 
-/* ===== Header ===== */
-.case-header {
+/* ===== Hero: image box, title, divider, facts ===== */
+.case-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 48px;
-  padding: 96px 16px 56px;
-  background: var(--color-lime-900);
+  gap: 40px;
+  padding-top: 56px;
   text-align: center;
+}
+
+.case-hero__media {
+  margin: 0;
+  width: 100%;
+}
+
+.case-hero__media .study-media.study-media--hero {
+  aspect-ratio: 1024 / 400;
+  min-height: 0;
+  border: 0;
+  border-radius: 20px;
+  background: var(--color-stone-100);
+  display: grid;
+  place-items: center;
+}
+
+/* Phones: the 1024x400 ratio is too thin at 358 wide, so the hero box is 3:2. */
+@media (max-width: 767px) {
+  .case-hero__media .study-media.study-media--hero {
+    aspect-ratio: 3 / 2;
+  }
+}
+
+.case-hero__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
 }
 
 .case-title {
   margin: 0;
-  max-width: 944px;
-  color: var(--color-neutral-50);
+  color: var(--color-stone-950);
 }
 
+/* Alpha/Border/Divider (#E3E3E3 at 60%) at 60%, 720 wide, round caps. */
+.case-divider {
+  width: min(720px, 100%);
+  height: 1px;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 1px;
+  background: rgba(227, 227, 227, 0.36);
+}
+
+/* Role / Platform / Tools: Meta/Medium Stone/600 over Body/Large Stone/900, 40 apart. */
 .case-facts {
   margin: 0;
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 40px;
   text-align: left;
-}
-
-@media (min-width: 768px) {
-  .case-facts {
-    width: auto;
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-  }
 }
 
 .case-facts div {
@@ -107,110 +135,125 @@
 }
 
 .case-facts dt {
-  color: var(--color-neutral-200);
+  color: var(--color-stone-600);
 }
 
 .case-facts dd {
   margin: 0;
-  color: var(--color-neutral-50);
-}
-
-@media (min-width: 1024px) {
-  .case-header {
-    min-height: 480px;
-    justify-content: center;
-    gap: 80px;
-    padding: 90px 100px;
-  }
+  color: var(--color-stone-900);
 }
 
 /* ===== Sections ===== */
-.case-body {
-  width: min(944px, calc(100% - 32px));
-  margin-inline: auto;
-  padding-bottom: 120px;
-}
-
 .case-section {
-  padding-top: 72px;
   display: flex;
   flex-direction: column;
   gap: 40px;
+  padding-top: 72px;
   scroll-margin-top: 0;
 }
 
+/* The divider between sections (and under the hero). */
+.case-hero::after,
+.case-section + .case-section::before {
+  content: '';
+  display: block;
+  width: min(720px, 100%);
+  height: 1px;
+  margin: 0 auto;
+  border-radius: 1px;
+  background: rgba(227, 227, 227, 0.36);
+}
+
+.case-hero::after {
+  margin-top: 32px;
+}
+
+.case-section + .case-section::before {
+  margin-bottom: 32px;
+}
+
 @media (min-width: 1024px) {
+  .case-hero {
+    padding-top: 40px;
+  }
+
   .case-section {
-    padding-top: 120px;
     gap: 56px;
+    padding-top: 120px;
+  }
+
+  .case-section + .case-section {
+    padding-top: 0;
+  }
+
+  .case-hero::after {
+    margin-top: 80px;
+  }
+
+  .case-section + .case-section::before {
+    margin-bottom: 64px;
   }
 }
 
-.case-block {
+.case-section__title {
+  margin: 0;
+  text-align: center;
+  color: var(--color-neutral-950);
+}
+
+.case-intro {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.case-lead {
+  margin: 0;
+  width: min(720px, 100%);
+  color: var(--color-neutral-700);
+}
+
+/* ===== What we uncovered: three findings, 32 apart; icon, H4 and body centred ===== */
+.case-findings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 24px;
 }
 
-.case-block--tight {
-  gap: 16px;
-}
-
-.case-section__title,
-.case-subhead {
+.case-findings__title {
   margin: 0;
   color: var(--color-neutral-950);
 }
 
-.case-text {
-  margin: 0;
-  color: var(--color-neutral-700);
-}
-
-.case-eyebrow {
-  margin: 0;
-  color: var(--color-lime-800);
-}
-
-.case-statement {
-  margin: 0;
-  color: var(--color-neutral-950);
-}
-
-.case-statement--hmw {
-  color: var(--color-stone-700);
-}
-
-.case-visual {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.case-visual figcaption {
-  color: var(--color-neutral-700);
-}
-
-/* "What we uncovered": two columns of findings, 32 apart. */
 .findings {
   list-style: none;
   margin: 0;
   padding: 0;
+  width: 100%;
   display: grid;
   gap: 32px;
 }
 
 @media (min-width: 768px) {
   .findings {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 .finding {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
+  text-align: center;
+}
+
+.finding__icon {
+  margin-bottom: 8px;
+  color: var(--color-stone-600);
 }
 
 .finding__title,
@@ -219,70 +262,150 @@
   color: var(--color-stone-900);
 }
 
-/* ===== Design decisions ===== */
-.decision-list {
+/* ===== Problem statement: Stone/100 card, label, How Might We in H1, optional art top right ===== */
+.case-statement {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  min-height: 220px;
+  padding: 24px;
+  border-radius: 8px;
+  background: var(--color-stone-100);
+  overflow: hidden;
+}
+
+.case-statement__label {
+  margin: 0;
+  color: var(--color-stone-600);
+}
+
+.case-statement__text {
+  margin: 0;
+  max-width: 653px;
+  color: var(--color-stone-900);
+}
+
+.case-statement__art {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.case-statement--art .case-statement__text {
+  max-width: calc(100% - 120px);
+}
+
+@media (min-width: 1024px) {
+  .case-statement {
+    min-height: 300px;
+    padding: 40px;
+  }
+
+  .case-statement__art {
+    width: 200px;
+    height: 200px;
+  }
+
+  .case-statement--art .case-statement__text {
+    max-width: 653px;
+  }
+}
+
+/* ===== Numbered steps (1.0, 1.1…): number Meta/Medium Stone/600 over H3 Stone/900, 16 to the
+   body, 24 to the images; steps 56 apart ===== */
+.case-steps {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 72px;
+  gap: 56px;
 }
 
-@media (min-width: 1024px) {
-  .decision-list {
-    gap: 56px;
-  }
-}
-
-.decision {
+.case-step {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.decision__parts {
+.case-step__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 676px;
+}
+
+.case-step__number {
   margin: 0;
+  color: var(--color-stone-600);
+}
+
+.case-step__title {
+  margin: 0;
+  color: var(--color-stone-900);
+}
+
+.case-step__body {
+  margin: -8px 0 0;
+  color: var(--color-neutral-700);
+}
+
+/* ===== Image blocks: Stone/100 with a Stone/150 edge, 400 tall at 1024 (radius 8); captions
+   Body/Default Neutral/700, 8 below; pairs 20 apart ===== */
+.case-visual {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.case-visual .study-media.study-media--slot {
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+}
+
+.case-visual--framed .study-media.study-media--slot {
+  border-color: rgba(227, 227, 227, 0.4);
+  border-radius: 12px;
+}
+
+.case-visual figcaption {
+  color: var(--color-neutral-700);
+}
+
+.case-pair {
   display: grid;
   gap: 20px;
 }
 
-.decision__parts div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+@media (min-width: 768px) {
+  .case-visual--wide .study-media.study-media--slot {
+    aspect-ratio: 1024 / 400;
+  }
 
-.decision__parts dt {
-  color: var(--color-neutral-950);
-}
+  .case-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
-.decision__parts dd {
-  margin: 0;
-  color: var(--color-neutral-700);
-}
-
-.considered {
-  margin: 0;
-  padding-left: 1.2em;
-  display: grid;
-  gap: 8px;
-}
-
-.considered__name {
-  color: var(--color-neutral-950);
-  font-weight: var(--font-weight-medium);
-}
-
-.decision .study-media--slot {
-  border-radius: 12px;
+  .case-pair .study-media.study-media--slot {
+    aspect-ratio: 462 / 400;
+  }
 }
 
 /* ===== Pager ===== */
 .case-pager {
   margin-top: 120px;
   padding-top: 32px;
-  border-top: 1.5px solid var(--color-stone-200);
+  border-top: 1px solid rgba(227, 227, 227, 0.6);
   display: flex;
   justify-content: space-between;
   gap: 24px;
@@ -297,7 +420,7 @@
 }
 
 .case-pager__move .text-meta {
-  color: var(--color-neutral-700);
+  color: var(--color-stone-600);
 }
 
 .case-pager__move--next {
@@ -316,10 +439,6 @@
   border-radius: 4px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-}
-
-.case-header .is-tbd {
-  background: color-mix(in srgb, var(--color-lime-300) 22%, transparent);
 }
 
 /* ===== Shared overlay close (case studies, Playground images) =====
@@ -391,7 +510,9 @@ html.glass-on-dark .overlay-close:hover {
   background: var(--color-stone-0);
   box-shadow: 0 -8px 32px rgba(10, 10, 10, 0.18);
   translate: 0 100%;
-  transition: translate 480ms var(--motion-ease-enter);
+  /* Emil Kowalski's drawer curve (Vaul, from Ionic: close to iOS sheets), 500ms in and out. A CSS
+     transition (not keyframes) so a close mid-opening reverses smoothly from where it is. */
+  transition: translate 500ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .case-sheet.is-open .case-sheet__backdrop {
@@ -402,12 +523,9 @@ html.glass-on-dark .overlay-close:hover {
   translate: 0 0;
 }
 
-.case-sheet.is-closing .case-sheet__panel {
-  transition: translate 320ms cubic-bezier(0.7, 0, 0.84, 0);
-}
-
-.case-sheet.is-closing .case-sheet__backdrop {
-  transition-duration: 0.3s;
+.case-sheet__backdrop {
+  transition-duration: 500ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .case-sheet__panel.is-dragging {
@@ -455,37 +573,36 @@ html.glass-on-dark .overlay-close:hover {
   color: var(--color-neutral-700);
 }
 
-/* The header clears the handle inside the sheet. */
-.case-sheet .case-header {
-  padding-top: 56px;
+/* The hero clears the handle inside the sheet. */
+.case-sheet .case-hero {
+  padding-top: 40px;
 }
 
 /* Desktop: a drawer from the right. */
 @media (min-width: 1024px) {
+  /* Full width (Figma Inner Page is the whole 1440 frame); slides in from the right. */
   .case-sheet__panel {
-    inset: 0 0 0 auto;
-    width: min(1384px, calc(100vw - 96px));
-    border-radius: 24px 0 0 24px;
+    inset: 0;
+    border-radius: 0;
     box-shadow: -12px 0 40px rgba(10, 10, 10, 0.16);
     translate: 100% 0;
-    transition-duration: 560ms;
-  }
-
-  .case-sheet.is-closing .case-sheet__panel {
-    transition: translate 380ms cubic-bezier(0.7, 0, 0.84, 0);
   }
 
   .case-sheet__grab {
     display: none;
   }
 
-  .case-sheet__close {
-    top: 24px;
-    left: -64px;
+  /* The × sits in the side column, 40 from its top and left, always dark on the Stone/50 column. */
+  .case-sheet__close,
+  html.glass-on-dark .case-sheet__close {
+    top: 40px;
+    left: 40px;
+    background: rgba(13, 13, 5, 0.08);
+    color: var(--color-neutral-950);
   }
 
-  .case-sheet .case-header {
-    padding-top: 90px;
+  .case-sheet .case-hero {
+    padding-top: 40px;
   }
 }
 

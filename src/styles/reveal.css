@@ -119,3 +119,104 @@
     scale: 1;
   }
 }
+
+/* ===== Skeleton loaders (src/scripts/skeleton.ts) =====
+   While its media loads, a container shows a Stone/100 block with a soft light sweeping across it
+   (transform only); the image fades in when it arrives. Reduced motion: a still block. */
+.is-skeleton,
+.skel {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-stone-100);
+}
+
+.is-skeleton img,
+.is-skeleton video {
+  opacity: 0;
+}
+
+[data-skeleton] img,
+[data-skeleton] video {
+  transition: opacity 0.4s var(--motion-ease-fade);
+}
+
+.is-skeleton::after,
+.skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.6) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: skel-sweep 1.4s var(--motion-ease-fade) infinite;
+  pointer-events: none;
+}
+
+@keyframes skel-sweep {
+  to { transform: translateX(100%); }
+}
+
+/* Case study placeholder while it loads in place (case-sheet.ts). Mirrors the inner page: hero image,
+   title, facts, then a block of text. */
+.case-skeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: min(1024px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 72px 0 120px;
+}
+
+.case-skeleton .skel {
+  border-radius: 8px;
+}
+
+.case-skeleton .skel--hero {
+  width: 100%;
+  aspect-ratio: 1024 / 400;
+  border-radius: 20px;
+}
+
+.case-skeleton .skel--title {
+  width: min(720px, 90%);
+  height: 40px;
+  margin-top: 16px;
+}
+
+.case-skeleton .skel--title-2 {
+  width: min(480px, 70%);
+  height: 40px;
+}
+
+.case-skeleton .skel--facts {
+  width: min(520px, 90%);
+  height: 52px;
+}
+
+.case-skeleton .skel--line {
+  width: min(720px, 100%);
+  height: 16px;
+}
+
+.case-skeleton .skel--line-short {
+  width: min(520px, 75%);
+  height: 16px;
+}
+
+.case-skeleton .skel--gap {
+  margin-top: 56px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-skeleton::after,
+  .skel::after {
+    animation: none;
+    display: none;
+  }
+
+  [data-skeleton] img,
+  [data-skeleton] video {
+    transition: none;
+  }
+}

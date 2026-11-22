@@ -79,7 +79,8 @@
   transition: translate 0.3s ease;
 }
 
-/* Card: Neutral/0, 1.5 border, radius 16, padding 24; image Stone/50 with a Stone/150 border;
+/* Card: Neutral/0, 1px Alpha/Border/Outline edge, radius 16, padding 24, Elevation 1 (Elevation 2 on
+   hover); image Stone/50 with a Stone/150 border;
    Meta/Large tags centred, 16 below the image. */
 .play-card {
   position: absolute;
@@ -93,8 +94,9 @@
   gap: 16px;
   padding: 24px;
   background: var(--color-neutral-0);
-  border: 1.5px solid rgba(227, 227, 227, 0.8);
+  border: 1px solid var(--border-outline);
   border-radius: var(--radius-md);
+  box-shadow: var(--elevation-1);
   color: var(--color-neutral-700);
   font: inherit;
   text-align: inherit;
@@ -105,7 +107,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .play-card:hover {
-    box-shadow: var(--shadow-card-hover);
+    box-shadow: var(--elevation-2);
   }
 }
 

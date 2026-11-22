@@ -35,6 +35,17 @@ a {
   outline-offset: 3px;
 }
 
+/* Focus rings are for keyboard and assistive-technology users only: a tap or click never leaves
+   one behind (scripts also move focus to the overlay itself, not its ×, when it was opened by
+   pointer; see focusFor in BaseLayout.astro). */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+[tabindex='-1']:focus {
+  outline: none;
+}
+
 .skip {
   position: absolute;
   left: var(--grid-margin);

@@ -102,8 +102,9 @@ const CLOSE =
     nav.classList.toggle('is-open', open);
     openButton.setAttribute('aria-expanded', String(open));
     if (!focus) return;
-    if (open) panel?.querySelector<HTMLElement>('.flap__link')?.focus({ preventScroll: true });
-    else openButton.focus({ preventScroll: true });
+    const focusTo = (window as unknown as { __ifyFocus?: (c: HTMLElement | null, k?: HTMLElement | null) => void }).__ifyFocus;
+    if (open) focusTo?.(panel?.querySelector<HTMLElement>('.flap__link') ?? null, panel ?? null);
+    else focusTo?.(openButton, null);
   }
 
   openButton?.addEventListener('click', () => setOpen(true));

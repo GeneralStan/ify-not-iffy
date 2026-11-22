@@ -1,6 +1,6 @@
 # Case Study Structure
 
-Replaces "Portfolio Case Study Structure" (Oct 12, 2026). Agreed Nov 21, 2026.
+Replaces "Portfolio Case Study Structure" (Oct 12, 2026). Agreed Nov 21, 2026; layout updated Nov 22, 2026 to Figma "Inner Page" (4110:3586).
 
 This is a mental model, not a set of fixed labels. Every case study is told in the same order so a reader always knows where they are, but each section can bend to fit the project.
 
@@ -10,17 +10,17 @@ It is written for two readers. The scanner gives it 30 seconds and reads the hea
 
 | Section | What it does | Length |
 | --- | --- | --- |
-| Header | Names the project and frames it | Title of 15 words max, plus four facts |
-| Overview | Summarises the whole case study | One short paragraph and a one-line outcome |
-| Defining the problem | Sets the stage for the decisions | Concise: a few paragraphs and the visuals that prove it |
-| Design decisions | The bulk of the page | 3 to 6 decisions, about 100 to 150 words each |
-| Learnings & reflections | What you took away, honestly | One short section |
+| Header | Hero image, the title, and three facts | Title of 15 words max, plus Role, Platform, Tools |
+| Overview | Summarises the whole case study | One short paragraph, then images |
+| Defining the problem | Sets the stage | What we uncovered (three findings), a problem statement, and the visuals that prove it |
+| Themed sections | The bulk of the page | One or more sections with their own titles (for example "How I built it", "Acting on delays"), each a run of numbered steps (1.0, 1.1, 2.0…) |
+| Key takeaways | What you took away, honestly | One short section |
 
 ## Header
 
+- **Hero:** a playground clip, a hero screen or a phone recording, matching what shipped, in the 1024x400 image box.
 - **Title:** names the product, the user problem and the intent, in 15 words or fewer. Never just "Driver App Redesign".
-- **Four facts:** Timeline, Role, Platform, Team. For example: 6 months · Lead Product Designer · Desktop · 1 PM, 3 engineers.
-- **Hero:** a playground clip, a hero screen or a phone recording, matching what shipped.
+- **Three facts:** Role, Platform, Tools. For example: Lead Product Designer · Web · Claude Code, MCPs, Figma.
 
 ## Overview
 
@@ -45,22 +45,19 @@ The Problem part of the story. Usually something had to be redesigned, simplifie
 
 Keep it concise. It sets the stage; it is not the story.
 
-## Design decisions
+## Themed sections and steps
 
-The bulk of the page. A decision is anything you chose on purpose: the big moves that answer the problem, and the smaller details that add polish and make the work worth showing. Both belong here.
+The bulk of the page. Group the work into one or more sections named for what they were about ("How I built it", "Acting on delays"). Each section is a run of numbered steps: section 1 gives 1.0, 1.1…, section 2 gives 2.0, 2.1…
 
-Each decision has an eyebrow ("Decision 01"), a title that says what you did and why, and a short body:
+A step is anything you chose on purpose: the big moves that answer the problem and the smaller details that add polish. Each step has:
 
-1. **What was wrong:** the problem this decision answers, with its evidence. For a polish detail, the friction it removes.
-2. **What I considered:** only when there were real alternatives. Name what you dropped and why. Do not invent options for small details.
-3. **What I did:** the choice, and the design moves that followed.
-4. **Result:** the measured result, the feedback, or the projected impact, marked as projected.
+1. **A title** that says what you did and why.
+2. **One short paragraph**: what was wrong (with its evidence), what you did, and what came of it (measured, feedback, or projected, marked as projected). Name the real alternatives you dropped only when there were some.
+3. **Images**: a full-width block, or two side by side (for example Before / After), each with an optional caption.
 
-Results live inside each decision. There is no separate results section; the Overview's outcome line sums them up.
+Results live inside each step. There is no separate results section.
 
-Visuals sit with the decision they prove. Caption or update any frame that differs from the live product.
-
-## Learnings & reflections
+## Key takeaways
 
 Talk honestly about what you learned, including the things that did not work. A reflection that only lists successes is a red flag: it suggests either no real difficulty, which nobody believes, or that the uncomfortable parts are being hidden.
 
@@ -83,8 +80,8 @@ It reads like one designer talking to another. Never write lines like "I learnt 
 
 ## On the site
 
-- Layout: Figma "Inner Page draft 1" (4058:1340) is the template for every case study. Its Dispatch Live Map copy is sample text only.
-- Side navigation lists the sections: Overview, Defining the problem, Design decisions, Learnings & reflections.
+- Layout: Figma "Inner Page" (4110:3586): a drawer over Home on desktop, a bottom sheet on phones.
+- Side navigation lists the sections: Overview, Defining the problem, each themed section by its title, Key takeaways.
 - Content: one Markdown file per case study in `src/content/work/`.
 
 ## Case study tracker

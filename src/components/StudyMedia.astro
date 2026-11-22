@@ -17,7 +17,7 @@ const mediaWebm = webm ? withBase(webm) : undefined;
 const mediaPoster = poster ? withBase(poster) : undefined;
 ---
 
-<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`]}>
+<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`]} data-skeleton={kind === 'placeholder' ? undefined : ''}>
   {
     kind === 'placeholder' && (
       <p class="study-media__label text-meta">{label}</p>

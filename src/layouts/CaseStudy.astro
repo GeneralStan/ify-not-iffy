@@ -1,13 +1,16 @@
 ---
 /**
- * Case study page, from Figma "Inner Page draft 1" (4058:1340). It is its own page with its own
- * address, drawn as an overlay over Home: a drawer sliding in from the right on desktop (1024+), a
- * bottom sheet on phones and tablets, over a frosted Stone/950 20% backdrop. Inside: the 240px side
- * nav (desktop) and the content column (dark header, then 944px sections).
+ * Case study page, from Figma "Inner Page" (4110:3586). It is its own page with its own address,
+ * drawn as an overlay over Home: a full-width drawer sliding in from the right on desktop (1024+),
+ * a bottom sheet on phones and tablets, over a frosted Stone/950 20% backdrop.
+ * Desktop: a 216 Stone/50 side column (× at the top, the section nav below) beside the content
+ * column (1224, with the content 1024 wide). Phones: the content alone; text styles follow their
+ * Mobile mode through the fluid type tokens.
+ * Order: hero image, title, Role / Platform / Tools; Overview; Defining the problem (What we
+ * uncovered, problem statement, visuals); themed sections of numbered steps; Key takeaways.
+ * Structure: docs/case-study-structure.md. Anything still "[TBD: …]" gets .is-tbd.
  * Opening a card on Home loads the same overlay in place (src/scripts/case-sheet.ts); opening the
  * address directly renders Home underneath with the overlay already in place, then slides it in.
- * Structure: docs/case-study-structure.md (Header, Overview, Defining the problem,
- * Design decisions, Learnings & reflections). Anything still "[TBD: …]" gets .is-tbd.
  */
 import type { CollectionEntry } from 'astro:content';
 import SiteLayout from './SiteLayout.astro';
@@ -28,25 +31,49 @@ interface Props {
 
 const { study, prev = null, next = null } = Astro.props;
 const { data } = study;
-const tbd = (value: string) => value.includes('[TBD');
+const tbd = (value?: string) => !!value && value.includes('[TBD');
 
 const facts = [
-  ['Timeline', data.facts.timeline],
   ['Role', data.facts.role],
   ['Platform', data.facts.platform],
-  ['Team', data.facts.team],
+  ['Tools', data.facts.tools],
 ] as const;
 
-const sections = [
+const slug = (text: string, i: number) =>
+  `section-${i + 1}-${text.toLowerCase().replace(/\[tbd[^\]]*\]/g, 'tbd').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+const themed = data.sections.map((section, i) => ({ ...section, id: slug(section.title, i) }));
+
+const nav = [
   ['overview', 'Overview'],
   ['problem', 'Defining the problem'],
-  ['decisions', 'Design decisions'],
-  ['learnings', 'Learnings & reflections'],
+  ...themed.map((section) => [section.id, section.title] as const),
+  ['takeaways', 'Key takeaways'],
 ] as const;
+
+type Block = (typeof data.overview.visuals)[number];
+const isPair = (block: Block): block is Extract<Block, { pair: unknown }> => 'pair' in block;
 
 const workHref = withBase('/#work');
 const CLOSE =
   'M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z';
+
+// "What we uncovered" line icons (Figma eye-off / zap-off / phone-off, 32px, 2px stroke).
+const ICONS: Record<string, string[]> = {
+  'eye-off': [
+    'M23.9226 23.9207C21.6434 25.658 18.8681 26.6205 16.0026 26.6674C6.66927 26.6674 1.33594 16.0007 1.33594 16.0007C2.99446 12.9099 5.29478 10.2095 8.0826 8.08068M13.2026 5.65402C14.1204 5.43919 15.06 5.3318 16.0026 5.33402C25.3359 5.33402 30.6693 16.0007 30.6693 16.0007C29.8599 17.5148 28.8947 18.9403 27.7893 20.254M18.8293 18.8274C18.4631 19.2203 18.0215 19.5356 17.5308 19.7542C17.0401 19.9728 16.5105 20.0904 15.9734 20.0998C15.4363 20.1093 14.9028 20.0105 14.4048 19.8093C13.9067 19.6082 13.4542 19.3087 13.0744 18.9289C12.6946 18.5491 12.3951 18.0966 12.1939 17.5985C11.9928 17.1005 11.894 16.567 11.9034 16.0299C11.9129 15.4928 12.0305 14.9631 12.2491 14.4725C12.4677 13.9818 12.7829 13.5402 13.1759 13.174',
+    'M1.33594 1.33398L30.6693 30.6673',
+  ],
+  'zap-off': [
+    'M16.5471 8.99935L17.3338 2.66602L14.0938 6.55935',
+    'M24.7628 17.214L28.0028 13.334H20.8828',
+    'M10.6667 10.666L4 18.666H16L14.6667 29.3327L21.3333 21.3327',
+    'M1.33594 1.33398L30.6693 30.6673',
+  ],
+  'phone-off': [
+    'M14.2367 17.7461C15.5898 19.1005 17.1191 20.2665 18.7833 21.2128L20.4767 19.5195C20.8392 19.161 21.2969 18.9139 21.7955 18.8076C22.2941 18.7013 22.8128 18.7401 23.29 18.9195C24.4997 19.3709 25.7566 19.684 27.0367 19.8528C27.6774 19.9434 28.2633 20.2638 28.6853 20.7545C29.1072 21.2451 29.3364 21.8724 29.33 22.5195V26.5195C29.3315 26.8908 29.2554 27.2584 29.1067 27.5986C28.9579 27.9388 28.7397 28.2443 28.4661 28.4953C28.1925 28.7463 27.8694 28.9375 27.5177 29.0564C27.1659 29.1754 26.7932 29.2196 26.4233 29.1861C22.3204 28.7403 18.3793 27.3383 14.9167 25.0928C13.3103 24.0729 11.8214 22.879 10.4767 21.5328M6.91666 17.0795C4.67113 13.6168 3.26913 9.6757 2.82332 5.57281C2.79 5.2041 2.83382 4.83249 2.95199 4.48164C3.07016 4.1308 3.26008 3.8084 3.50968 3.53497C3.75927 3.26155 4.06306 3.04309 4.40171 2.89351C4.74036 2.74392 5.10644 2.66649 5.47666 2.66614H9.47666C10.1237 2.65978 10.751 2.88892 11.2417 3.31086C11.7323 3.73279 12.0528 4.31874 12.1433 4.95948C12.3122 6.23957 12.6253 7.49645 13.0767 8.70614C13.256 9.18338 13.2949 9.70203 13.1885 10.2007C13.0822 10.6993 12.8351 11.157 12.4767 11.5195L10.7833 13.2128',
+    'M30.6693 1.33398L1.33594 30.6673',
+  ],
+};
 ---
 
 <SiteLayout page="home" overlay title={`${data.name} — Ifeanyi Ulasika`} description={data.summary}>
@@ -70,155 +97,170 @@ const CLOSE =
       </a>
       <div class="case-sheet__scroll" data-sheet-scroll>
         <div class="case-layout" data-case-layout>
-    <nav class="case-toc" aria-label="On this page">
-      <ol class="case-toc__list">
-        {sections.map(([id, label]) => (
-          <li>
-            <a class="case-toc__link" href={`#${id}`} data-toc-link={id}>{label}</a>
-          </li>
-        ))}
-      </ol>
-    </nav>
+          <aside class="case-rail">
+            <nav class="case-toc" aria-label="On this page">
+              <ol class="case-toc__list">
+                {nav.map(([id, label]) => (
+                  <li>
+                    <a class:list={['case-toc__link text-label-md', tbd(label) && 'is-tbd']} href={`#${id}`} data-toc-link={id}>{label}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </aside>
 
-    <article class="case-main">
-      <header class="case-header">
-        <h1 class:list={['case-title text-title', tbd(data.title) && 'is-tbd']}>{data.title}</h1>
-        <dl class="case-facts">
-          {facts.map(([label, value]) => (
-            <div>
-              <dt class="text-meta">{label}</dt>
-              <dd class:list={['text-body-lg', tbd(value) && 'is-tbd']}>{value}</dd>
-            </div>
-          ))}
-        </dl>
-      </header>
-
-      <div class="case-body">
-        <section class="case-section" id="overview" aria-labelledby="overview-title" data-toc-section>
-          <div class="case-block case-block--lead">
-            <h2 class="case-section__title text-h1" id="overview-title">Overview</h2>
-            <p class:list={['case-text text-body-lg', tbd(data.overview.body) && 'is-tbd']}>{data.overview.body}</p>
-          </div>
-          <figure class="case-visual">
-            <StudyMedia frame="hero" {...data.hero} />
-          </figure>
-          <div class="case-block case-block--tight">
-            <p class="case-eyebrow text-meta-lg">Outcome</p>
-            <p class:list={['case-statement text-h2', tbd(data.overview.outcome) && 'is-tbd']}>{data.overview.outcome}</p>
-          </div>
-        </section>
-
-        <section class="case-section" id="problem" aria-labelledby="problem-title" data-toc-section>
-          <div class="case-block case-block--lead">
-            <h2 class="case-section__title text-h1" id="problem-title">Defining the problem</h2>
-            <p class:list={['case-text text-body-lg', tbd(data.problem.body) && 'is-tbd']}>{data.problem.body}</p>
-          </div>
-          {
-            data.problem.hmw && (
-              <div class="case-block case-block--tight">
-                <p class="case-eyebrow text-meta-lg">Problem statement</p>
-                <p class:list={['case-statement case-statement--hmw text-h2', tbd(data.problem.hmw) && 'is-tbd']}>{data.problem.hmw}</p>
+          <article class="case-main">
+            <header class="case-hero">
+              <figure class="case-hero__media">
+                <StudyMedia frame="hero" {...data.hero} />
+              </figure>
+              <div class="case-hero__text">
+                <h1 class:list={['case-title text-h1', tbd(data.title) && 'is-tbd']}>{data.title}</h1>
+                <hr class="case-divider" />
+                <dl class="case-facts">
+                  {facts.map(([label, value]) => (
+                    <div>
+                      <dt class="text-meta">{label}</dt>
+                      <dd class:list={['text-body-lg', tbd(value) && 'is-tbd']}>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
-            )
-          }
-          {
-            data.problem.findings && data.problem.findings.length > 0 && (
-              <div class="case-block">
-                <h3 class="case-subhead text-h2">What we uncovered</h3>
-                <ul class="findings">
-                  {data.problem.findings.map((finding) => (
-                    <li class="finding">
-                      <h4 class:list={['finding__title text-h4', tbd(finding.title) && 'is-tbd']}>{finding.title}</h4>
-                      <p class:list={['finding__body text-body', tbd(finding.body) && 'is-tbd']}>{finding.body}</p>
+            </header>
+
+            <section class="case-section" id="overview" aria-labelledby="overview-title" data-toc-section>
+              <div class="case-intro">
+                <h2 class="case-section__title text-h1" id="overview-title">Overview</h2>
+                <p class:list={['case-lead text-body', tbd(data.overview.body) && 'is-tbd']}>{data.overview.body}</p>
+              </div>
+              {data.overview.visuals.map((block) => (
+                isPair(block) ? (
+                  <div class="case-pair">
+                    {block.pair.map((v) => (
+                      <figure class="case-visual">
+                        <StudyMedia frame="slot" {...v} />
+                        {v.caption && <figcaption class="text-body">{v.caption}</figcaption>}
+                      </figure>
+                    ))}
+                  </div>
+                ) : (
+                  <figure class="case-visual case-visual--wide">
+                    <StudyMedia frame="slot" {...block} />
+                    {block.caption && <figcaption class="text-body">{block.caption}</figcaption>}
+                  </figure>
+                )
+              ))}
+            </section>
+
+            <section class="case-section" id="problem" aria-labelledby="problem-title" data-toc-section>
+              <div class="case-intro">
+                <h2 class="case-section__title text-h1" id="problem-title">Defining the problem</h2>
+                {data.problem.body && (
+                  <p class:list={['case-lead text-body', tbd(data.problem.body) && 'is-tbd']}>{data.problem.body}</p>
+                )}
+              </div>
+              {data.problem.findings.length > 0 && (
+                <div class="case-findings">
+                  <h3 class="case-findings__title text-h2">What we uncovered</h3>
+                  <ul class="findings">
+                    {data.problem.findings.map((finding) => (
+                      <li class="finding">
+                        {finding.icon && (
+                          <svg class="finding__icon" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            {ICONS[finding.icon].map((d) => <path d={d} />)}
+                          </svg>
+                        )}
+                        <h4 class:list={['finding__title text-h4', tbd(finding.title) && 'is-tbd']}>{finding.title}</h4>
+                        <p class:list={['finding__body text-body', tbd(finding.body) && 'is-tbd']}>{finding.body}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {data.problem.hmw && (
+                <div class:list={['case-statement', data.problem.hmwImage && 'case-statement--art']}>
+                  <p class="case-statement__label text-meta">Problem Statement</p>
+                  <p class:list={['case-statement__text text-h1', tbd(data.problem.hmw) && 'is-tbd']}>{data.problem.hmw}</p>
+                  {data.problem.hmwImage && <img class="case-statement__art" src={withBase(data.problem.hmwImage)} alt="" loading="lazy" />}
+                </div>
+              )}
+              {data.problem.visuals.map((block) => (
+                isPair(block) ? (
+                  <div class="case-pair">
+                    {block.pair.map((v) => (
+                      <figure class="case-visual">
+                        <StudyMedia frame="slot" {...v} />
+                        {v.caption && <figcaption class="text-body">{v.caption}</figcaption>}
+                      </figure>
+                    ))}
+                  </div>
+                ) : (
+                  <figure class="case-visual case-visual--wide case-visual--framed">
+                    <StudyMedia frame="slot" {...block} />
+                    {block.caption && <figcaption class="text-body">{block.caption}</figcaption>}
+                  </figure>
+                )
+              ))}
+            </section>
+
+            {themed.map((section, s) => (
+              <section class="case-section" id={section.id} aria-labelledby={`${section.id}-title`} data-toc-section>
+                <h2 class:list={['case-section__title text-h1', tbd(section.title) && 'is-tbd']} id={`${section.id}-title`}>{section.title}</h2>
+                <ol class="case-steps">
+                  {section.steps.map((step, i) => (
+                    <li class="case-step">
+                      <div class="case-step__head">
+                        <p class="case-step__number text-meta">{`${s + 1}.${i}`}</p>
+                        <h3 class:list={['case-step__title text-h3', tbd(step.title) && 'is-tbd']}>{step.title}</h3>
+                      </div>
+                      <p class:list={['case-step__body text-body', tbd(step.body) && 'is-tbd']}>{step.body}</p>
+                      {step.visuals.map((block) => (
+                        isPair(block) ? (
+                          <div class="case-pair">
+                            {block.pair.map((v) => (
+                              <figure class="case-visual">
+                                <StudyMedia frame="slot" {...v} />
+                                {v.caption && <figcaption class="text-body">{v.caption}</figcaption>}
+                              </figure>
+                            ))}
+                          </div>
+                        ) : (
+                          <figure class="case-visual case-visual--wide">
+                            <StudyMedia frame="slot" {...block} />
+                            {block.caption && <figcaption class="text-body">{block.caption}</figcaption>}
+                          </figure>
+                        )
+                      ))}
                     </li>
                   ))}
-                </ul>
+                </ol>
+              </section>
+            ))}
+
+            <section class="case-section" id="takeaways" aria-labelledby="takeaways-title" data-toc-section>
+              <div class="case-intro">
+                <h2 class="case-section__title text-h1" id="takeaways-title">Key takeaways</h2>
+                {data.takeaways.map((paragraph) => (
+                  <p class:list={['case-lead text-body', tbd(paragraph) && 'is-tbd']}>{paragraph}</p>
+                ))}
               </div>
-            )
-          }
-          {data.problem.visuals.map((visual) => (
-            <figure class="case-visual">
-              <StudyMedia frame="slot" {...visual} />
-              {visual.caption && <figcaption class="text-body">{visual.caption}</figcaption>}
-            </figure>
-          ))}
-        </section>
+            </section>
 
-        <section class="case-section" id="decisions" aria-labelledby="decisions-title" data-toc-section>
-          <h2 class="case-section__title text-h1" id="decisions-title">Design decisions</h2>
-          <ol class="decision-list">
-            {data.decisions.map((item, index) => (
-              <li class="decision" id={`decision-${index + 1}`}>
-                <div class="case-block case-block--tight">
-                  <p class="case-eyebrow text-meta-lg">Decision {index + 1}</p>
-                  <h3 class:list={['case-subhead text-h2', tbd(item.title) && 'is-tbd']}>{item.title}</h3>
-                </div>
-                <dl class="decision__parts">
-                  <div>
-                    <dt class="text-h4">What was wrong</dt>
-                    <dd class:list={['text-body', tbd(item.wrong) && 'is-tbd']}>{item.wrong}</dd>
-                  </div>
-                  {item.considered && item.considered.length > 0 && (
-                    <div>
-                      <dt class="text-h4">What I considered</dt>
-                      <dd>
-                        <ul class="considered">
-                          {item.considered.map((option) => (
-                            <li class="text-body">
-                              <span class:list={['considered__name', tbd(option.name) && 'is-tbd']}>{option.name}</span>
-                              {' '}
-                              <span class:list={[tbd(option.reason) && 'is-tbd']}>{option.reason}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </dd>
-                    </div>
-                  )}
-                  <div>
-                    <dt class="text-h4">What I did</dt>
-                    <dd class:list={['text-body', tbd(item.did) && 'is-tbd']}>{item.did}</dd>
-                  </div>
-                  <div>
-                    <dt class="text-h4">Result</dt>
-                    <dd class:list={['text-body', tbd(item.result) && 'is-tbd']}>{item.result}</dd>
-                  </div>
-                </dl>
-                {item.visual && (
-                  <figure class="case-visual">
-                    <StudyMedia frame="slot" {...item.visual} />
-                    {item.visual.caption && <figcaption class="text-body">{item.visual.caption}</figcaption>}
-                  </figure>
-                )}
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section class="case-section" id="learnings" aria-labelledby="learnings-title" data-toc-section>
-          <div class="case-block case-block--lead">
-            <h2 class="case-section__title text-h1" id="learnings-title">Learnings &amp; reflections</h2>
-            {data.learnings.map((paragraph) => (
-              <p class:list={['case-text text-body-lg', tbd(paragraph) && 'is-tbd']}>{paragraph}</p>
-            ))}
-          </div>
-        </section>
-
-        <nav class="case-pager" aria-label="Other case studies">
-          {prev && (
-            <a class="case-pager__move" href={withBase(`/work/${prev.id}/`)}>
-              <span class="text-meta">Previous</span>
-              <span class="case-pager__name text-h4">{prev.data.name}</span>
-            </a>
-          )}
-          {next && (
-            <a class="case-pager__move case-pager__move--next" href={withBase(`/work/${next.id}/`)}>
-              <span class="text-meta">Next</span>
-              <span class="case-pager__name text-h4">{next.data.name}</span>
-            </a>
-          )}
-        </nav>
-      </div>
-    </article>
+            <nav class="case-pager" aria-label="Other case studies">
+              {prev && (
+                <a class="case-pager__move" href={withBase(`/work/${prev.id}/`)}>
+                  <span class="text-meta">Previous</span>
+                  <span class="case-pager__name text-h4">{prev.data.name}</span>
+                </a>
+              )}
+              {next && (
+                <a class="case-pager__move case-pager__move--next" href={withBase(`/work/${next.id}/`)}>
+                  <span class="text-meta">Next</span>
+                  <span class="case-pager__name text-h4">{next.data.name}</span>
+                </a>
+              )}
+            </nav>
+          </article>
         </div>
       </div>
     </div>

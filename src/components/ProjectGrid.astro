@@ -60,7 +60,7 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                 data-tooltip="View details"
                 style={`--order: ${project.n}; --reveal-delay: ${c * 110}ms`}
               >
-                <div class:list={['project-card__media', project.video && 'project-card__media--phone']}>
+                <div class:list={['project-card__media', project.video && 'project-card__media--phone']} data-skeleton>
                   {project.video ? (
                     <StudyMedia
                       kind="video"

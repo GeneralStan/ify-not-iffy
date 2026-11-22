@@ -142,6 +142,7 @@
 
 /* Heading/H3 Stone/500 on desktop, Body/Large on the Mobile Hero. */
 .hero-scroll {
+  position: relative;
   font-family: var(--type-body-family);
   font-size: clamp(16px, calc(16px + (100vw - 390px) * 0.007619), 24px);
   line-height: clamp(24px, calc(24px + (100vw - 390px) * 0.007619), 32px);
@@ -177,9 +178,9 @@
      0      the name and role, then the nav toolbar (60ms later), slide down from the top
      280    the six runs rise one by one from a bottom-edge mask, 70ms apart
      700    polaroid grows 0 → 120% → 100%
-     1050   "Scroll to view work" rises
      1150   the hedges pop up from behind the hero's bottom edge, all at once
      1400   once every word has landed, the ampersand grows like the polaroid
+     2100   last, "Scroll to view work" appears pixel by pixel, top to bottom, over about 2.4s
    The polaroid and the ampersand sit outside the words' masks, so nothing cuts them. */
 .intro-wait .site-nav__lead,
 .intro-wait .glass-nav,
@@ -187,8 +188,7 @@
 .intro-wait .site-nav__menu-panel,
 .intro-wait .hero-word__inner,
 .intro-wait .hero-polaroid,
-.intro-wait .hero-amp,
-.intro-wait .hero-scroll {
+.intro-wait .hero-amp {
   opacity: 0;
 }
 
@@ -225,8 +225,34 @@
   animation: intro-polaroid 760ms 1400ms both;
 }
 
-.intro-play .hero-scroll {
-  animation: intro-rise 700ms var(--motion-ease-enter) 1050ms both;
+/* "Scroll to view work": last, revealed as pixels from top to bottom over about 2.4s (2.1s-4.4s).
+   Each square of hero colour drops away at its own delay (set in SiteHero.astro). */
+.pixel-mask {
+  display: none;
+}
+
+.intro-wait .pixel-mask,
+.intro-play .pixel-mask {
+  position: absolute;
+  inset: -2px -4px;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  pointer-events: none;
+}
+
+.pixel-mask span {
+  background: var(--color-lime-900);
+}
+
+.intro-play .pixel-mask span {
+  animation: pixel-out 160ms steps(2, end) both;
+  animation-delay: calc(2100ms + var(--d));
+}
+
+@keyframes pixel-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 @keyframes intro-nav {
@@ -537,7 +563,15 @@
   }
 }
 
-/* Figma "Case Study Card": Neutral/0, 1.5 border, radius 16, padding 24, 32 between image and copy. */
+/* Figma "Case Study Card" (4033:3512): Neutral/0, a 1px Alpha/Border/Outline edge (#E3E3E3 at 40%),
+   radius 16, padding 24, 32 between image and copy. Hover: Elevation 1, edge at 80%. */
+:root {
+  /* Figma effect styles. */
+  --elevation-1: 0 0 12px rgba(10, 10, 10, 0.1), 0 4px 4px rgba(250, 250, 250, 0.1);
+  --elevation-2: 1px 0 15px rgba(10, 10, 10, 0.25), 0 0 12px rgba(10, 10, 10, 0.1), 0 4px 4px rgba(250, 250, 250, 0.1);
+  --border-outline: rgba(227, 227, 227, 0.4);
+}
+
 .project-card {
   color: inherit;
   text-decoration: none;
@@ -546,9 +580,11 @@
   gap: clamp(20px, 2.2vw, 32px);
   padding: clamp(16px, 1.7vw, 24px);
   background: var(--color-neutral-0);
-  border: 1.5px solid rgba(227, 227, 227, 0.8);
+  border: 1px solid var(--border-outline);
   border-radius: var(--radius-md);
-  transition: box-shadow 0.3s ease;
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Crunchr: the phone video sits centred in the media box. */
@@ -564,7 +600,8 @@
 /* State=Hover: two soft shadows, nothing moves. */
 @media (hover: hover) and (pointer: fine) {
   .project-card:hover {
-    box-shadow: var(--shadow-card-hover);
+    box-shadow: var(--elevation-1);
+    border-color: rgba(227, 227, 227, 0.8);
   }
 }
 

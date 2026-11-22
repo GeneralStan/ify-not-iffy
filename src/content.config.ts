@@ -4,8 +4,10 @@ import { z } from 'astro/zod';
 
 /**
  * Case studies, one Markdown file each under src/content/work.
- * Structure: docs/case-study-structure.md (Header, Overview, Defining the problem,
- * Design decisions, Learnings & reflections). Template: src/layouts/CaseStudy.astro.
+ * Structure: docs/case-study-structure.md. Layout: Figma "Inner Page" (4110:3586), template
+ * src/layouts/CaseStudy.astro.
+ * Order: header (hero image, title, Role / Platform / Tools), Overview, Defining the problem, then
+ * themed sections of numbered steps (1.0, 1.1, 2.0…), then Key takeaways.
  * Anything still "[TBD: …]" renders as a marked placeholder.
  */
 const visual = z.object({
@@ -18,17 +20,17 @@ const visual = z.object({
   caption: z.string().optional(),
 });
 
-const decision = z.object({
+/** A full-width image block, or two side by side (e.g. Before / After), each with its own caption. */
+const block = z.union([visual, z.object({ pair: z.tuple([visual, visual]) })]);
+
+/** Line icons for "What we uncovered" (Figma 4110:3586). */
+const findingIcon = z.enum(['eye-off', 'zap-off', 'phone-off']);
+
+const step = z.object({
   title: z.string(),
-  /** What was wrong: the problem this decision answers, with its evidence (or the friction a detail removes). */
-  wrong: z.string(),
-  /** What I considered: only when there were real alternatives. */
-  considered: z.array(z.object({ name: z.string(), reason: z.string() })).optional(),
-  /** What I did: the choice and the design moves that followed. */
-  did: z.string(),
-  /** Result: measured result, feedback, or projected impact (say "projected"). */
-  result: z.string(),
-  visual: visual.optional(),
+  /** One short paragraph: what was wrong, what you did and what came of it. */
+  body: z.string(),
+  visuals: z.array(block).default([]),
 });
 
 const work = defineCollection({
@@ -43,25 +45,29 @@ const work = defineCollection({
     order: z.number(),
     tags: z.array(z.string()).default([]),
     facts: z.object({
-      timeline: z.string(),
       role: z.string(),
       platform: z.string(),
-      team: z.string(),
+      tools: z.string(),
     }),
     hero: visual,
     overview: z.object({
       body: z.string(),
-      outcome: z.string(),
+      visuals: z.array(block).default([]),
     }),
     problem: z.object({
-      body: z.string(),
+      body: z.string().optional(),
+      /** "What we uncovered": the findings that define the problem (three in the layout). */
+      findings: z.array(z.object({ icon: findingIcon.optional(), title: z.string(), body: z.string() })).default([]),
+      /** Problem statement card: a How Might We line, with an optional illustration (top right). */
       hmw: z.string().optional(),
-      /** "What we uncovered": findings that define the problem, with their evidence. */
-      findings: z.array(z.object({ title: z.string(), body: z.string() })).optional(),
-      visuals: z.array(visual).default([]),
+      hmwImage: z.string().optional(),
+      visuals: z.array(block).default([]),
     }),
-    decisions: z.array(decision).min(3).max(6),
-    learnings: z.array(z.string()).min(1),
+    /** Themed sections ("How I built it", "Acting on delays"…), each a run of numbered steps. */
+    sections: z
+      .array(z.object({ title: z.string(), steps: z.array(step).min(1) }))
+      .min(1),
+    takeaways: z.array(z.string()).min(1),
   }),
 });
 

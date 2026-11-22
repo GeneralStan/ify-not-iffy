@@ -46,8 +46,8 @@ if (root.dataset.navstyle === 'glass') {
     openButton.setAttribute('aria-expanded', String(open));
     if (open) requestAnimationFrame(() => placePill(current, false));
     if (!focus) return;
-    if (open) closeButton?.focus({ preventScroll: true });
-    else openButton.focus({ preventScroll: true });
+    if (open) window.__ifyFocus?.(closeButton ?? null, capsule ?? null);
+    else window.__ifyFocus?.(openButton, null);
   }
 
   openButton?.addEventListener('click', () => setOpen(true));
