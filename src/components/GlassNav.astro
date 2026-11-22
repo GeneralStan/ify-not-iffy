@@ -9,6 +9,7 @@
  *   In Chromium the rim also refracts what is behind it (an SVG displacement map, glass-nav.ts);
  *   other browsers keep the blur and the rim light.
  * - Over the dark hero and footer the glass and text switch to their dark-background style.
+ * - The name and role stay pinned top left on every screen (plain text), over a blur band.
  * - Phones and tablets (below 1024): only a glass "Menu" button. It morphs leftwards into the
  *   capsule [ × | Work | Playground | About ]; the name and role slide out meanwhile.
  */
@@ -325,28 +326,35 @@ const CLOSE =
     }
   }
 
-  /* ===== Desktop: the name and role stay pinned with the toolbar =====
-     Plain text (no glass), lined up with the capsule's centre line and the bar's left edge. */
-  @media (min-width: 1024px) {
+  /* ===== The name and role stay pinned top left with the toolbar, on every screen =====
+     Plain text (no glass). Phones: 16 from the left, 10 from the top, beside the Menu button.
+     Desktop: lined up with the capsule's centre line and the bar's left edge. A blur band behind the
+     top of the screen (SiteNav.astro) lets content pass under them. */
+  :global(html[data-navstyle='glass']) :global(.site-nav__lead) {
+    position: fixed;
+    z-index: 60;
+    top: 10px;
+    left: 16px;
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
     :global(html[data-navstyle='glass']) :global(.site-nav__lead) {
-      position: fixed;
-      z-index: 60;
       top: 14px;
       left: max(32px, calc((100vw - 1200px) / 2));
-      margin: 0;
     }
+  }
 
-    /* Ink follows what is under the bar: light text over the hero and footer, the page's own inks
-       elsewhere (Home's light section uses Work's stone inks). */
-    :global(html[data-navstyle='glass'][data-page='home']:not(.glass-on-dark)) :global(.site-nav) {
-      --nav-name: var(--color-stone-950);
-      --nav-role: var(--color-stone-700);
-    }
+  /* Ink follows what is under the bar: light text over the hero and footer, the page's own inks
+     elsewhere (Home's light section uses Work's stone inks). */
+  :global(html[data-navstyle='glass'][data-page='home']:not(.glass-on-dark)) :global(.site-nav) {
+    --nav-name: var(--color-stone-950);
+    --nav-role: var(--color-stone-700);
+  }
 
-    :global(html[data-navstyle='glass'].glass-on-dark) :global(.site-nav) {
-      --nav-name: var(--color-neutral-0);
-      --nav-role: var(--color-stone-400);
-    }
+  :global(html[data-navstyle='glass'].glass-on-dark) :global(.site-nav) {
+    --nav-name: var(--color-neutral-0);
+    --nav-role: var(--color-stone-400);
   }
 
   @media (prefers-reduced-motion: reduce) {

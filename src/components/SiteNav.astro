@@ -146,6 +146,50 @@ const CLOSE =
     opacity: 1;
   }
 
+  /* Glass nav: the name, role and toolbar stay pinned, so the band is deeper and stronger, reaching
+     just past them (60 on phones, 88 on tablets and desktop), and fades out over its lower part so
+     content passes under them smoothly. */
+  :global(html[data-navstyle='glass']) .nav-edge {
+    height: calc(76px + env(safe-area-inset-top, 0px));
+    /* A soft wash of the colour underneath (the page colour, or the hero's over the hero and
+       footer) so text passing under the name fades instead of colliding with it. */
+    --edge-tint: var(--page-bg);
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--edge-tint) 88%, transparent) 0%,
+      color-mix(in srgb, var(--edge-tint) 70%, transparent) 50%,
+      transparent 100%
+    );
+  }
+
+  :global(html[data-navstyle='glass'].glass-on-dark) .nav-edge {
+    --edge-tint: var(--color-lime-900);
+  }
+
+  @media (min-width: 768px) {
+    :global(html[data-navstyle='glass']) .nav-edge {
+      height: calc(108px + env(safe-area-inset-top, 0px));
+    }
+  }
+
+  :global(html[data-navstyle='glass']) .nav-edge__blur--1 {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+  }
+
+  :global(html[data-navstyle='glass']) .nav-edge__blur--2 {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    mask-image: linear-gradient(to bottom, #000 45%, transparent 85%);
+  }
+
+  :global(html[data-navstyle='glass']) .nav-edge__blur--3 {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    mask-image: linear-gradient(to bottom, #000 30%, transparent 70%);
+  }
+
   .nav-edge__blur {
     position: absolute;
     inset: 0;
