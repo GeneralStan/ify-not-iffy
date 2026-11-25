@@ -180,7 +180,7 @@
      700    polaroid grows 0 → 120% → 100%
      1150   the hedges pop up from behind the hero's bottom edge, all at once
      1400   once every word has landed, the ampersand grows like the polaroid
-     2100   last, "Scroll to view work" appears pixel by pixel, top to bottom, over about 2.4s
+     2100   last, "Scroll to view work" appears pixel by pixel, top to bottom, over 1s
    The polaroid and the ampersand sit outside the words' masks, so nothing cuts them. */
 .intro-wait .site-nav__lead,
 .intro-wait .glass-nav,
@@ -225,7 +225,7 @@
   animation: intro-polaroid 760ms 1400ms both;
 }
 
-/* "Scroll to view work": last, revealed as pixels from top to bottom over about 2.4s (2.1s-4.4s).
+/* "Scroll to view work": last, revealed as pixels from top to bottom over 1s (2.1s-3.1s).
    Each square of hero colour drops away at its own delay (set in SiteHero.astro). */
 .pixel-mask {
   display: none;
