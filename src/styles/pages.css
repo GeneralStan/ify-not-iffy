@@ -11,120 +11,145 @@
   width: min(604px, calc(100% - 32px));
 }
 
-/* ===== Playground canvas (Figma Playground 4068:7511) =====
-   The canvas fills the page from the top; the heading floats over it (it lets drags through), and
-   the board starts just below it, so cards pass under the title, the lead and the nav bar. The board
-   keeps the Figma frame's coordinates (origin at the 1440 frame's left edge, centred on the screen),
-   repeats sideways every --period px and drifts; it is as tall as the Figma board. Cards are 45% on
-   phones, 85% on tablets and small laptops, full size from 1200. Up and down swipes scroll the page;
-   sideways drags pan the board. */
-.playground {
-  padding: 0;
+/* ===== Playground (Figma "Playground — layout explorations", Variation D) =====
+   Centred heading with filter pills under it, then rows of tiles (src/data/playground.ts):
+   full, two, three (32 apart) and bento (one big beside two stacked). Rows keep the Figma
+   proportions at 1240 wide and scale down with the page. Phones: 16 gaps, and a row of three
+   becomes a sideways swipe strip. */
+.page-section > .play-head {
+  width: min(800px, calc(100% - 32px));
+  margin-bottom: clamp(32px, 4.4vw, 64px);
 }
 
-.play-canvas {
-  --board-top: calc(var(--section-top) + 176px);
-  --s: 0.45;
-  position: relative;
-  height: calc(var(--board-top) + var(--board-h) * 1px * var(--s));
-  overflow: hidden;
-  cursor: grab;
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-@media (min-width: 768px) {
-  .play-canvas {
-    --s: 0.85;
-  }
-}
-
-@media (min-width: 1200px) {
-  .play-canvas {
-    --s: 1;
-  }
-}
-
-.play-canvas.is-dragging {
-  cursor: grabbing;
-}
-
-.play-canvas:focus-visible {
-  outline: 2px solid var(--color-stone-700);
-  outline-offset: -4px;
-}
-
-.play-head {
-  position: absolute;
-  z-index: 2;
-  top: var(--section-top);
-  left: 50%;
-  translate: -50% 0;
-  width: min(604px, calc(100% - 32px));
-  margin: 0;
-  pointer-events: none;
-}
-
-.play-board {
-  position: absolute;
-  top: var(--board-top);
-  left: calc(50% - 720px * var(--s));
-  width: calc(1440px * var(--s));
-  height: 0;
-  will-change: translate;
-}
-
-.play-board.is-easing {
-  transition: translate 0.3s ease;
-}
-
-/* Card: Neutral/0, 1px Alpha/Border/Outline edge, radius 16, padding 24, Elevation 1 (Elevation 2 on
-   hover); image Stone/50 with a Stone/150 border;
-   Meta/Large tags centred, 16 below the image. */
-.play-card {
-  position: absolute;
-  left: calc(var(--x) * 1px * var(--s));
-  top: calc(var(--y) * 1px * var(--s));
-  width: calc(var(--w) * 1px);
-  scale: var(--s);
-  transform-origin: 0 0;
+/* Filter Pill: Label/Medium, 16 x 8, fully round. Idle: 1px Stone/150 outline. Hover: Stone/100.
+   Selected: Stone/950 with Neutral/0 text. */
+.play-filters {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  background: var(--color-neutral-0);
-  border: 1px solid var(--border-outline);
-  border-radius: var(--radius-md);
-  box-shadow: var(--elevation-1);
-  color: var(--color-neutral-700);
-  font: inherit;
-  text-align: inherit;
-  cursor: zoom-in;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: clamp(12px, 1.7vw, 24px);
+}
+
+.play-filter {
+  padding: 8px 16px;
+  border: 1px solid var(--color-stone-150);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--color-stone-950);
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: box-shadow 0.3s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    scale 0.16s var(--motion-ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .play-card:hover {
-    box-shadow: var(--elevation-2);
+  .play-filter:hover {
+    background: var(--color-stone-100);
   }
 }
 
-.play-card:focus-visible {
-  outline: 2px solid var(--color-stone-700);
-  outline-offset: 4px;
+.play-filter:active {
+  scale: 0.96;
 }
 
-.play-card__media {
-  display: block;
-  height: calc(var(--media-h) * 1px);
-  overflow: hidden;
+.play-filter[aria-pressed='true'] {
+  border-color: var(--color-stone-950);
+  background: var(--color-stone-950);
+  color: var(--color-neutral-0);
+}
+
+.play-filter:focus-visible {
+  outline: 2px solid var(--color-stone-700);
+  outline-offset: 2px;
+}
+
+.play-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.play-row {
+  display: grid;
+  gap: 32px;
+}
+
+.play-row--full {
+  grid-template-columns: 1fr;
+  aspect-ratio: 1240 / 640;
+}
+
+.play-row--two {
+  grid-template-columns: 1fr 1fr;
+  aspect-ratio: 1240 / 520;
+}
+
+.play-row--three {
+  grid-template-columns: repeat(3, 1fr);
+  aspect-ratio: 1240 / 440;
+}
+
+.play-row--bento {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  aspect-ratio: 1240 / 720;
+}
+
+.play-row--bento > :first-child {
+  grid-row: span 2;
+}
+
+/* Playground Tile: Stone/50, 1px Stone/150 border, radius 24. The preview sits centred with at
+   least 40 clear on the top and sides; the caption sits in the bottom margin, 16 below it. */
+.play-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  min-height: 0;
+  padding: 40px 40px 16px;
+  border: 1px solid var(--color-stone-150);
+  border-radius: 24px;
   background: var(--color-stone-50);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.play-tile__stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  container-type: size;
+}
+
+/* Fitted inside the stage at its own shape (--aspect), never cropped. */
+.play-tile__preview {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: min(100cqw, 100cqh * var(--aspect));
+  aspect-ratio: var(--aspect);
+  border-radius: 12px;
+  background: var(--color-stone-100);
+  transition: scale 0.4s var(--motion-ease-enter);
+}
+
+.play-tile__preview.is-placeholder {
   border: 1px solid var(--color-stone-150);
 }
 
-.play-card__media img {
+.play-tile__preview img {
   display: block;
   width: 100%;
   height: 100%;
@@ -132,17 +157,109 @@
   pointer-events: none;
 }
 
-.play-card__tags {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
+.play-tile__preview .study-media {
+  background: var(--color-stone-50);
 }
 
-/* ===== Playground zoom =====
-   The tapped card grows from its spot to fit the screen (never past its real size) over the frosted
-   Stone/950 20% backdrop shared with case studies; the shared round × sits top-left. */
+.play-tile__caption {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-stone-600);
+}
+
+.play-tile__title {
+  color: var(--color-stone-950);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .play-tile:hover {
+    background: var(--color-stone-100);
+  }
+
+  .play-tile:hover .play-tile__preview {
+    scale: 1.015;
+  }
+}
+
+.play-tile:focus-visible {
+  outline: 2px solid var(--color-stone-700);
+  outline-offset: 4px;
+}
+
+/* Tablets: a little less room around the preview. */
+@media (max-width: 1023px) {
+  .play-tile {
+    padding: 24px 24px 12px;
+    gap: 12px;
+  }
+}
+
+/* Phones (Figma D mobile): 358 wide, 16 gaps, tiles with 16 around the preview. */
+@media (max-width: 767px) {
+  .play-grid,
+  .play-row {
+    gap: 16px;
+  }
+
+  .play-row--full {
+    aspect-ratio: 358 / 420;
+  }
+
+  .play-row--two {
+    aspect-ratio: 358 / 260;
+  }
+
+  .play-row--bento {
+    aspect-ratio: 358 / 416;
+  }
+
+  /* Three: a sideways swipe strip that peeks past the edge. */
+  .play-row--three {
+    display: flex;
+    gap: 12px;
+    aspect-ratio: auto;
+    margin-inline: -16px;
+    padding-inline: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .play-row--three::-webkit-scrollbar {
+    display: none;
+  }
+
+  .play-row--three > .play-tile {
+    flex: 0 0 240px;
+    height: 300px;
+    scroll-snap-align: start;
+  }
+
+  .play-tile {
+    padding: 16px 16px 12px;
+    gap: 12px;
+    border-radius: 16px;
+  }
+
+  .play-tile__preview {
+    border-radius: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-tile__preview,
+  .play-filter {
+    transition: none;
+  }
+}
+
+/* ===== Playground expanded view =====
+   The tapped tile's preview glides out of the tile, wider and into the centre (never past its real
+   size), over the frosted Stone/950 20% backdrop shared with case studies; the glass × sits top-left. */
 .play-zoom {
   position: fixed;
   inset: 0;
