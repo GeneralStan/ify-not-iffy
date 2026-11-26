@@ -199,6 +199,18 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     pointer-events: none;
   }
 
+  /* Phones: sized from the width instead, keeping Figma's share of space at either side
+     (125 / 1024 = 12.2%, so 774 / 1024 = 75.6% wide), and cropped at the bottom by the same share
+     as in Figma (130 of the screen's 435 below the box): bottom = -(130 / 1024) of the box width. */
+  @media (max-width: 767px) {
+    .study-media.study-media--screen video,
+    .study-media.study-media--screen .study-media__still {
+      top: auto;
+      bottom: -12.7cqw;
+      width: 75.59cqw;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .study-media--video .study-media__video {
       display: none;

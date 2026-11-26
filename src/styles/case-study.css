@@ -773,39 +773,29 @@ html.has-case-sheet :is(.hero, main, .site-footer) *::after {
 
 /* ===== Playbook additions, Figma "Inner Page" 4192:24706 (Nov 26) ===== */
 
-/* Impact metrics (4192:24938): under a second 720 divider, a Stone/50 card (radius 8, no outline),
-   24 padding; each metric an H3 value over a Body/Large label, both Stone/900, 8 apart, left aligned;
-   metrics 40 apart with a 64 tall Alpha/Border/Divider rule between them. Phones: one under another,
-   a full-width rule between. */
+/* Impact metrics (Figma Impact 4202:25049): a 720 row of three cards, under the second divider. */
 .case-metrics {
-  margin: 0;
-  width: 100%;
-  padding: 24px;
+  margin: 0 auto;
+  width: min(720px, 100%);
+  display: flex;
+  gap: 4px;
+}
+
+/* Figma Impact 4202:25049: three equal cards, 4 apart, each Stone/50 with the outline, radius 8,
+   24 padding, the H3 value over its Body/Large label (8 apart), centred. */
+.case-metric {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 23px; /* 24 in Figma, whose centred 1px stroke adds no size */
+  border: 1px solid rgba(227, 227, 227, 0.4);
   border-radius: 8px;
   background: var(--color-stone-50);
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 16px 40px;
-  text-align: left;
-}
-
-.case-metric {
-  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  position: relative;
-}
-
-.case-metric + .case-metric::before {
-  content: '';
-  position: absolute;
-  left: -20px;
-  top: 0;
-  width: 1px;
-  height: 64px;
-  background: rgba(227, 227, 227, 0.8);
+  text-align: center;
 }
 
 .case-metric__value,
@@ -818,23 +808,10 @@ html.has-case-sheet :is(.hero, main, .site-footer) *::after {
   font-variant-numeric: tabular-nums;
 }
 
+/* Phones: the cards stack, still 4 apart. */
 @media (max-width: 767px) {
   .case-metrics {
     flex-direction: column;
-    align-items: stretch;
-    gap: 33px;
-  }
-
-  .case-metric {
-    align-items: center;
-    text-align: center;
-  }
-
-  .case-metric + .case-metric::before {
-    left: 0;
-    top: -17px;
-    width: 100%;
-    height: 1px;
   }
 }
 
