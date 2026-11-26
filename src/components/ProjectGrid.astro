@@ -39,7 +39,7 @@ const projects = [
     video: {
       src: '/work/crunchr-iphone.mp4',
       webm: '/work/crunchr-iphone.webm',
-      poster: '/work/crunchr-iphone-poster.jpg',
+      poster: '/work/crunchr-iphone-poster.webp',
       screen: false,
     },
   },
@@ -93,7 +93,7 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                   )}
                 </div>
                 <div class="project-card__copy">
-                  <p class="project-card__tags text-meta-lg">
+                  <p class="project-card__tags text-meta">
                     {project.tags.map((tag, i) => (
                       <>
                         {i > 0 && <span aria-hidden="true">·</span>}
@@ -101,7 +101,7 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                       </>
                     ))}
                   </p>
-                  <h3 class="project-card__title text-h3">{project.title}</h3>
+                  <h3 class="project-card__title text-body-lg">{project.title}</h3>
                 </div>
               </a>
             ))}

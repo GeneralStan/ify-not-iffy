@@ -25,7 +25,7 @@ hero:
   kind: video
   src: /work/crunchr-iphone.mp4
   webm: /work/crunchr-iphone.webm
-  poster: /work/crunchr-iphone-poster.jpg
+  poster: /work/crunchr-iphone-poster.webp
   alt: Crunchr on an iPhone
 overview:
   body: Leta's software helps delivery businesses run their orders. Dispatchers assign each order to a driver and track it until drop-off. Their everyday tasks took too many steps, and testing fixes in Figma was slow. I rebuilt the design system in code with Claude Code, wrote six specs, and built a working prototype dispatchers have tested.

@@ -563,8 +563,8 @@
   }
 }
 
-/* Figma "Case Study Card" (4033:3512): Neutral/0, a 1px Alpha/Border/Outline edge (#E3E3E3 at 40%),
-   radius 16, padding 24, 32 between image and copy. Hover: Elevation 1, edge at 80%. */
+/* Figma "Case Study Card" (4033:3512, updated Nov 26): Neutral/0, a 1px Alpha/Border/Outline edge
+   (#E3E3E3 at 40%), radius 8, padding 16, 16 between image and copy. Hover: Elevation 1 only. */
 :root {
   /* Figma effect styles. */
   --elevation-1: 0 0 12px rgba(10, 10, 10, 0.1), 0 4px 4px rgba(250, 250, 250, 0.1);
@@ -577,14 +577,12 @@
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 2.2vw, 32px);
-  padding: clamp(16px, 1.7vw, 24px);
+  gap: 16px;
+  padding: 16px;
   background: var(--color-neutral-0);
   border: 1px solid var(--border-outline);
-  border-radius: var(--radius-md);
-  transition:
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease;
 }
 
 /* Crunchr: the phone video sits centred in the media box. */
@@ -601,17 +599,16 @@
 @media (hover: hover) and (pointer: fine) {
   .project-card:hover {
     box-shadow: var(--elevation-1);
-    border-color: rgba(227, 227, 227, 0.8);
   }
 }
 
 .project-card__media {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 556 / 400; /* Figma image area 556x400 */
+  aspect-ratio: 572 / 400; /* Figma image area 572x400: Stone/100, 1px Stone/150 inside, radius 2 */
   background: var(--color-stone-100);
-  border: 1px solid rgba(240, 237, 229, 0.6);
-  border-radius: 8px 2px 2px 8px;
+  border: 1px solid var(--color-stone-150);
+  border-radius: 2px;
 }
 
 .project-card__shot {
@@ -632,7 +629,7 @@
   gap: 8px;
 }
 
-/* Meta/Large, Neutral/700, 8 apart. */
+/* Meta/Medium, Neutral/700, 8 apart. */
 .project-card__tags {
   display: flex;
   flex-wrap: wrap;
@@ -641,7 +638,7 @@
   color: var(--color-neutral-700);
 }
 
-/* Heading/H3, Neutral/950. */
+/* Body/Large, Neutral/950. */
 .project-card__title {
   margin: 0;
   color: var(--color-neutral-950);

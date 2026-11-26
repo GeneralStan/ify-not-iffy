@@ -80,12 +80,13 @@ Figma "Inner Page" (4192:24706, Nov 26, 2026). They apply to every case study, i
 
 - **Section rhythm:** every section is split from the next by a 720 divider with the same space above and below it: 80 on desktop, 56 on phones. The hero gets one too. Key takeaways ends with 120 below.
 - **Header:** title, 720 divider, meta row, 720 divider, impact metrics card, all 24 apart.
-- **Impact metrics** (Figma Impact 4202:25049): a 720 wide row of equal cards, 4 apart. Each card is Stone/50 with the 1px outline (#E3E3E3 at 40%), radius 8, 24 padding, an H3 value over a Body/Large label (Stone/900, 8 apart), centred. No rules between them. Phones: the cards stack, 4 apart.
+- **Impact metrics** (Figma Impact 4202:25049): a 720 wide row of equal cards, 4 apart. Each card is Stone/50 with the 1px outline (#E3E3E3 at 40%), radius 8, 24 padding, an H3 value over a Body/Large label (Stone/900, 8 apart), centred. No rules between them. Phones: still one row, scaled down (value 18/24, label 14/20, 12 padding); long labels wrap.
 - **Inside a section:** the title and each block are 56 apart. A step is a number over its title, 16 to the body, 24 to the images, all centred. Images are 24 apart, captions 8 below their image, pairs 20 apart.
 - **Image boxes:** 1024 × 400 (a pair is two 502 boxes), Stone/100, radius 8, 1px Alpha/Border/Outline (#E3E3E3 at 40%). Every corner radius on the page is 8.
-- **Screen images in a hero or card box** (Figma 4192:24709): in the 1024 × 400 box the screen is 774 wide, centred, 95 from the top and cropped at the bottom, radius 8, two soft shadows. The work card and the drawer hero show the same crop.
-  - **Desktop:** sized from the box height (774/400 wide, 95/400 down), so a narrower box, like the work card, trims the sides.
-  - **Phones (below 768):** sized from the box width instead. Keep Figma's share of space at either side (12.2% each, so the screen is 75.6% wide), keep the bottom crop at Figma's share (130 of 1024, measured from the box width), and apply it to the work card and the drawer alike.
+- **Screen images in a hero or card box.** Each box places the screenshot rectangle (1.63 wide to 1 tall, radius 8, two soft shadows) its own way, cropped at the bottom:
+  - **Drawer hero** (Figma 4192:24709): 774 × 475 in the 1024 × 400 box, centred, 95 down. Desktop: sized from the box height. Phones (below 768): sized from the box width, keeping Figma's share of space at either side (12.2% each) and its bottom crop (170 of 1024, measured from the box width).
+  - **Work card** (Figma Case Study Card 4033:3512, live site 4203:25206): 523 × 321 in the 572 × 400 image box, 24 from each side, 94 down. The box keeps its shape at every width, so phones get the same side gaps and crop.
+  - The rule for phones: keep the desktop box's share of side space, and keep the bottom crop.
 - **Text width:** running text is 720 wide at most, centred. Captions follow their image.
 - **Colour:** section titles Stone/950, step and takeaway titles Stone/900, running text and captions Stone/900, labels, step numbers and sources Stone/600.
 - **Problem statement card:** Stone/50, radius 8, 40 padding, 300 tall, the How Might We line in H1 (653 wide) at the bottom. The illustration (200 square, top-right) is optional.

@@ -808,10 +808,24 @@ html.has-case-sheet :is(.hero, main, .site-footer) *::after {
   font-variant-numeric: tabular-nums;
 }
 
-/* Phones: the cards stack, still 4 apart. */
+/* Phones: still one row, scaled down: value 18/24, label 14/20, 12 padding. Long labels wrap; the
+   row's cards share one height. */
 @media (max-width: 767px) {
-  .case-metrics {
-    flex-direction: column;
+  .case-metric {
+    padding: 11px; /* 12 including the 1px outline */
+    gap: 4px;
+    justify-content: flex-start;
+  }
+
+  .case-metric .case-metric__value {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .case-metric .case-metric__label {
+    font-size: 14px;
+    line-height: 20px;
+    text-wrap: balance;
   }
 }
 

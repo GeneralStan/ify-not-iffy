@@ -167,10 +167,8 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     display: none;
   }
 
-  /* A screen recording (Leta), placed as in Figma 4192:24709: in the 1024 x 400 box the screen is
-     774 wide, centred, 95 from the top and running off the bottom (cropped), radius 8, two soft
-     shadows. Sized from the box height, so the card (also 400 tall on desktop) and the drawer hero
-     show the same crop, on phones too; a narrower box trims the sides. */
+  /* A screen recording (Leta), placed as in Figma. The screenshot rectangle is 1.63 wide to 1 tall;
+     the 16:9 clip fills it from the top (a sliver off each side). Radius 8, two soft shadows. */
   .study-media--screen {
     container-type: size;
   }
@@ -182,16 +180,11 @@ const mediaPoster = poster ? withBase(poster) : undefined;
   .study-media.study-media--screen video,
   .study-media.study-media--screen .study-media__still {
     position: absolute;
-    top: 23.75cqh; /* 95 / 400 */
-    left: 50%;
-    width: 193.5cqh; /* 774 / 400 */
-    height: auto;
     max-width: none;
     max-height: none;
-    aspect-ratio: 16 / 9;
+    height: auto;
     object-fit: cover;
     object-position: top center;
-    transform: translateX(-50%);
     border-radius: 8px;
     box-shadow:
       0 0 12px rgba(10, 10, 10, 0.1),
@@ -199,25 +192,38 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     pointer-events: none;
   }
 
-  /* Phones: sized from the width instead, keeping Figma's share of space at either side
-     (125 / 1024 = 12.2%, so 774 / 1024 = 75.6% wide), and cropped at the bottom by the same share
-     as in Figma (130 of the screen's 435 below the box): bottom = -(130 / 1024) of the box width. */
-  @media (max-width: 767px) {
-    .study-media.study-media--screen video,
-    .study-media.study-media--screen .study-media__still {
-      top: auto;
-      bottom: -12.7cqw;
-      width: 75.59cqw;
-    }
+  /* Drawer hero (Figma 4192:24709): in the 1024 x 400 box the screen is 774 x 475, centred, 95 down,
+     cropped at the bottom. Desktop: sized from the box height. */
+  .study-media.study-media--screen:not(.study-media--card) video,
+  .study-media.study-media--screen:not(.study-media--card) .study-media__still {
+    top: 23.75cqh; /* 95 / 400 */
+    left: 50%;
+    width: 193.5cqh; /* 774 / 400 */
+    aspect-ratio: 774 / 475;
+    transform: translateX(-50%);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .study-media--video .study-media__video {
-      display: none;
-    }
+  /* Work card (Figma Case Study Card on the live site, 4203:25206): in the 572 x 400 image box the
+     screen is 523 x 321, 24 from each side, 94 down, cropped at the bottom. The box keeps its shape
+     at every width, so phones show the same side gaps and crop. */
+  .study-media.study-media--card.study-media--screen video,
+  .study-media.study-media--card.study-media--screen .study-media__still {
+    top: 23.5%; /* 94 / 400 */
+    left: 4.28%; /* 24.5 / 572 */
+    width: 91.43%; /* 523 / 572 */
+    aspect-ratio: 523 / 321;
+    transform: none;
+  }
 
-    .study-media--video .study-media__still {
-      display: block;
+  /* Phones, drawer hero: sized from the width instead, keeping Figma's share of space at either side
+     (125 / 1024 = 12.2% each) and its bottom crop (170 of the 475 below the box, so -170 / 1024 of
+     the box width). See docs/case-study-structure.md, "Screen images in a hero or card box". */
+  @media (max-width: 767px) {
+    .study-media.study-media--screen:not(.study-media--card) video,
+    .study-media.study-media--screen:not(.study-media--card) .study-media__still {
+      top: auto;
+      bottom: -16.6cqw;
+      width: 75.59cqw;
     }
   }
 </style>

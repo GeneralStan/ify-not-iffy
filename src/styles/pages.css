@@ -105,24 +105,25 @@
   grid-row: span 2;
 }
 
-/* Playground Tile: Stone/50, 1px Stone/150 border, radius 24. The preview sits centred with at
-   least 40 clear on the top and sides; the caption sits in the bottom margin, 16 below it. */
+/* Figma "Playground Card" (4176:22746): Neutral/0, a 1px Alpha/Border/Outline edge, radius 8,
+   padding 16; the Media box (Stone/50, 1px Stone/150 inside, radius 2) fills the width, then the
+   Meta/Large caption, Neutral/700, centred, 16 below. Hover: Elevation 1 only. */
 .play-tile {
   display: flex;
   flex-direction: column;
   gap: 16px;
   min-width: 0;
   min-height: 0;
-  padding: 40px 40px 16px;
-  border: 1px solid var(--color-stone-150);
-  border-radius: 24px;
-  background: var(--color-stone-50);
+  padding: 16px;
+  border: 1px solid var(--border-outline, rgba(227, 227, 227, 0.4));
+  border-radius: 8px;
+  background: var(--color-neutral-0);
   color: inherit;
   font: inherit;
   text-align: center;
   cursor: zoom-in;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.3s ease;
+  transition: box-shadow 0.3s ease;
 }
 
 .play-tile__stage {
@@ -131,6 +132,10 @@
   display: grid;
   place-items: center;
   container-type: size;
+  overflow: hidden;
+  border: 1px solid var(--color-stone-150);
+  border-radius: 2px;
+  background: var(--color-stone-50);
 }
 
 /* Fitted inside the stage at its own shape (--aspect), never cropped. */
@@ -140,9 +145,7 @@
   overflow: hidden;
   width: min(100cqw, 100cqh * var(--aspect));
   aspect-ratio: var(--aspect);
-  border-radius: 12px;
   background: var(--color-stone-100);
-  transition: scale 0.4s var(--motion-ease-enter);
 }
 
 .play-tile__preview.is-placeholder {
@@ -173,34 +176,19 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: var(--color-stone-600);
-}
-
-.play-tile__title {
-  color: var(--color-stone-950);
+  text-align: center;
+  color: var(--color-neutral-700);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .play-tile:hover {
-    background: var(--color-stone-100);
-  }
-
-  .play-tile:hover .play-tile__preview {
-    scale: 1.015;
+    box-shadow: var(--elevation-1, 0 0 12px rgba(10, 10, 10, 0.1), 0 4px 4px rgba(250, 250, 250, 0.1));
   }
 }
 
 .play-tile:focus-visible {
   outline: 2px solid var(--color-stone-700);
   outline-offset: 4px;
-}
-
-/* Tablets: a little less room around the preview. */
-@media (max-width: 1023px) {
-  .play-tile {
-    padding: 24px 24px 12px;
-    gap: 12px;
-  }
 }
 
 /* Phones (Figma D mobile): 358 wide, 16 gaps, tiles with 16 around the preview. */
@@ -246,19 +234,10 @@
     scroll-snap-align: start;
   }
 
-  .play-tile {
-    padding: 16px 16px 12px;
-    gap: 12px;
-    border-radius: 16px;
-  }
-
-  .play-tile__preview {
-    border-radius: 8px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play-tile__preview,
+  .play-tile,
   .play-filter {
     transition: none;
   }
