@@ -33,6 +33,8 @@ interface Props {
   /** Rendered width of the whole PNG box in CSS px, used for the srcset `sizes` hint
       (raised 20% so the tap pop to 1.2x stays sharp). */
   displayWidth?: number;
+  /** A full `sizes` value, for polaroids whose size changes with the screen (About strip). */
+  sizes?: string;
   class?: string;
   eager?: boolean;
   /** Grow in (0 → 120% → 100%) the first time it scrolls into view, after this many ms. */
@@ -40,7 +42,7 @@ interface Props {
   style?: string;
 }
 
-const { photo, displayWidth = 96, class: className, eager = false, revealDelay, style } = Astro.props;
+const { photo, displayWidth = 96, sizes, class: className, eager = false, revealDelay, style } = Astro.props;
 const revealStyle = revealDelay !== undefined ? `--reveal-delay: ${revealDelay}ms;` : '';
 ---
 
@@ -57,7 +59,7 @@ const revealStyle = revealDelay !== undefined ? `--reveal-delay: ${revealDelay}m
       src={photos[photo]}
       formats={['avif', 'webp']}
       widths={[192, 256, 384, 512, 768, 931]}
-      sizes={`${Math.round(displayWidth * 1.2)}px`}
+      sizes={sizes ?? `${Math.round(displayWidth * 1.2)}px`}
       alt=""
       loading={eager ? 'eager' : 'lazy'}
       fetchpriority={eager ? 'high' : undefined}
