@@ -80,7 +80,7 @@ Figma "Inner Page" (4192:24706, Nov 26, 2026). They apply to every case study, i
 
 - **Section rhythm:** every section is split from the next by a 720 divider with the same space above and below it: 80 on desktop, 56 on phones. The hero gets one too. Key takeaways ends with 120 below.
 - **Header:** title, 720 divider, meta row, 720 divider, impact metrics card, all 24 apart.
-- **Impact metrics** (Figma Impact 4202:25049): a 720 wide row of equal cards, 4 apart. Each card is Stone/50 with the 1px outline (#E3E3E3 at 40%), radius 8, 24 padding, an H3 value over a Body/Large label (Stone/900, 8 apart), centred. No rules between them. Phones: still one row, scaled down (value 18/24, label 14/20, 12 padding); long labels wrap.
+- **Impact metrics** (Figma Impact 4202:25049): a 720 wide row of equal cards, 4 apart. Each card is Stone/50 with the 1px outline (#E3E3E3 at 40%), radius 8, 24 padding, an H3 value over a Body/Large label (Stone/900, 8 apart), centred. No rules between them. Phones: the cards stack, 4 apart.
 - **Inside a section:** the title and each block are 56 apart. A step is a number over its title, 16 to the body, 24 to the images, all centred. Images are 24 apart, captions 8 below their image, pairs 20 apart.
 - **Image boxes:** 1024 × 400 (a pair is two 502 boxes), Stone/100, radius 8, 1px Alpha/Border/Outline (#E3E3E3 at 40%). Every corner radius on the page is 8.
 - **Screen images in a hero or card box.** Each box places the screenshot rectangle (1.63 wide to 1 tall, radius 8, two soft shadows) its own way, cropped at the bottom:
