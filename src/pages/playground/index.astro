@@ -58,7 +58,7 @@ const CLOSE =
               >
                 <span class="play-tile__stage">
                   <span
-                    class:list={['play-tile__preview', piece.placeholder && 'is-placeholder']}
+                    class:list={['play-tile__preview', piece.placeholder && 'is-placeholder', piece.transparent && 'is-transparent']}
                     data-play-preview
                     style={`--aspect: ${piece.aspect};`}
                   >

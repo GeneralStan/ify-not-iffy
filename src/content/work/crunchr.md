@@ -48,7 +48,14 @@ sections:
       - title: "[TBD: action 3]"
         body: "[TBD: what was chosen]"
         visuals: []
+results:
+  status: "[TBD: shipped, partly shipped or not yet in production, and any adoption]"
+  quotes:
+    - text: "[TBD: word-for-word quote]"
+      by: "[TBD: role and context, never a name]"
 takeaways:
-  - "[TBD: what you learned, tied to a real moment from the project]"
-  - "[TBD: what did not work, and what you would change if you did it again]"
+  - title: "[TBD: takeaway title]"
+    body: "[TBD: a real moment from the project, what didn't work, and what you changed afterwards]"
+  - title: "[TBD: takeaway title]"
+    body: "[TBD: a real moment from the project, what didn't work, and what you changed afterwards]"
 ---

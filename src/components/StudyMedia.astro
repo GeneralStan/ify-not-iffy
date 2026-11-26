@@ -44,6 +44,9 @@ const mediaPoster = poster ? withBase(poster) : undefined;
         >
           {mediaWebm && <source src={mediaWebm} type="video/webm" />}
           <source src={mediaSrc} type="video/mp4" />
+          {/* Clips with a transparent background ship as VP9-with-alpha WebM (Chrome, Firefox) and
+              HEVC-with-alpha MP4 (Safari). Safari also plays the WebM but drops its alpha, so the
+              script below removes the WebM source there. */}
         </video>
       </>
     )
@@ -55,9 +58,13 @@ const mediaPoster = poster ? withBase(poster) : undefined;
      when they leave (and never play with reduced motion: the still shows instead). */
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  // Safari (macOS and iOS, where every browser is WebKit) needs the HEVC MP4 for transparency.
+  const webkit = /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Android/.test(navigator.userAgent);
+
   function bindVideos() {
     const videos = document.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]:not([data-bound])');
     if (!videos.length) return;
+    if (webkit) videos.forEach((video) => video.querySelector('source[type="video/webm"]')?.remove());
     if (!('IntersectionObserver' in window)) {
       videos.forEach((video) => {
         video.preload = 'auto';

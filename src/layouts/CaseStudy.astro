@@ -6,8 +6,10 @@
  * Desktop: a 216 Stone/50 side column (× at the top, the section nav below) beside the content
  * column (1224, with the content 1024 wide). Phones: the content alone; text styles follow their
  * Mobile mode through the fluid type tokens.
- * Order: hero image, title, Role / Platform / Tools; Overview; Defining the problem (What we
- * uncovered, problem statement, visuals); themed sections of numbered steps; Key takeaways.
+ * Order: hero image, title, Role / Platform / Tools / Timeline, impact metrics; Overview; Defining
+ * the problem (What we uncovered, problem statement, visuals); themed sections of numbered steps
+ * (optional principle label and pull quote); Results (quote cards, "Feedback" in the wireframe);
+ * Key takeaways. Figma: "Inner Page" 4192:24706 (Nov 26).
  * Structure: docs/case-study-structure.md. Anything still "[TBD: …]" gets .is-tbd.
  * Opening a card on Home loads the same overlay in place (src/scripts/case-sheet.ts); opening the
  * address directly renders Home underneath with the overlay already in place, then slides it in.
@@ -37,6 +39,7 @@ const facts = [
   ['Role', data.facts.role],
   ['Platform', data.facts.platform],
   ['Tools', data.facts.tools],
+  ...(data.facts.timeline ? ([['Timeline', data.facts.timeline]] as const) : []),
 ] as const;
 
 const slug = (text: string, i: number) =>
@@ -46,7 +49,8 @@ const themed = data.sections.map((section, i) => ({ ...section, id: slug(section
 const nav = [
   ['overview', 'Overview'],
   ['problem', 'Defining the problem'],
-  ...themed.map((section) => [section.id, section.title] as const),
+  ...themed.map((section) => [section.id, section.nav ?? section.title] as const),
+  ...(data.results ? ([['results', data.results.title]] as const) : []),
   ['takeaways', 'Key takeaways'],
 ] as const;
 
@@ -127,6 +131,19 @@ const ICONS: Record<string, string[]> = {
                     </div>
                   ))}
                 </dl>
+                {data.metrics.length > 0 && (
+                  <>
+                    <hr class="case-divider" />
+                    <dl class="case-metrics">
+                      {data.metrics.map((metric) => (
+                        <div class="case-metric">
+                          <dt class:list={['case-metric__value text-h3', tbd(metric.value) && 'is-tbd']}>{metric.value}</dt>
+                          <dd class:list={['case-metric__label text-body-lg', tbd(metric.label) && 'is-tbd']}>{metric.label}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </>
+                )}
               </div>
             </header>
 
@@ -174,6 +191,9 @@ const ICONS: Record<string, string[]> = {
                         )}
                         <h4 class:list={['finding__title text-h4', tbd(finding.title) && 'is-tbd']}>{finding.title}</h4>
                         <p class:list={['finding__body text-body', tbd(finding.body) && 'is-tbd']}>{finding.body}</p>
+                        {finding.source && (
+                          <p class:list={['finding__source text-meta', tbd(finding.source) && 'is-tbd']}>Source: {finding.source}</p>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -214,6 +234,9 @@ const ICONS: Record<string, string[]> = {
                       <div class="case-step__head">
                         <p class="case-step__number text-meta">{`${s + 1}.${i}`}</p>
                         <h3 class:list={['case-step__title text-h3', tbd(step.title) && 'is-tbd']}>{step.title}</h3>
+                        {step.principle && (
+                          <p class:list={['case-step__principle text-meta', tbd(step.principle) && 'is-tbd']}>{step.principle}</p>
+                        )}
                       </div>
                       <p class:list={['case-step__body text-body', tbd(step.body) && 'is-tbd']}>{step.body}</p>
                       {step.visuals.map((block) => (
@@ -233,19 +256,59 @@ const ICONS: Record<string, string[]> = {
                           </figure>
                         )
                       ))}
+                      {step.quote && (
+                        <blockquote class="case-quote">
+                          <p class:list={['case-quote__text text-h3', tbd(step.quote.text) && 'is-tbd']}>“{step.quote.text}”</p>
+                          {step.quote.by && <footer class="case-quote__by text-meta">{step.quote.by}</footer>}
+                        </blockquote>
+                      )}
                     </li>
                   ))}
                 </ol>
               </section>
             ))}
 
+            {data.results && (
+              <section class="case-section" id="results" aria-labelledby="results-title" data-toc-section>
+                <div class="case-intro">
+                  <h2 class:list={['case-section__title text-h1', tbd(data.results.title) && 'is-tbd']} id="results-title">{data.results.title}</h2>
+                  {data.results.status && (
+                    <p class:list={['case-lead text-body', tbd(data.results.status) && 'is-tbd']}>{data.results.status}</p>
+                  )}
+                </div>
+                {data.results.quotes.length > 0 && (
+                  <div class="case-said">
+                    {data.results.quotesFrom && <h3 class="case-said__title text-h4">{data.results.quotesFrom}</h3>}
+                    <ul class="case-said__list">
+                      {data.results.quotes.map((quote) => (
+                        <li class="case-said__card">
+                          <blockquote class="case-said__quote">
+                            <p class:list={['case-said__text text-h3', tbd(quote.text) && 'is-tbd']}>“{quote.text}”</p>
+                            {quote.by && <footer class:list={['case-said__by text-meta', tbd(quote.by) && 'is-tbd']}>{quote.by}</footer>}
+                          </blockquote>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {data.results.projected && (
+                  <p class:list={['case-projected text-body', tbd(data.results.projected) && 'is-tbd']}>
+                    <span class="text-meta">Projected</span> {data.results.projected}
+                  </p>
+                )}
+              </section>
+            )}
+
             <section class="case-section" id="takeaways" aria-labelledby="takeaways-title" data-toc-section>
-              <div class="case-intro">
-                <h2 class="case-section__title text-h1" id="takeaways-title">Key takeaways</h2>
-                {data.takeaways.map((paragraph) => (
-                  <p class:list={['case-lead text-body', tbd(paragraph) && 'is-tbd']}>{paragraph}</p>
-                ))}
-              </div>
+              <h2 class="case-section__title text-h1" id="takeaways-title">Key takeaways</h2>
+              {data.takeaways.map((takeaway) => (
+                <div class="case-takeaway">
+                  <h3 class:list={['case-takeaway__title text-h3', tbd(takeaway.title) && 'is-tbd']}>{takeaway.title}</h3>
+                  {takeaway.body.split(/\n\s*\n/).map((paragraph) => (
+                    <p class:list={['case-takeaway__body text-body', tbd(paragraph) && 'is-tbd']}>{paragraph}</p>
+                  ))}
+                </div>
+              ))}
             </section>
 
             <nav class="case-pager" aria-label="Other case studies">

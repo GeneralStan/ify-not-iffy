@@ -3,11 +3,11 @@
    content column, whose content is 1024 wide (100 each side). Sections start 120 below the one
    before, 56 between blocks, a 720 divider between sections. Type uses the token classes, which
    follow each style's Mobile mode on phones (H1 32/36, H2 Lead 24/32, H3 18/28, H4 18/24, Meta
-   14/20). Colours: titles Neutral/950 or Stone/900-950, text Neutral/700, labels Stone/600. */
+   14/20). Colours: titles Stone/950 (H3, H4 Stone/900), running text Stone/900, labels Stone/600. */
 .case-layout {
   min-height: 100%;
   background: var(--color-stone-0);
-  color: var(--color-neutral-700);
+  color: var(--color-stone-900);
 }
 
 .case-rail {
@@ -81,8 +81,7 @@
 .case-hero__media .study-media.study-media--hero {
   aspect-ratio: 1024 / 400;
   min-height: 0;
-  border: 0;
-  border-radius: 20px;
+  border-radius: 8px;
   background: var(--color-stone-100);
   display: grid;
   place-items: center;
@@ -148,11 +147,12 @@
   display: flex;
   flex-direction: column;
   gap: 40px;
-  padding-top: 72px;
   scroll-margin-top: 0;
 }
 
-/* The divider between sections (and under the hero). */
+/* The divider between sections (and under the hero), 720 wide, with the same space above and
+   below it everywhere: 80 on desktop, 56 below that (Figma Inner Page, Nov 26). The hero's gap (40)
+   and a section's gap (56 desktop, 40 below) count towards it. */
 .case-hero::after,
 .case-section + .case-section::before {
   content: '';
@@ -164,12 +164,16 @@
   background: rgba(227, 227, 227, 0.36);
 }
 
+.case-section {
+  padding-top: 56px;
+}
+
 .case-hero::after {
-  margin-top: 32px;
+  margin-top: 16px;
 }
 
 .case-section + .case-section::before {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 @media (min-width: 1024px) {
@@ -179,26 +183,22 @@
 
   .case-section {
     gap: 56px;
-    padding-top: 120px;
-  }
-
-  .case-section + .case-section {
-    padding-top: 0;
+    padding-top: 80px;
   }
 
   .case-hero::after {
-    margin-top: 80px;
+    margin-top: 40px;
   }
 
   .case-section + .case-section::before {
-    margin-bottom: 64px;
+    margin-bottom: 24px;
   }
 }
 
 .case-section__title {
   margin: 0;
   text-align: center;
-  color: var(--color-neutral-950);
+  color: var(--color-stone-950);
 }
 
 .case-intro {
@@ -212,7 +212,7 @@
 .case-lead {
   margin: 0;
   width: min(720px, 100%);
-  color: var(--color-neutral-700);
+  color: var(--color-stone-900);
 }
 
 /* ===== What we uncovered: three findings, 32 apart; icon, H4 and body centred ===== */
@@ -225,7 +225,7 @@
 
 .case-findings__title {
   margin: 0;
-  color: var(--color-neutral-950);
+  color: var(--color-stone-950);
 }
 
 .findings {
@@ -262,17 +262,22 @@
   color: var(--color-stone-900);
 }
 
-/* ===== Problem statement: Stone/100 card, label, How Might We in H1, optional art top right ===== */
+/* ===== Problem statement (Figma 4117:10604): Stone/50 card, 1px Alpha/Border/Outline (#E3E3E3 at
+   40%), radius 8, 40 padding, 300 tall at 1024. "Problem Statement" in Meta/Medium Stone/600 at the
+   top, the How Might We line in H1 Stone/900 (653 max) at the bottom. Optional art: a 200 square
+   illustration flush in the top-right corner, clipped by the card's radius. Not every case study
+   has the art; without it the line can run the full width. ===== */
 .case-statement {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 40px;
-  min-height: 220px;
-  padding: 24px;
+  min-height: 300px;
+  padding: 40px;
+  border: 1px solid rgba(227, 227, 227, 0.4);
   border-radius: 8px;
-  background: var(--color-stone-100);
+  background: var(--color-stone-50);
   overflow: hidden;
 }
 
@@ -285,34 +290,35 @@
   margin: 0;
   max-width: 653px;
   color: var(--color-stone-900);
+  text-wrap: pretty;
 }
 
 .case-statement__art {
   position: absolute;
   top: 0;
   right: 0;
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
+  pointer-events: none;
 }
 
-.case-statement--art .case-statement__text {
-  max-width: calc(100% - 120px);
-}
-
-@media (min-width: 1024px) {
+/* Up to tablet: 24 padding, the art at 112 so the line keeps the width; the label row is as tall
+   as the art so the line always starts below it. */
+@media (max-width: 1023px) {
   .case-statement {
-    min-height: 300px;
-    padding: 40px;
+    min-height: 0;
+    padding: 24px;
   }
 
   .case-statement__art {
-    width: 200px;
-    height: 200px;
+    width: 112px;
+    height: 112px;
   }
 
-  .case-statement--art .case-statement__text {
-    max-width: 653px;
+  .case-statement--art .case-statement__label {
+    min-height: 64px;
+    padding-right: 112px;
   }
 }
 
@@ -336,6 +342,9 @@
 .case-step__head {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  align-self: center;
+  text-align: center;
   gap: 4px;
   max-width: 676px;
 }
@@ -351,8 +360,10 @@
 }
 
 .case-step__body {
-  margin: -8px 0 0;
-  color: var(--color-neutral-700);
+  margin: -8px auto 0;
+  width: min(720px, 100%);
+  text-align: center;
+  color: var(--color-stone-900);
 }
 
 /* ===== Image blocks: Stone/100 with a Stone/150 edge, 400 tall at 1024 (radius 8); captions
@@ -374,12 +385,11 @@
 }
 
 .case-visual--framed .study-media.study-media--slot {
-  border-color: rgba(227, 227, 227, 0.4);
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .case-visual figcaption {
-  color: var(--color-neutral-700);
+  color: var(--color-stone-900);
 }
 
 .case-pair {
@@ -401,6 +411,23 @@
   }
 }
 
+/* Every image box (hero and slots): radius 8 and the 1px Alpha/Border/Outline (#E3E3E3 at 40%). */
+.case-hero__media .study-media.study-media--hero,
+.case-visual .study-media.study-media--slot {
+  border: 1px solid rgba(227, 227, 227, 0.4);
+  border-radius: 8px;
+}
+
+/* An image in the hero or a slot is a whole composed box exported from Figma (screens arranged on
+   Stone/100 with their shadows), so it fills the box at its own shape; any spare room is the same
+   Stone/100 as the box. */
+.case-hero__media .study-media.study-media--hero.study-media--image img:not(.study-media__still),
+.case-visual .study-media.study-media--slot.study-media--image img:not(.study-media__still) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* ===== Pager ===== */
 .case-pager {
   margin-top: 120px;
@@ -415,7 +442,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  color: var(--color-neutral-950);
+  color: var(--color-stone-950);
   text-decoration: none;
 }
 
@@ -433,13 +460,9 @@
   text-underline-offset: 0.2em;
 }
 
-/* ===== Draft placeholders ===== */
-.is-tbd {
-  background: color-mix(in srgb, var(--color-lime-300) 30%, transparent);
-  border-radius: 4px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
+/* ===== Draft placeholders =====
+   Text still reading "[TBD: …]" gets .is-tbd. It is no longer highlighted (the brackets say enough);
+   the class stays as a hook for finding drafts. */
 
 /* ===== Shared overlay close (case studies, Playground images) =====
    The round × in the design system's glass material (base.css; the phone Menu button's look): a
@@ -458,7 +481,7 @@
   -webkit-backdrop-filter: blur(var(--glass-blur));
   backdrop-filter: blur(var(--glass-blur));
   box-shadow: var(--glass-shadow);
-  color: var(--color-neutral-950);
+  color: var(--color-stone-950);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -598,7 +621,7 @@ html.glass-on-dark .overlay-close {
   html.glass-on-dark .case-sheet__close {
     top: 40px;
     left: 40px;
-    color: var(--color-neutral-950);
+    color: var(--color-stone-950);
   }
 
   .case-sheet .case-hero {
@@ -746,4 +769,198 @@ html.has-case-sheet :is(.hero, main, .site-footer) *::after {
   .case-sheet__backdrop {
     transition: none !important;
   }
+}
+
+/* ===== Playbook additions, Figma "Inner Page" 4192:24706 (Nov 26) ===== */
+
+/* Impact metrics (4192:24938): under a second 720 divider, a Stone/50 card (radius 8, no outline),
+   24 padding; each metric an H3 value over a Body/Large label, both Stone/900, 8 apart, left aligned;
+   metrics 40 apart with a 64 tall Alpha/Border/Divider rule between them. Phones: one under another,
+   a full-width rule between. */
+.case-metrics {
+  margin: 0;
+  width: 100%;
+  padding: 24px;
+  border-radius: 8px;
+  background: var(--color-stone-50);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px 40px;
+  text-align: left;
+}
+
+.case-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.case-metric + .case-metric::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 0;
+  width: 1px;
+  height: 64px;
+  background: rgba(227, 227, 227, 0.8);
+}
+
+.case-metric__value,
+.case-metric__label {
+  margin: 0;
+  color: var(--color-stone-900);
+}
+
+.case-metric__value {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  .case-metrics {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 33px;
+  }
+
+  .case-metric {
+    align-items: center;
+    text-align: center;
+  }
+
+  .case-metric + .case-metric::before {
+    left: 0;
+    top: -17px;
+    width: 100%;
+    height: 1px;
+  }
+}
+
+/* A finding's source, under its body. */
+.finding__source {
+  margin: 4px 0 0;
+  color: var(--color-stone-600);
+}
+
+/* A step's principle label, small, under its title. */
+.case-step__principle {
+  margin: 4px 0 0;
+  color: var(--color-stone-600);
+}
+
+/* A pull quote beside a step: 2px Stone/200 rule on the left, H3 Stone/950. */
+.case-quote {
+  margin: 0 auto;
+  width: min(720px, 100%);
+  padding-left: 24px;
+  border-left: 2px solid var(--color-stone-200);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.case-quote__text {
+  margin: 0;
+  color: var(--color-stone-950);
+  text-wrap: pretty;
+}
+
+.case-quote__by {
+  color: var(--color-stone-600);
+}
+
+/* Results / Feedback (4192:24889): quote cards in two columns 32 apart, each Stone/50 with the
+   Alpha/Border/Outline edge, radius 8, 32 padding, the quote (H3 Stone/900, 373 max) centred
+   vertically, 208 tall. Phones: one column, 24 padding, 16 apart. */
+.case-said {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.case-said__title {
+  margin: 0;
+  color: var(--color-stone-950);
+}
+
+.case-said__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  gap: 16px;
+}
+
+.case-said__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  border: 1px solid rgba(227, 227, 227, 0.4);
+  border-radius: 8px;
+  background: var(--color-stone-50);
+}
+
+.case-said__quote {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 373px;
+}
+
+.case-said__text {
+  margin: 0;
+  color: var(--color-stone-900);
+  text-wrap: pretty;
+}
+
+.case-said__by {
+  color: var(--color-stone-600);
+}
+
+@media (min-width: 768px) {
+  .case-said__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+  }
+
+  .case-said__card {
+    min-height: 208px;
+    padding: 32px;
+  }
+}
+
+.case-projected {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  color: var(--color-stone-900);
+}
+
+.case-projected .text-meta {
+  margin-right: 8px;
+  color: var(--color-stone-600);
+}
+
+/* Key takeaways (4192:24910): each an H3 title over its body (720, Body Stone/900), 16 apart and
+   centred, like a step; takeaways sit the section's gap apart (56 desktop, 40 below). */
+.case-takeaway {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.case-takeaway__title,
+.case-takeaway__body {
+  margin: 0;
+  width: min(720px, 100%);
+  color: var(--color-stone-900);
+  text-wrap: pretty;
 }

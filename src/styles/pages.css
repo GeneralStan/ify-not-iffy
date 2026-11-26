@@ -157,8 +157,15 @@
   pointer-events: none;
 }
 
-.play-tile__preview .study-media {
-  background: var(--color-stone-50);
+/* Clips recorded with no background (the phone and its shadow only) sit straight on the tile, so
+   they match it at rest and on hover, and drop the card shadow when expanded. */
+.play-tile__preview.is-transparent,
+.play-tile__preview.is-transparent .study-media {
+  background: transparent;
+}
+
+.play-zoom .play-zoom__card.is-transparent {
+  box-shadow: none;
 }
 
 .play-tile__caption {

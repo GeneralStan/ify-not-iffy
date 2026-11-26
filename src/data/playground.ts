@@ -38,6 +38,8 @@ export interface Piece {
   aspect: number;
   image?: ImageMetadata;
   video?: { src: string; webm: string; poster: string };
+  /** The media has no background of its own (an alpha video), so it sits straight on the tile. */
+  transparent?: boolean;
   /** A stand-in until the real piece is added (shown as [TBD] on the site). */
   placeholder?: boolean;
 }
@@ -47,14 +49,16 @@ const SCREEN = 16 / 10;
 
 export const pieces: Piece[] = [
   {
-    // LETA Express home entrance, recorded from playground-sims/leta-express (640x822 poster).
+    // LETA Express home entrance, recorded from playground-sims/leta-express with no background:
+    // VP9-alpha WebM and HEVC-alpha MP4, 640x822 (record.mjs --bg transparent).
     title: 'LETA Express home entrance',
     categories: ['Motion', 'Product'],
     aspect: 640 / 822,
+    transparent: true,
     video: {
       src: '/playground/leta-express.mp4',
       webm: '/playground/leta-express.webm',
-      poster: '/playground/leta-express-poster.jpg',
+      poster: '/playground/leta-express-poster.webp',
     },
   },
   { title: '[TBD: product piece]', categories: ['Product'], aspect: SCREEN, placeholder: true },

@@ -1,94 +1,106 @@
 # Case Study Structure
 
-Replaces "Portfolio Case Study Structure" (Oct 12, 2026). Agreed Nov 21, 2026; layout updated Nov 22, 2026 to Figma "Inner Page" (4110:3586).
+Replaces "Portfolio Case Study Structure" (Oct 12, 2026) and the Nov 21 structure. Updated Nov 26, 2026 to the new playbook and to Figma "Inner Page" (4192:24706).
 
-This is a mental model, not a set of fixed labels. Every case study is told in the same order so a reader always knows where they are, but each section can bend to fit the project.
+Every case study follows the same page order. A case study can have fewer themed sections or steps, but never skips or reorders the parts below.
 
-It is written for two readers. The scanner gives it 30 seconds and reads the header, the Overview and the decision titles. The careful reader slows down to check the thinking: the evidence behind the problem, what you considered and dropped, and what you would do differently.
+## Readers
 
-## The order
+Write for two readers at once:
 
-| Section | What it does | Length |
-| --- | --- | --- |
-| Header | Hero image, the title, and three facts | Title of 15 words max, plus Role, Platform, Tools |
-| Overview | Summarises the whole case study | One short paragraph, then images |
-| Defining the problem | Sets the stage | What we uncovered (three findings), a problem statement, and the visuals that prove it |
-| Themed sections | The bulk of the page | One or more sections with their own titles (for example "How I built it", "Acting on delays"), each a run of numbered steps (1.0, 1.1, 2.0…) |
-| Key takeaways | What you took away, honestly | One short section |
+- **The scanner** (about 30 seconds) reads the title, the impact metrics, the Overview and the step titles. These must tell the whole story on their own.
+- **The careful reader** checks the evidence, the options I rejected, and whether the reflection is honest.
 
-## Header
+## Page order
 
-- **Hero:** a playground clip, a hero screen or a phone recording, matching what shipped, in the 1024x400 image box.
-- **Title:** names the product, the user problem and the intent, in 15 words or fewer. Never just "Driver App Redesign".
-- **Three facts:** Role, Platform, Tools. For example: Lead Product Designer · Web · Claude Code, MCPs, Figma.
+### 1. Header
 
-## Overview
+- Hero image or short clip (a marked slot until supplied).
+- Title: 15 words or fewer. It names the product, the user problem and the intent. Never just "[Product] Redesign".
+- Meta row: Role · Platform · Tools · Timeline.
+- Impact metrics, directly under the meta row: two to four measured results, each a large number with a one-line label that says what it is compared against (e.g. "3 weeks" / "to build the design system, against an estimated 3 months"). Measured results only: nothing projected, nothing estimated without saying so. These numbers appear only here.
 
-The introduction, and nothing more. It holds:
+### 2. Overview
 
-1. The product or vertical, in a sentence.
-2. The duration, scope and your role, if the header facts need a sentence of context.
-3. The main problem, as a negative signal: low conversion, high drop-off, slow task times, usability issues. Name the number if there is one. This is the teaser for Defining the problem.
-4. What you did, in one line.
-5. A one-line preview of the outcome: the actual result, or the projected one, clearly marked as projected.
+- One short paragraph: what the product does and who uses it, what was going wrong, and what I did. No numbers that already appear in the impact metrics.
+- Then one image.
 
-If it runs past one short paragraph and the outcome line, it is doing another section's job.
+### 3. Defining the problem
 
-## Defining the problem
+- Short intro: one or two sentences on why it mattered.
+- "What we uncovered": exactly three findings, each with an icon, a short title and two or three sentences. They must not overlap. Each names its source plainly (e.g. "Source: timed usability sessions").
+- Problem statement card: one "How might we…" question, wide enough that every themed section answers part of it.
+- Supporting research visuals with captions: journey maps, usability results, card sorts, surveys, field notes. Research visuals live here, never in a section of their own.
 
-The Problem part of the story. Usually something had to be redesigned, simplified or built new. This section explains why, and shows how you came to understand it.
+### 4. Themed sections (usually 2 or 3)
 
-- Lead with why it mattered, before any screenshots.
-- Show the evidence: research, UX mapping, journey maps, research screenshots, stakeholder input or field reports. Name the source plainly, for example "ops team field reports from three clients". Never dress up stakeholder input as formal research.
-- A How Might We line is optional, one sentence.
-- Personas, journey maps and flows support the problem. They are never sections of their own.
+- A short title saying what the section achieved (e.g. "How I built it", "Completing daily tasks faster"). A shorter side-nav label is allowed ("Faster workflows").
+- A run of numbered steps: 1.0, 1.1, 2.0, 2.1…
+- Each step has:
+  - Number and title: what was done and why, as a full phrase.
+  - Principle label (optional, small, under the title): the heuristic or principle the step shows ("Visibility of system status", "Error prevention", "Recognition over recall", "Flexibility and efficiency of use", "Consistency and standards"). Named once; no separate heuristics section.
+  - One paragraph, about 100 words, in this order: the problem and its evidence → the option I considered and why I dropped it → what I built → the result or feedback. No sub-headings.
+  - Images: one full-width image or a pair, with optional captions. Before/after pairs preferred.
+  - Optional pull quote beside the step it proves, at most one per case study.
+- Each step is built around one main decision: **strategic** (what to build or not), **tactical** (how a screen or flow works) or **micro** (where a single element sits or what it says). Strategic decisions usually lead the first section; tactical ones fill the themed sections; micro decisions are supporting details inside a step, not steps of their own.
 
-Keep it concise. It sets the stage; it is not the story.
+### 5. Results (always before Key takeaways)
 
-## Themed sections and steps
+- A status line: shipped, partly shipped, or not yet in production, said plainly, with any adoption.
+- What people said: two or three quotes in quote marks, attributed by role and context, never by name (e.g. "Dispatcher, grocery client"). Without individual attribution, group them under their source ("From dispatchers and ops:"). Only word-for-word quotes go in quote marks; paraphrased feedback is plain text.
+- Projected: at most one line, clearly marked as projected.
+- Do not repeat the impact metrics. The heading can be renamed ("Feedback" in the Leta case study).
 
-The bulk of the page. Group the work into one or more sections named for what they were about ("How I built it", "Acting on delays"). Each section is a run of numbered steps: section 1 gives 1.0, 1.1…, section 2 gives 2.0, 2.1…
+### 6. Key takeaways
 
-A step is anything you chose on purpose: the big moves that answer the problem and the smaller details that add polish. Each step has:
-
-1. **A title** that says what you did and why.
-2. **One short paragraph**: what was wrong (with its evidence), what you did, and what came of it (measured, feedback, or projected, marked as projected). Name the real alternatives you dropped only when there were some.
-3. **Images**: a full-width block, or two side by side (for example Before / After), each with an optional caption.
-
-Results live inside each step. There is no separate results section.
-
-## Key takeaways
-
-Talk honestly about what you learned, including the things that did not work. A reflection that only lists successes is a red flag: it suggests either no real difficulty, which nobody believes, or that the uncomfortable parts are being hidden.
-
-A strong reflection is:
-
-- **Specific:** tied to real moments from the project.
-- **Personal:** what you took away, not what designers should know in general.
-- **Honest about what failed:** what did not work, and what you would change if you did it again.
-
-It reads like one designer talking to another. Never write lines like "I learnt the importance of user-centric design".
+- Two or three, each a title and one paragraph.
+- Each ties a lesson to a real moment, says what didn't work, and says what I changed afterwards. A takeaway without the change is not finished.
+- First person, plain and honest. No quotes and no metrics.
 
 ## Writing rules
 
-- **Pass both gates.** The header, Overview and decision titles must hold up on a 30-second scan. The evidence and the options must hold up when someone slows down.
-- **Pair every action with a result.** "Improved the UX" is not a line. If the result is still a placeholder, the line is not ready.
-- **Name the evidence source.** Research, stakeholder input, field reports or support tickets, said plainly.
-- **Mention AI only where it was used.** Say what it executed and what you decided. Where it was not used, say nothing.
-- **Unshipped is not a weakness.** State projected impact as projected, and back it with validation and feedback.
-- **Make every word earn its place.** Plain, direct sentences.
+- Plain, direct sentences. Short paragraphs. No jargon, no abbreviations, no marketing words.
+- Every claim pairs an action with a result: measured, feedback, or projected and labelled as projected.
+- Name every evidence source plainly. Never present stakeholder input as formal research.
+- Mention AI only where it was used, and say what it executed and what I decided.
+- Unshipped work is not a weakness: state its status plainly and back it with feedback and validation.
+- Anonymise clients unless told otherwise ("a grocery client", "a restaurant chain").
+- Each number appears once on the page.
+- Anything missing is marked [TBD: what is needed], never guessed.
+
+## Images
+
+- Every section has at least one marked image slot that says what the picture should show.
+- Visuals must match what was built or shipped; caption any frame that differs.
+- Older explorations go inside the step they belong to, captioned "Earlier exploration", never in a gallery of their own.
+
+## Layout rules
+
+Figma "Inner Page" (4192:24706, Nov 26, 2026). They apply to every case study, in Figma and on the site.
+
+- **Section rhythm:** every section is split from the next by a 720 divider with the same space above and below it: 80 on desktop, 56 on phones. The hero gets one too. Key takeaways ends with 120 below.
+- **Header:** title, 720 divider, meta row, 720 divider, impact metrics card, all 24 apart.
+- **Impact metrics card:** 1024 wide, Stone/50, radius 8, 24 padding. Each metric an H3 value over a Body/Large label (Stone/900, 8 apart), metrics 40 apart with a 64 tall divider rule between. Phones: stacked, centred, a full-width rule between.
+- **Inside a section:** the title and each block are 56 apart. A step is a number over its title, 16 to the body, 24 to the images, all centred. Images are 24 apart, captions 8 below their image, pairs 20 apart.
+- **Image boxes:** 1024 × 400 (a pair is two 502 boxes), Stone/100, radius 8, 1px Alpha/Border/Outline (#E3E3E3 at 40%). Every corner radius on the page is 8.
+- **Text width:** running text is 720 wide at most, centred. Captions follow their image.
+- **Colour:** section titles Stone/950, step and takeaway titles Stone/900, running text and captions Stone/900, labels, step numbers and sources Stone/600.
+- **Problem statement card:** Stone/50, radius 8, 40 padding, 300 tall, the How Might We line in H1 (653 wide) at the bottom. The illustration (200 square, top-right) is optional.
+- **What we uncovered:** three findings in equal-height columns, 32 apart.
+- **Results quote cards:** two columns 32 apart, each Stone/50 with the outline, radius 8, 32 padding, 208 tall, the quote in H3 Stone/900 (373 wide) centred vertically. Phones: one column, 24 padding.
+- **Key takeaways:** each an H3 title over its 720 body, 16 apart, centred; takeaways 56 apart.
 
 ## On the site
 
-- Layout: Figma "Inner Page" (4110:3586): a drawer over Home on desktop, a bottom sheet on phones.
-- Side navigation lists the sections: Overview, Defining the problem, each themed section by its title, Key takeaways.
-- Content: one Markdown file per case study in `src/content/work/`.
+- Layout: a drawer over Home on desktop, a bottom sheet on phones.
+- Side navigation lists Overview, Defining the problem, each themed section (by its nav label or title), Results (by its heading) and Key takeaways.
+- Content: one Markdown file per case study in `src/content/work/`; the shape is in `src/content.config.ts`.
 
 ## Case study tracker
 
 | Case study | Status | Open items |
 | --- | --- | --- |
-| Leta design system to working prototype (flagship) | Drafting | Title. Team and timeline. Field feedback. Prototype build time before and after. Rejected options from Figma. Pick two product decisions from: notifications as a ledger, depot as a filter, single-driver dispatch, killing the order creation wizard |
+| Leta design system to working prototype (flagship) | Drafting | Timeline. Metric labels that say what each is compared against. Finding sources. Step bodies (1.0 to 3.1), section 2 step titles, principle labels. Results status line and quote attribution. Second takeaway body |
 | Leta M-Pesa Mini App | Needs context | Everything except the 69% time-to-first-value figure from the About page |
 | Leta Driver App redesign | Needs context | Shipped. Numbers or driver quotes behind the impact claims. Update Figma frames to the per-order swipe |
 | Crunchr | Needs context | Material not shared yet. Phone recording is in the repo |
