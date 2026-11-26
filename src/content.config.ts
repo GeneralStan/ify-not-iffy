@@ -15,6 +15,8 @@ const visual = z.object({
   src: z.string().optional(),
   webm: z.string().optional(),
   poster: z.string().optional(),
+  /** A screen recording, placed and cropped as in Figma 4192:24709. */
+  screen: z.boolean().optional(),
   alt: z.string().default(''),
   label: z.string().optional(),
   caption: z.string().optional(),

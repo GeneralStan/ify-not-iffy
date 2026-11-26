@@ -40,7 +40,7 @@ export interface Piece {
   video?: { src: string; webm: string; poster: string };
   /** The media has no background of its own (an alpha video), so it sits straight on the tile. */
   transparent?: boolean;
-  /** A stand-in until the real piece is added (shown as [TBD] on the site). */
+  /** A stand-in until the real piece is added (an empty tile with its name). */
   placeholder?: boolean;
 }
 
@@ -61,14 +61,14 @@ export const pieces: Piece[] = [
       poster: '/playground/leta-express-poster.webp',
     },
   },
-  { title: '[TBD: product piece]', categories: ['Product'], aspect: SCREEN, placeholder: true },
-  { title: '[TBD: 3D piece]', categories: ['3D'], aspect: 1, placeholder: true },
-  { title: '[TBD: illustration]', categories: ['Illustration'], aspect: 4 / 5, placeholder: true },
-  { title: '[TBD: motion piece]', categories: ['Motion'], aspect: PHONE, placeholder: true },
-  { title: '[TBD: product piece]', categories: ['Product'], aspect: PHONE, placeholder: true },
-  { title: '[TBD: 3D piece]', categories: ['3D'], aspect: SCREEN, placeholder: true },
-  { title: '[TBD: illustration]', categories: ['Illustration'], aspect: SCREEN, placeholder: true },
-  { title: '[TBD: motion piece]', categories: ['Motion'], aspect: SCREEN, placeholder: true },
+  { title: 'Product piece', categories: ['Product'], aspect: SCREEN, placeholder: true },
+  { title: '3D piece', categories: ['3D'], aspect: 1, placeholder: true },
+  { title: 'Illustration', categories: ['Illustration'], aspect: 4 / 5, placeholder: true },
+  { title: 'Motion piece', categories: ['Motion'], aspect: PHONE, placeholder: true },
+  { title: 'Product piece', categories: ['Product'], aspect: PHONE, placeholder: true },
+  { title: '3D piece', categories: ['3D'], aspect: SCREEN, placeholder: true },
+  { title: 'Illustration', categories: ['Illustration'], aspect: SCREEN, placeholder: true },
+  { title: 'Motion piece', categories: ['Motion'], aspect: SCREEN, placeholder: true },
 ];
 
 const SIZE: Record<RowType, number> = { full: 1, two: 2, three: 3, bento: 3 };

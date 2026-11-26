@@ -9,15 +9,17 @@ interface Props {
   poster?: string;
   alt?: string;
   label?: string;
+  /** A screen recording, placed and cropped as in Figma 4192:24709. */
+  screen?: boolean;
 }
 
-const { kind, frame, src, webm, poster, alt = '', label = '' } = Astro.props;
+const { kind, frame, src, webm, poster, alt = '', label = '', screen = false } = Astro.props;
 const mediaSrc = src ? withBase(src) : undefined;
 const mediaWebm = webm ? withBase(webm) : undefined;
 const mediaPoster = poster ? withBase(poster) : undefined;
 ---
 
-<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`]} data-skeleton={kind === 'placeholder' ? undefined : ''}>
+<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`, screen && 'study-media--screen']} data-skeleton={kind === 'placeholder' ? undefined : ''}>
   {
     kind === 'placeholder' && (
       <p class="study-media__label text-meta">{label}</p>
@@ -160,8 +162,41 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     object-position: center;
   }
 
-  .study-media__still {
+  /* Two classes, to outrank `.study-media img` above. */
+  .study-media .study-media__still {
     display: none;
+  }
+
+  /* A screen recording (Leta), placed as in Figma 4192:24709: in the 1024 x 400 box the screen is
+     774 wide, centred, 95 from the top and running off the bottom (cropped), radius 8, two soft
+     shadows. Sized from the box height, so the card (also 400 tall on desktop) and the drawer hero
+     show the same crop, on phones too; a narrower box trims the sides. */
+  .study-media--screen {
+    container-type: size;
+  }
+
+  .study-media--screen:not(.study-media--card) {
+    position: relative;
+  }
+
+  .study-media.study-media--screen video,
+  .study-media.study-media--screen .study-media__still {
+    position: absolute;
+    top: 23.75cqh; /* 95 / 400 */
+    left: 50%;
+    width: 193.5cqh; /* 774 / 400 */
+    height: auto;
+    max-width: none;
+    max-height: none;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top center;
+    transform: translateX(-50%);
+    border-radius: 8px;
+    box-shadow:
+      0 0 12px rgba(10, 10, 10, 0.1),
+      0 4px 4px rgba(250, 250, 250, 0.1);
+    pointer-events: none;
   }
 
   @media (prefers-reduced-motion: reduce) {

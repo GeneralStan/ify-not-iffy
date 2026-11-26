@@ -15,6 +15,12 @@ const projects = [
     slug: 'leta-design-system',
     tags: ['Leta Technologies', 'Web', 'B2B'],
     title: 'Rebuilding Leta’s dispatch dashboard as a working prototype ops teams could test before launch.',
+    video: {
+      src: '/work/leta-design-system/preview.mp4',
+      webm: '/work/leta-design-system/preview.webm',
+      poster: '/work/leta-design-system/preview-poster.jpg',
+      screen: true,
+    },
   },
   {
     slug: 'leta-mpesa',
@@ -30,9 +36,20 @@ const projects = [
     slug: 'crunchr',
     tags: ['Crunchr', 'Mobile', 'B2C'],
     title: 'Enabling users to purchase everyday essentials within 30 minutes.',
-    video: true,
+    video: {
+      src: '/work/crunchr-iphone.mp4',
+      webm: '/work/crunchr-iphone.webm',
+      poster: '/work/crunchr-iphone-poster.jpg',
+      screen: false,
+    },
   },
-].map((project, index) => ({ ...project, n: index + 1 }));
+].map((project, index) => ({ ...project, n: index + 1 })) as Array<{
+  slug: string;
+  tags: string[];
+  title: string;
+  n: number;
+  video?: { src: string; webm: string; poster: string; screen: boolean };
+}>;
 
 const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p.n % 2 === 0)];
 ---
@@ -60,14 +77,15 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                 data-tooltip="View details"
                 style={`--order: ${project.n}; --reveal-delay: ${c * 110}ms`}
               >
-                <div class:list={['project-card__media', project.video && 'project-card__media--phone']} data-skeleton>
+                <div class:list={['project-card__media', project.video && !project.video.screen && 'project-card__media--phone']} data-skeleton>
                   {project.video ? (
                     <StudyMedia
                       kind="video"
                       frame="card"
-                      src="/work/crunchr-iphone.mp4"
-                      webm="/work/crunchr-iphone.webm"
-                      poster="/work/crunchr-iphone-poster.jpg"
+                      src={project.video.src}
+                      webm={project.video.webm}
+                      poster={project.video.poster}
+                      screen={project.video.screen}
                       alt=""
                     />
                   ) : (

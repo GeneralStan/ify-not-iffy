@@ -21,10 +21,14 @@ metrics:
     label: Order Fulfilment
   - value: 100+
     label: Components
+# Screen recording from my-portfolio-materials/Case study 1 preview.MOV (1440 wide, no sound).
 hero:
-  kind: image
-  src: /work/leta-design-system/hero.webp
-  alt: The redesigned Deliveries table, with unassigned and dispatched orders and their delay flags.
+  kind: video
+  src: /work/leta-design-system/preview.mp4
+  webm: /work/leta-design-system/preview.webm
+  poster: /work/leta-design-system/preview-poster.jpg
+  screen: true
+  alt: Selecting an order in the redesigned Deliveries table, which brings up the bulk action bar.
 overview:
   body: Leta's software helps delivery businesses run their orders. Dispatchers assign each order to a driver and track it until drop-off. Their everyday tasks took too many steps, and testing fixes in Figma was slow. I rebuilt the design system in code with Claude Code, wrote six specs, and built a working prototype dispatchers have tested.
   visuals:
@@ -64,7 +68,7 @@ sections:
   - title: How I built it
     steps:
       - title: Rebuilding the design system before redesigning a single screen
-        body: "[TBD: step body. The wireframe's stand-in paragraph: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed.]"
+        body: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed. They also needed to view the drop-off locations of unassigned orders to determine where deliveries needed to happen. Finally, they required access to live delivery metrics on the map without interrupting the view.
         visuals:
           - kind: image
             src: /work/leta-design-system/built-1-0.webp
@@ -72,20 +76,19 @@ sections:
           - kind: image
             src: /work/leta-design-system/older-explorations.webp
             alt: Two earlier login screen explorations.
-            caption: Earlier exploration
+            caption: Older Explorations
       - title: Specs, skills and an interactive prototype
-        body: "[TBD: step body]"
+        body: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed. They also needed to view the drop-off locations of unassigned orders to determine where deliveries needed to happen. Finally, they required access to live delivery metrics on the map without interrupting the view.
         visuals:
           - kind: placeholder
-            label: "[TBD: image]"
           - kind: image
             src: /work/leta-design-system/older-explorations.webp
             alt: Two earlier login screen explorations.
-            caption: Earlier exploration
+            caption: Older Explorations
   - title: Acting on delays
     steps:
-      - title: "[TBD: step title]"
-        body: "[TBD: step body]"
+      - title: Rebuilding the design system before redesigning a single screen
+        body: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed. They also needed to view the drop-off locations of unassigned orders to determine where deliveries needed to happen. Finally, they required access to live delivery metrics on the map without interrupting the view.
         visuals:
           - kind: image
             src: /work/leta-design-system/built-1-0.webp
@@ -99,15 +102,14 @@ sections:
                 src: /work/leta-design-system/after.webp
                 alt: The new Deliveries screen, with depot filters and unassigned and delayed counts.
                 caption: After
-      - title: "[TBD: step title]"
-        body: "[TBD: step body]"
+      - title: Scoped feature specs then built a prototype to test
+        body: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed. They also needed to view the drop-off locations of unassigned orders to determine where deliveries needed to happen. Finally, they required access to live delivery metrics on the map without interrupting the view.
         visuals:
           - kind: placeholder
-            label: "[TBD: image]"
           - kind: image
             src: /work/leta-design-system/older-explorations.webp
             alt: Two earlier login screen explorations.
-            caption: Earlier exploration
+            caption: Older Explorations
   - title: Completing daily tasks faster
     nav: Faster workflows
     steps:
@@ -127,14 +129,13 @@ sections:
                 alt: The new Deliveries screen, with depot filters and unassigned and delayed counts.
                 caption: After
       - title: Reassigning and rescheduling
-        body: "[TBD: step body]"
+        body: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed. They also needed to view the drop-off locations of unassigned orders to determine where deliveries needed to happen. Finally, they required access to live delivery metrics on the map without interrupting the view.
         visuals:
           - kind: placeholder
-            label: "[TBD: image]"
           - kind: image
             src: /work/leta-design-system/older-explorations.webp
             alt: Two earlier login screen explorations.
-            caption: Earlier exploration
+            caption: Older Explorations
 results:
   title: Feedback
   quotes:
@@ -147,5 +148,5 @@ takeaways:
 
       To bring the engineers and product owners closer to the project, I deployed and shared the interactive prototype and opened the repository for engineers to fork and test in their own sandboxes.
   - title: Building fast showed me how much I was working alone
-    body: "[TBD: takeaway body]"
+    body: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed. They also needed to view the drop-off locations of unassigned orders to determine where deliveries needed to happen. Finally, they required access to live delivery metrics on the map without interrupting the view.
 ---
