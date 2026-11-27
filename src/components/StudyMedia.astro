@@ -1,8 +1,20 @@
 ---
 import { withBase } from '../lib/url';
+import LetaThemeCompare from './LetaThemeCompare';
+
+interface Overlay {
+  src: string;
+  still: string;
+  alt?: string;
+  /** Left, top and width in percent of the image box; ratio is the animation's width / height. */
+  x: number;
+  y: number;
+  w: number;
+  ratio: number;
+}
 
 interface Props {
-  kind: 'image' | 'video' | 'placeholder';
+  kind: 'image' | 'video' | 'placeholder' | 'compare';
   frame: 'card' | 'hero' | 'slot';
   src?: string;
   webm?: string;
@@ -11,24 +23,45 @@ interface Props {
   label?: string;
   /** A screen recording, placed and cropped as in Figma 4192:24709. */
   screen?: boolean;
+  /** A playground demo recording in a 16:10 box. */
+  demo?: boolean;
+  /** A looping animation laid over the image (the Overview's Login map). */
+  overlay?: Overlay;
 }
 
-const { kind, frame, src, webm, poster, alt = '', label = '', screen = false } = Astro.props;
+const { kind, frame, src, webm, poster, alt = '', label = '', screen = false, demo = false, overlay } = Astro.props;
 const mediaSrc = src ? withBase(src) : undefined;
 const mediaWebm = webm ? withBase(webm) : undefined;
 const mediaPoster = poster ? withBase(poster) : undefined;
 ---
 
-<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`, screen && 'study-media--screen']} data-skeleton={kind === 'placeholder' ? undefined : ''}>
+<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`, screen && 'study-media--screen', demo && 'study-media--demo']} data-skeleton={kind === 'placeholder' ? undefined : ''}>
   {
     kind === 'placeholder' && (
       <p class="study-media__label text-meta">{label}</p>
     )
   }
   {
-    kind === 'image' && mediaSrc && (
+    kind === 'image' && mediaSrc && !overlay && (
       <img src={mediaSrc} alt={alt} />
     )
+  }
+  {
+    kind === 'image' && mediaSrc && overlay && (
+      <div class="study-media__stage">
+        <img src={mediaSrc} alt={alt} />
+        <picture
+          class="study-media__overlay"
+          style={`left: ${overlay.x}%; top: ${overlay.y}%; width: ${overlay.w}%; aspect-ratio: ${overlay.ratio};`}
+        >
+          <source srcset={withBase(overlay.still)} media="(prefers-reduced-motion: reduce)" />
+          <img src={withBase(overlay.src)} alt={overlay.alt ?? ''} loading="lazy" decoding="async" />
+        </picture>
+      </div>
+    )
+  }
+  {
+    kind === 'compare' && <LetaThemeCompare client:visible />
   }
   {
     kind === 'video' && mediaSrc && (
@@ -213,6 +246,57 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     width: 91.43%; /* 523 / 572 */
     aspect-ratio: 523 / 321;
     transform: none;
+  }
+
+  /* An image with a looping animation laid over it: the stage keeps the Figma box's shape (1024 x 400)
+     so the overlay's percentages line up at every width. */
+  .study-media__stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1024 / 400;
+    overflow: hidden;
+  }
+
+  .study-media__stage > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .study-media__overlay {
+    position: absolute;
+    display: block;
+  }
+
+  .study-media__overlay img {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Light/dark compare (Figma 4257:35298): fills the 1024 x 400 box at every width. */
+  .study-media--compare {
+    display: block;
+  }
+
+  .study-media--compare :global(.leta-theme-compare) {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Playground demo recordings: a 16:10 box at every width, which the 1440 x 900 clip fills. */
+  .study-media.study-media--demo {
+    position: relative;
+  }
+
+  .study-media.study-media--demo video,
+  .study-media.study-media--demo .study-media__still {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: top center;
   }
 
   /* Phones, drawer hero: sized from the width instead, keeping Figma's share of space at either side

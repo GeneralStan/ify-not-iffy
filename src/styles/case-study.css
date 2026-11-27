@@ -411,6 +411,17 @@
   }
 }
 
+/* Playground demo recordings keep the clip's 16:10 shape at every width (1024 x 640 on desktop).
+   The compare keeps the Figma box's 1024 x 400 at every width so the components stay legible. */
+.case-visual .study-media.study-media--slot.study-media--demo {
+  aspect-ratio: 16 / 10;
+}
+
+.case-visual .study-media.study-media--slot.study-media--compare,
+.case-visual .study-media.study-media--slot:has(.study-media__stage) {
+  aspect-ratio: 1024 / 400;
+}
+
 /* Every image box (hero and slots): radius 8 and the 1px Alpha/Border/Outline (#E3E3E3 at 40%). */
 .case-hero__media .study-media.study-media--hero,
 .case-visual .study-media.study-media--slot {

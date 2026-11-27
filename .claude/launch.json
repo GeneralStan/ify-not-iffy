@@ -12,6 +12,12 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": ["-c", "cd playground-sims/leta-express && BROWSER=none npx expo start --web --port 8091"],
       "port": 8091
+    },
+    {
+      "name": "leta-playground",
+      "runtimeExecutable": "/Users/ifeanyi/Library/pnpm/bin/pnpm",
+      "runtimeArgs": ["-C", "/Users/ifeanyi/Sandbox/LETA", "--filter", "@leta/playground", "dev", "--port", "5180", "--strictPort"],
+      "port": 5180
     }
   ]
 }

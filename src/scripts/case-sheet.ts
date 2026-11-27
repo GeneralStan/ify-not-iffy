@@ -544,6 +544,15 @@ function fillFrom(doc: Document, node: HTMLElement, scroll: HTMLElement) {
   node.setAttribute('aria-label', doc.title.split(' — ')[0] || 'Case study');
   document.title = doc.title;
   scroll.replaceChildren(document.importNode(layout, true));
+  // Scripts inserted this way never run, and the layout carries Astro's island loader (the Leta
+  // light/dark compare is a React island). Recreate each one so it runs and the island hydrates;
+  // the loader guards its own custom element, so opening a case study twice is safe.
+  scroll.querySelectorAll('script').forEach((old) => {
+    const script = document.createElement('script');
+    for (const { name, value } of old.attributes) script.setAttribute(name, value);
+    script.textContent = old.textContent;
+    old.replaceWith(script);
+  });
   window.__ifySkeleton?.(scroll);
   bindToc(scroll, scroll);
   scroll.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]').forEach((video) => {

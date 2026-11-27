@@ -12,6 +12,7 @@ This project keeps its motion knowledge in `.claude/skills/`. Start here, then o
 - **CSS keyframes and transitions** for load-in, hover, focus and state changes (docked nav, hedges).
 - **Web Animations API** (`element.animate()`) in small vanilla scripts for anything replayable on input: the logo spin (`src/scripts/hero-intro.ts`) and the polaroid pop (`src/scripts/polaroid.ts`).
 - Do not add GSAP, Motion/React, Lenis, Lottie or Three.js without asking the owner.
+- Exception, asked for by the owner (Nov 27, 2026): the Leta case study's light/dark compare (`src/components/ui/image-compare.tsx`) is a React island that uses Motion (`motion/react`) for its springs. Keep Motion inside that island.
 
 ## Shared values (`tokens/tokens.json` → `src/styles/tokens.css`)
 

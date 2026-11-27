@@ -11,12 +11,19 @@ import { z } from 'astro/zod';
  * Anything still "[TBD: …]" renders as a marked placeholder.
  */
 const visual = z.object({
-  kind: z.enum(['image', 'video', 'placeholder']),
+  /** `compare` is the light/dark slider of Leta components (Figma 4257:35298). */
+  kind: z.enum(['image', 'video', 'placeholder', 'compare']),
   src: z.string().optional(),
   webm: z.string().optional(),
   poster: z.string().optional(),
   /** A screen recording, placed and cropped as in Figma 4192:24709. */
   screen: z.boolean().optional(),
+  /** A playground demo recording: a 16:10 box (1024 x 640) the 1440 x 900 clip fills. */
+  demo: z.boolean().optional(),
+  /** A looping animation laid over an image, in percent of the Figma box (Overview: the Login map). */
+  overlay: z
+    .object({ src: z.string(), still: z.string(), alt: z.string().default(''), x: z.number(), y: z.number(), w: z.number(), ratio: z.number() })
+    .optional(),
   alt: z.string().default(''),
   label: z.string().optional(),
   caption: z.string().optional(),
