@@ -303,8 +303,13 @@ const mediaPoster = poster ? withBase(poster) : undefined;
   /* Browser-framed screens: the box is the container, so the frames' cqw offsets and the windows
      themselves scale together with the box at every width. The box crops each window's bottom. */
   .study-media--framed {
-    position: relative;
     container-type: inline-size;
+  }
+
+  /* The work card box is already absolutely placed over its media box; only the others need a
+     positioning context (forcing relative on the card collapsed it to 0px and hid the window). */
+  .study-media--framed:not(.study-media--card) {
+    position: relative;
   }
 
   .study-media__framebox {

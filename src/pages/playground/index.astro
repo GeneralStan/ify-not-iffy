@@ -6,8 +6,12 @@ import badgeGold from '../../assets/playground/badges/badge-gold.svg?raw';
 import badgeSilver from '../../assets/playground/badges/badge-silver.svg?raw';
 import badgeBronze from '../../assets/playground/badges/badge-bronze.svg?raw';
 
+// The back of each coin is the same badge without its number (the last <text> or <path>).
+const blankBack = (svg: string) =>
+  /<text[\s\S]*<\/text>/.test(svg) ? svg.replace(/<text[\s\S]*<\/text>/, '') : svg.replace(/<path(?![\s\S]*<path)[^>]*\/>/, '');
+const medals = [badgeGold, badgeSilver, badgeBronze].map((front) => ({ front, back: blankBack(front) }));
 // Two runs of the three badges, so the track can loop without a seam.
-const badges = [badgeGold, badgeSilver, badgeBronze, badgeGold, badgeSilver, badgeBronze];
+const badges = [...medals, ...medals];
 
 // Figma "Playground — layout explorations", Variation D (rows + filters). The first render uses the
 // desktop row order with every piece; the script below lays the tiles out again for phones and
@@ -19,8 +23,6 @@ const grouped = rows.map((row) => {
   next += row.size;
   return { ...row, items };
 });
-const CLOSE =
-  'M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z';
 ---
 
 <SiteLayout
@@ -54,13 +56,13 @@ const CLOSE =
         grouped.map((row) => (
           <div class={`play-row play-row--${row.type}`}>
             {row.items.map(({ piece, index }) => (
-              <button
-                type="button"
+              <div
                 class="play-tile"
                 data-play-tile
                 data-index={index}
                 data-cats={piece.categories.join('|')}
-                aria-label={`Expand ${piece.title.replace(/^\[TBD: (.*)\]$/, '$1')}`}
+                role="img"
+                aria-label={piece.title.replace(/^\[TBD: (.*)\]$/, '$1')}
               >
                 <span class="play-tile__stage" data-media-reveal>
                   <span
@@ -71,9 +73,12 @@ const CLOSE =
                     {piece.badges && (
                       <span class="play-badges" aria-hidden="true">
                         <span class="play-badges__track">
-                          {badges.map((svg, i) => (
+                          {badges.map((medal, i) => (
                             <span class="play-badge" style={`--i: ${i % 3};`}>
-                              <span class="play-badge__coin" set:html={svg} />
+                              <span class="play-badge__coin">
+                                <span class="play-badge__face" set:html={medal.front} />
+                                <span class="play-badge__face play-badge__face--back" set:html={medal.back} />
+                              </span>
                             </span>
                           ))}
                         </span>
@@ -91,7 +96,7 @@ const CLOSE =
                     )}
                   </span>
                 </span>
-              </button>
+              </div>
             ))}
           </div>
         ))
@@ -99,23 +104,15 @@ const CLOSE =
     </div>
   </section>
 
-  <template id="play-zoom-close">
-    <button type="button" class="overlay-close play-zoom__close" aria-label="Close" data-zoom-close>
-      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d={CLOSE} /></svg>
-    </button>
-  </template>
 </SiteLayout>
 
 <script>
   /*
-   * Playground: rows, filters and the expanded view.
+   * Playground: rows and filters.
    * - Rows: tiles are grouped into rows (full, two, three, bento) in the order set per breakpoint in
    *   src/data/playground.ts, again whenever the screen crosses 768px or a filter is picked.
    * - Filters: only the matching pieces stay, laid out with the same row order, with a quick fade.
-   * - Expand: the preview glides out of its tile, wider and into the centre (like a case study card's
-   *   image gliding into the drawer's hero), then the frosted backdrop fades in behind it. Closing
-   *   runs it backwards: backdrop first, then the preview settles back into its tile. Close with the
-   *   glass ×, Escape, or a tap on the backdrop or the preview.
+   * - Tiles don't open or expand (removed Nov 28, 2026, at the owner's request).
    */
   import { layoutRows, type RowType } from '../../data/playground';
 
@@ -182,107 +179,5 @@ const CLOSE =
     filters.forEach((button) => button.addEventListener('click', () => pick(button.dataset.filter ?? 'all')));
     phone.addEventListener('change', layout);
     if (phone.matches) layout();
-
-    /* ----- Expand a preview ----- */
-    const closeTemplate = document.querySelector<HTMLTemplateElement>('#play-zoom-close');
-    const ifyFocus = (control: HTMLElement | null, container?: HTMLElement | null) =>
-      (window as unknown as { __ifyFocus?: (c: HTMLElement | null, k?: HTMLElement | null) => void }).__ifyFocus?.(
-        control,
-        container,
-      );
-    let open = false;
-
-    grid.addEventListener('click', (event) => {
-      const tile = (event.target as Element).closest<HTMLElement>('[data-play-tile]');
-      if (tile && !open) expand(tile);
-    });
-
-    function expand(tile: HTMLElement) {
-      const preview = tile.querySelector<HTMLElement>('[data-play-preview]');
-      if (!preview) return;
-      open = true;
-      const aspect = parseFloat(getComputedStyle(preview).getPropertyValue('--aspect')) || 1;
-      const from = preview.getBoundingClientRect();
-
-      // Centred and as large as the screen allows, never past the media's own size.
-      const vw = document.documentElement.clientWidth;
-      const vh = window.innerHeight;
-      const media = preview.querySelector<HTMLImageElement | HTMLVideoElement>('img, video');
-      const natural =
-        media instanceof HTMLImageElement ? media.naturalWidth : media instanceof HTMLVideoElement ? media.videoWidth : 0;
-      const capW = natural ? Math.max(natural, from.width) : 1100;
-      const w = Math.min(vw - (vw < 768 ? 32 : 160), (vh - 144) * aspect, capW);
-      const h = w / aspect;
-      const left = (vw - w) / 2;
-      const top = (vh - h) / 2 + 24;
-
-      const overlay = document.createElement('div');
-      overlay.className = 'play-zoom';
-      overlay.setAttribute('role', 'dialog');
-      overlay.setAttribute('aria-modal', 'true');
-      overlay.setAttribute('aria-label', tile.getAttribute('aria-label')?.replace('Expand ', '') ?? 'Project');
-      const backdrop = document.createElement('div');
-      backdrop.className = 'play-zoom__backdrop';
-      const clone = preview.cloneNode(true) as HTMLElement;
-      clone.removeAttribute('data-play-preview');
-      clone.classList.add('play-zoom__card');
-      clone.setAttribute('tabindex', '-1');
-      Object.assign(clone.style, { width: `${w}px`, height: `${h}px` });
-      const close = closeTemplate!.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
-      overlay.append(backdrop, clone, close);
-      document.body.append(overlay);
-      document.documentElement.classList.add('has-play-zoom');
-      const swallow = (event: Event) => event.preventDefault();
-      overlay.addEventListener('wheel', swallow, { passive: false });
-      overlay.addEventListener('touchmove', swallow, { passive: false });
-
-      // A cloned video starts paused; carry on from where the tile's copy is.
-      const video = preview.querySelector('video');
-      const cloneVideo = clone.querySelector('video');
-      if (video && cloneVideo && !reduced.matches) {
-        cloneVideo.currentTime = video.currentTime;
-        cloneVideo.play().catch(() => undefined);
-      }
-
-      const at = (r: DOMRect) => `translate(${r.left}px, ${r.top}px) scale(${r.width / w})`;
-      const centre = `translate(${left}px, ${top}px) scale(1)`;
-      preview.style.visibility = 'hidden';
-      clone.style.transform = at(from);
-      clone.getBoundingClientRect(); // commit the start before animating
-      requestAnimationFrame(() => {
-        overlay.classList.add('is-open');
-        clone.style.transform = centre;
-      });
-      ifyFocus(close, overlay);
-
-      let closing = false;
-      function done() {
-        if (closing) return;
-        closing = true;
-        overlay.classList.remove('is-open');
-        clone.style.transform = at(preview!.getBoundingClientRect());
-        const finish = () => {
-          overlay.remove();
-          preview!.style.visibility = '';
-          document.documentElement.classList.remove('has-play-zoom');
-          document.removeEventListener('keydown', onKey);
-          open = false;
-          ifyFocus(tile, null);
-        };
-        if (reduced.matches) finish();
-        else window.setTimeout(finish, 600); // 160ms behind the backdrop, then 420ms home
-      }
-      const onKey = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') done();
-        if (event.key === 'Tab') {
-          event.preventDefault();
-          close.focus();
-        }
-      };
-      close.addEventListener('click', done);
-      backdrop.addEventListener('click', done);
-      clone.addEventListener('click', done);
-      document.addEventListener('keydown', onKey);
-    }
   }
 </script>

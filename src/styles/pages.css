@@ -120,7 +120,6 @@
   background: #f6f6f1;
   color: inherit;
   font: inherit;
-  cursor: zoom-in;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   transition: box-shadow 0.3s ease;
@@ -164,10 +163,6 @@
   background: transparent;
 }
 
-.play-zoom .play-zoom__card.is-transparent {
-  box-shadow: none;
-}
-
 /* A piece that fills the whole slot (the badges) rather than sitting centred at a shape. */
 .play-tile__preview.is-fill {
   width: 100%;
@@ -205,12 +200,25 @@
 }
 
 .play-badge__coin {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
   animation: play-badge-flip 4.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
   animation-delay: calc(var(--i) * -1.4s);
+}
+
+.play-badge__face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* The back of the coin: the badge without its number. */
+.play-badge__face--back {
+  transform: rotateY(180deg);
 }
 
 .play-badge__coin svg {
@@ -229,7 +237,8 @@
   }
 }
 
-/* Rest, then one quick full turn (the depth reads as a coin flipping), then rest. */
+/* Rest, then one quick full turn, then rest. The turn runs the same way the badges travel
+   (the front face rolls to the right), like a coin rolling rightward. */
 @keyframes play-badge-flip {
   0%,
   55% {
@@ -237,7 +246,7 @@
   }
   85%,
   100% {
-    transform: rotateY(360deg);
+    transform: rotateY(-360deg);
   }
 }
 
@@ -248,16 +257,6 @@
   }
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .play-tile:hover {
-    box-shadow: var(--elevation-1, 0 0 12px rgba(10, 10, 10, 0.1), 0 4px 4px rgba(250, 250, 250, 0.1));
-  }
-}
-
-.play-tile:focus-visible {
-  outline: 2px solid var(--color-stone-700);
-  outline-offset: 4px;
-}
 
 /* Phones (Figma D mobile): 358 wide, 16 gaps, tiles with 16 around the preview. */
 @media (max-width: 767px) {
@@ -315,84 +314,6 @@
 @media (prefers-reduced-motion: reduce) {
   .play-tile,
   .play-filter {
-    transition: none;
-  }
-}
-
-/* ===== Playground expanded view =====
-   The tapped tile's preview glides out of the tile, wider and into the centre (never past its real
-   size), over the frosted Stone/950 20% backdrop shared with case studies; the glass × sits top-left. */
-.play-zoom {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-}
-
-/* Sequenced (two-way): opening, the card grows out of the board first and the frosted backdrop
-   follows as it lands; closing, the backdrop clears first and then the card settles back. The
-   transitions sit on the state being entered, so each direction gets its own delays. */
-.play-zoom__backdrop {
-  position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--color-stone-950) 20%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  opacity: 0;
-  will-change: opacity;
-  transition: opacity 240ms var(--motion-ease-fade);
-}
-
-.play-zoom.is-open .play-zoom__backdrop {
-  opacity: 1;
-  transition: opacity 320ms var(--motion-ease-fade) 380ms;
-}
-
-.play-zoom .play-zoom__card {
-  position: fixed;
-  left: 0;
-  top: 0;
-  scale: none;
-  transform-origin: 0 0;
-  cursor: zoom-out;
-  box-shadow: 0 16px 48px rgba(10, 10, 10, 0.25);
-  will-change: transform;
-  /* Emil Kowalski's drawer curve, as on the case study drawer. */
-  transition: transform 420ms cubic-bezier(0.32, 0.72, 0, 1) 160ms;
-}
-
-.play-zoom.is-open .play-zoom__card {
-  transition: transform 460ms cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.play-zoom__close {
-  position: absolute;
-  z-index: 2;
-  top: 16px;
-  left: 16px;
-  opacity: 0;
-  transition:
-    opacity 200ms var(--motion-ease-fade),
-    background-color 0.3s ease,
-    scale 0.16s var(--motion-ease-out);
-}
-
-.play-zoom.is-open .play-zoom__close {
-  opacity: 1;
-  transition:
-    opacity 320ms var(--motion-ease-fade) 380ms,
-    background-color 0.3s ease,
-    scale 0.16s var(--motion-ease-out);
-}
-
-/* No overflow lock (it reflowed the page as the scrollbar went); the overlay swallows scrolling. */
-.play-zoom {
-  touch-action: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play-zoom__backdrop,
-  .play-zoom .play-zoom__card,
-  .play-zoom__close {
     transition: none;
   }
 }
