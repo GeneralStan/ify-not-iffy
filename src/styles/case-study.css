@@ -462,6 +462,12 @@
   object-fit: contain;
 }
 
+/* A hero image exported from Figma carries its own background (M-Pesa: Amber/150, no stroke in
+   Figma 4307:55907), so the box drops its outline, as the work card does. */
+.case-hero__media .study-media.study-media--hero.study-media--image {
+  border-color: transparent;
+}
+
 /* Phones: the hero box takes the card's shape, so a 1024x400 hero image is cropped to its middle
    (where the screens are), as the card shows it. */
 @media (max-width: 767px) {
