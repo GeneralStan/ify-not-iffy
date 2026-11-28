@@ -87,12 +87,17 @@ sections:
       - title: Identifying delayed and at-risk deliveries.
         body: Nothing on the orders page said how many orders were late. Order fulfilment is split into five stage targets, from assignment to drop-off, that add up to one total for every order. With single and multi order trips, delays are flagged as soon as one stage runs over. An order is flagged as “At Risk” when the driver's live position & speed predicts a miss.
         visuals:
-          - kind: image
-            src: /work/leta-design-system/delayed-orders.webp
-            alt: The Deliveries table with delayed and at-risk counts, and the reason an order is delayed.
+          - kind: video
+            demo: true
+            src: /work/leta-design-system/demo-delays.mp4
+            webm: /work/leta-design-system/demo-delays.webm
+            poster: /work/leta-design-system/demo-delays.jpg
+            alt: Hovering the Delayed and At Risk icons in the Deliveries table, then opening each order to see its delay banner.
             caption: Identifying delayed orders
           - kind: image
             src: /work/leta-design-system/time-targets.webp
+            frames:
+              - { src: /work/leta-design-system/shot-time-targets.webp, x: 201, y: 20, w: 623 }
             alt: Time Targets settings, with a target for each delivery stage.
             caption: Configuring time targets
       - title: Notifications to stay ahead
@@ -119,6 +124,10 @@ sections:
             alt: Filtering to broadcasted orders, opening one, and following its broadcast logs, driver groups and notified drivers until a driver accepts.
           - kind: image
             src: /work/leta-design-system/broadcast-states.webp
+            frames:
+              - { src: /work/leta-design-system/shot-broadcast-1.webp, x: 23, y: 103, w: 310 }
+              - { src: /work/leta-design-system/shot-broadcast-2.webp, x: 357, y: 103, w: 310 }
+              - { src: /work/leta-design-system/shot-broadcast-3.webp, x: 691, y: 103, w: 310 }
             alt: Three order drawers showing different broadcast states.
             caption: Snapshots of the various order broadcast states
   - title: Faster workflows
@@ -154,10 +163,16 @@ sections:
           - pair:
               - kind: image
                 src: /work/leta-design-system/search-before.webp
+                box: [502, 400]
+                frames:
+                  - { src: /work/leta-design-system/shot-search-before.webp, x: 43, y: 24, w: 669, vis: 0.6861 }
                 alt: The old Orders screen, with status filters in a long dropdown.
                 caption: Before
               - kind: image
                 src: /work/leta-design-system/search-after.webp
+                box: [502, 400]
+                frames:
+                  - { src: /work/leta-design-system/shot-search-after.webp, x: 60, y: 40, w: 645, vis: 0.6853 }
                 alt: The new Deliveries screen, with group filters and More filters open.
                 caption: After
       - title: Simplified order creation
@@ -172,10 +187,16 @@ sections:
           - pair:
               - kind: image
                 src: /work/leta-design-system/create-before.webp
+                box: [502, 400]
+                frames:
+                  - { src: /work/leta-design-system/shot-create-before.webp, x: 31, y: 65, w: 440 }
                 alt: The old Add Order form.
                 caption: Before
               - kind: image
                 src: /work/leta-design-system/create-after.webp
+                box: [502, 400]
+                frames:
+                  - { src: /work/leta-design-system/shot-create-after.webp, x: 31, y: 65, w: 440 }
                 alt: The new two-column Create Order drawer.
                 caption: After
 results:

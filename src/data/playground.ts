@@ -42,6 +42,9 @@ export interface Piece {
   transparent?: boolean;
   /** A stand-in until the real piece is added (an empty tile with its name). */
   placeholder?: boolean;
+  /** The medal badges (Figma 4179:24004): gold, silver and bronze drifting across the tile, each
+      turning like a coin. Fills the tile instead of sitting at `aspect`. */
+  badges?: boolean;
 }
 
 const PHONE = 9 / 19.5;
@@ -61,7 +64,7 @@ export const pieces: Piece[] = [
       poster: '/playground/leta-express-poster.webp',
     },
   },
-  { title: 'Product piece', categories: ['Product'], aspect: SCREEN, placeholder: true },
+  { title: 'Medal badges', categories: ['Motion', 'Illustration'], aspect: 1, badges: true },
   { title: '3D piece', categories: ['3D'], aspect: 1, placeholder: true },
   { title: 'Illustration', categories: ['Illustration'], aspect: 4 / 5, placeholder: true },
   { title: 'Motion piece', categories: ['Motion'], aspect: PHONE, placeholder: true },

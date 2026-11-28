@@ -180,7 +180,7 @@
   --type-h2-family: var(--font-display);
   --type-h2-weight: var(--font-weight-regular);
   --type-h2-size: clamp(24px, calc(24px + (100vw - 390px) * 0.00762), 32px);
-  --type-h2-line-height: clamp(32px, calc(32px + (100vw - 390px) * 0.00762), 40px);
+  --type-h2-line-height: clamp(28px, calc(28px + (100vw - 390px) * 0.01143), 40px);
   --type-h2-tracking: -0.015em;
   --type-h3-family: var(--font-body);
   --type-h3-weight: var(--font-weight-regular);

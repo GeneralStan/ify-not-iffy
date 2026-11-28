@@ -1,0 +1,84 @@
+---
+/**
+ * A browser window drawn around a screen (screenshot or recording): a light top bar with the three
+ * window dots, a 1px outline, radius and the two soft shadows from the Figma screen rectangles.
+ * Every size is in container units of the frame itself, so the whole window scales as one piece
+ * (desktop to phone) and never crops the screen's sides: the screen sits under the bar at its own
+ * shape. Place it with `style` (left / top / width) inside a positioned box; the box crops the
+ * bottom when the window is taller than the box.
+ */
+interface Props {
+  class?: string;
+  style?: string;
+}
+
+const { class: className, style } = Astro.props;
+---
+
+<div class:list={['browser-frame', className]} style={style}>
+  <div class="browser-frame__bar" aria-hidden="true">
+    <span class="browser-frame__dot browser-frame__dot--close"></span>
+    <span class="browser-frame__dot browser-frame__dot--min"></span>
+    <span class="browser-frame__dot browser-frame__dot--max"></span>
+  </div>
+  <div class="browser-frame__screen">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .browser-frame {
+    container-type: inline-size;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-radius: 1.4cqw;
+    box-shadow:
+      0 0 12px rgba(10, 10, 10, 0.1),
+      0 4px 4px rgba(250, 250, 250, 0.1);
+  }
+
+  .browser-frame__bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75cqw;
+    height: 3cqw;
+    padding: 0 1.6cqw;
+    background: #f7f7f5;
+    border-bottom: 1px solid #ececea;
+  }
+
+  .browser-frame__dot {
+    width: 0.95cqw;
+    height: 0.95cqw;
+    border-radius: 50%;
+  }
+
+  .browser-frame__dot--close {
+    background: #ff5f57;
+  }
+
+  .browser-frame__dot--min {
+    background: #febc2e;
+  }
+
+  .browser-frame__dot--max {
+    background: #28c840;
+  }
+
+  .browser-frame__screen {
+    position: relative;
+    line-height: 0;
+  }
+
+  .browser-frame__screen :global(img),
+  .browser-frame__screen :global(video) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

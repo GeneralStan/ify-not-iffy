@@ -1,6 +1,18 @@
 ---
 import { withBase } from '../lib/url';
 import LetaThemeCompare from './LetaThemeCompare';
+import BrowserFrame from './BrowserFrame.astro';
+
+/** A screenshot in a browser frame, placed as in Figma: x, y and w in px of the Figma box. `vis`
+    is the share of the screenshot's width inside the box (a screen that runs off the right edge). */
+interface FrameShot {
+  src: string;
+  alt?: string;
+  x: number;
+  y: number;
+  w: number;
+  vis?: number;
+}
 
 interface Overlay {
   src: string;
@@ -27,22 +39,53 @@ interface Props {
   demo?: boolean;
   /** A looping animation laid over the image (the Overview's Login map). */
   overlay?: Overlay;
+  /** Screenshots, each in a browser frame at its Figma position. */
+  frames?: FrameShot[];
+  /** The Figma box the frames are placed in, [width, height]. */
+  box?: [number, number];
 }
 
-const { kind, frame, src, webm, poster, alt = '', label = '', screen = false, demo = false, overlay } = Astro.props;
+const { kind, frame, src, webm, poster, alt = '', label = '', screen = false, demo = false, overlay, frames, box } = Astro.props;
+
+/* Where the browser window sits in each box (Figma px). Hero: Figma 4192:24709, 774 wide, centred,
+   95 down. Work card: Case Study Card 4094:775, 523 wide, 24 from each side, 94 down. Demo: the whole
+   window with 40 around it. Static screens: their own Figma rectangles (`frames`). */
+const boxWidth = box?.[0] ?? (frame === 'card' ? 572 : 1024);
+const videoSpot = demo ? { x: 40, y: 40, w: 944 } : frame === 'card' ? { x: 24.5, y: 94, w: 523 } : { x: 125, y: 95, w: 774 };
+const place = (s: { x: number; y: number; w: number }) =>
+  `left: ${((s.x / boxWidth) * 100).toFixed(3)}%; top: ${((s.y / boxWidth) * 100).toFixed(3)}cqw; width: ${((s.w / boxWidth) * 100).toFixed(3)}%;`;
+const framedVideo = kind === 'video' && (screen || demo);
+const framed = framedVideo || (kind === 'image' && !!frames?.length);
 const mediaSrc = src ? withBase(src) : undefined;
 const mediaWebm = webm ? withBase(webm) : undefined;
 const mediaPoster = poster ? withBase(poster) : undefined;
 ---
 
-<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`, screen && 'study-media--screen', demo && 'study-media--demo']} data-skeleton={kind === 'placeholder' ? undefined : ''}>
+<div class:list={['study-media', `study-media--${frame}`, `study-media--${kind}`, screen && 'study-media--screen', demo && 'study-media--demo', framed && 'study-media--framed']} data-skeleton={kind === 'placeholder' ? undefined : ''} data-media-reveal={kind === 'placeholder' ? undefined : ''}>
   {
     kind === 'placeholder' && (
       <p class="study-media__label text-meta">{label}</p>
     )
   }
   {
-    kind === 'image' && mediaSrc && !overlay && (
+    kind === 'image' && frames?.length && (
+      <div class="study-media__framebox">
+        {frames.map((shot) => (
+          <BrowserFrame style={place(shot)}>
+            <img
+              src={withBase(shot.src)}
+              alt={shot.alt ?? alt}
+              loading="lazy"
+              decoding="async"
+              style={shot.vis && shot.vis < 1 ? `width: ${(shot.vis * 100).toFixed(2)}%` : undefined}
+            />
+          </BrowserFrame>
+        ))}
+      </div>
+    )
+  }
+  {
+    kind === 'image' && mediaSrc && !overlay && !frames?.length && (
       <img src={mediaSrc} alt={alt} />
     )
   }
@@ -64,7 +107,29 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     kind === 'compare' && <LetaThemeCompare client:visible />
   }
   {
-    kind === 'video' && mediaSrc && (
+    framedVideo && mediaSrc && (
+      <div class="study-media__framebox">
+        <BrowserFrame style={place(videoSpot)}>
+          <img class="study-media__still" src={mediaPoster} alt={alt} />
+          <video
+            class="study-media__video"
+            data-lazy-video
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster={mediaPoster}
+            aria-label={alt || undefined}
+          >
+            {mediaWebm && <source src={mediaWebm} type="video/webm" />}
+            <source src={mediaSrc} type="video/mp4" />
+          </video>
+        </BrowserFrame>
+      </div>
+    )
+  }
+  {
+    kind === 'video' && !framedVideo && mediaSrc && (
       <>
         <img class="study-media__still" src={mediaPoster} alt={alt} />
         <video
@@ -200,54 +265,6 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     display: none;
   }
 
-  /* A screen recording (Leta), placed as in Figma. The screenshot rectangle is 1.63 wide to 1 tall;
-     the 16:9 clip fills it from the top (a sliver off each side). Radius 8, two soft shadows. */
-  .study-media--screen {
-    container-type: size;
-  }
-
-  .study-media--screen:not(.study-media--card) {
-    position: relative;
-  }
-
-  .study-media.study-media--screen video,
-  .study-media.study-media--screen .study-media__still {
-    position: absolute;
-    max-width: none;
-    max-height: none;
-    height: auto;
-    object-fit: cover;
-    object-position: top center;
-    border-radius: 8px;
-    box-shadow:
-      0 0 12px rgba(10, 10, 10, 0.1),
-      0 4px 4px rgba(250, 250, 250, 0.1);
-    pointer-events: none;
-  }
-
-  /* Drawer hero (Figma 4192:24709): in the 1024 x 400 box the screen is 774 x 475, centred, 95 down,
-     cropped at the bottom. Desktop: sized from the box height. */
-  .study-media.study-media--screen:not(.study-media--card) video,
-  .study-media.study-media--screen:not(.study-media--card) .study-media__still {
-    top: 23.75cqh; /* 95 / 400 */
-    left: 50%;
-    width: 193.5cqh; /* 774 / 400 */
-    aspect-ratio: 774 / 475;
-    transform: translateX(-50%);
-  }
-
-  /* Work card (Figma Case Study Card on the live site, 4203:25206): in the 572 x 400 image box the
-     screen is 523 x 321, 24 from each side, 94 down, cropped at the bottom. The box keeps its shape
-     at every width, so phones show the same side gaps and crop. */
-  .study-media.study-media--card.study-media--screen video,
-  .study-media.study-media--card.study-media--screen .study-media__still {
-    top: 23.5%; /* 94 / 400 */
-    left: 4.28%; /* 24.5 / 572 */
-    width: 91.43%; /* 523 / 572 */
-    aspect-ratio: 523 / 321;
-    transform: none;
-  }
-
   /* An image with a looping animation laid over it: the stage keeps the Figma box's shape (1024 x 400)
      so the overlay's percentages line up at every width. */
   .study-media__stage {
@@ -283,31 +300,32 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     height: 100%;
   }
 
-  /* Playground demo recordings: a 16:10 box at every width, which the 1440 x 900 clip fills. */
-  .study-media.study-media--demo {
+  /* Browser-framed screens: the box is the container, so the frames' cqw offsets and the windows
+     themselves scale together with the box at every width. The box crops each window's bottom. */
+  .study-media--framed {
     position: relative;
+    container-type: inline-size;
   }
 
-  .study-media.study-media--demo video,
-  .study-media.study-media--demo .study-media__still {
+  .study-media__framebox {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    object-fit: cover;
-    object-position: top center;
+    overflow: hidden;
   }
 
-  /* Phones, drawer hero: sized from the width instead, keeping Figma's share of space at either side
-     (125 / 1024 = 12.2% each) and its bottom crop (170 of the 475 below the box, so -170 / 1024 of
-     the box width). See docs/case-study-structure.md, "Screen images in a hero or card box". */
-  @media (max-width: 767px) {
-    .study-media.study-media--screen:not(.study-media--card) video,
-    .study-media.study-media--screen:not(.study-media--card) .study-media__still {
-      top: auto;
-      bottom: -16.6cqw;
-      width: 75.59cqw;
-    }
+  .study-media.study-media--framed .study-media__framebox :global(img),
+  .study-media.study-media--framed .study-media__framebox :global(video) {
+    width: 100%;
+    height: auto;
+    position: static;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    object-fit: fill;
   }
+
+  .study-media--framed .study-media__framebox :global(.study-media__still) {
+    display: none;
+  }
+
 </style>

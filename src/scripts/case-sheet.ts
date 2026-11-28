@@ -554,6 +554,7 @@ function fillFrom(doc: Document, node: HTMLElement, scroll: HTMLElement) {
     old.replaceWith(script);
   });
   window.__ifySkeleton?.(scroll);
+  window.__ifyMediaReveal?.(scroll);
   bindToc(scroll, scroll);
   scroll.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]').forEach((video) => {
     if (reduced.matches) return;

@@ -2,6 +2,12 @@
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import StudyMedia from '../../components/StudyMedia.astro';
 import { categories, layoutRows, pieces, playgroundHead, rowPattern } from '../../data/playground';
+import badgeGold from '../../assets/playground/badges/badge-gold.svg?raw';
+import badgeSilver from '../../assets/playground/badges/badge-silver.svg?raw';
+import badgeBronze from '../../assets/playground/badges/badge-bronze.svg?raw';
+
+// Two runs of the three badges, so the track can loop without a seam.
+const badges = [badgeGold, badgeSilver, badgeBronze, badgeGold, badgeSilver, badgeBronze];
 
 // Figma "Playground — layout explorations", Variation D (rows + filters). The first render uses the
 // desktop row order with every piece; the script below lays the tiles out again for phones and
@@ -56,12 +62,23 @@ const CLOSE =
                 data-cats={piece.categories.join('|')}
                 aria-label={`Expand ${piece.title.replace(/^\[TBD: (.*)\]$/, '$1')}`}
               >
-                <span class="play-tile__stage">
+                <span class="play-tile__stage" data-media-reveal>
                   <span
-                    class:list={['play-tile__preview', piece.placeholder && 'is-placeholder', piece.transparent && 'is-transparent']}
+                    class:list={['play-tile__preview', piece.placeholder && 'is-placeholder', piece.transparent && 'is-transparent', piece.badges && 'is-fill']}
                     data-play-preview
                     style={`--aspect: ${piece.aspect};`}
                   >
+                    {piece.badges && (
+                      <span class="play-badges" aria-hidden="true">
+                        <span class="play-badges__track">
+                          {badges.map((svg, i) => (
+                            <span class="play-badge" style={`--i: ${i % 3};`}>
+                              <span class="play-badge__coin" set:html={svg} />
+                            </span>
+                          ))}
+                        </span>
+                      </span>
+                    )}
                     {piece.image && <img src={piece.image.src} alt="" loading="lazy" decoding="async" draggable="false" />}
                     {piece.video && (
                       <StudyMedia
@@ -73,10 +90,6 @@ const CLOSE =
                       />
                     )}
                   </span>
-                </span>
-                <span class="play-tile__caption text-meta-lg">
-                  <span class:list={['play-tile__title', piece.placeholder && 'is-tbd']}>{piece.title}</span>
-                  <span class="play-tile__cats"> · {piece.categories.join(', ')}</span>
                 </span>
               </button>
             ))}

@@ -24,6 +24,12 @@ const visual = z.object({
   overlay: z
     .object({ src: z.string(), still: z.string(), alt: z.string().default(''), x: z.number(), y: z.number(), w: z.number(), ratio: z.number() })
     .optional(),
+  /** Screenshots, each in a browser frame at its Figma position (x, y, w in px of the Figma box). */
+  frames: z
+    .array(z.object({ src: z.string(), alt: z.string().optional(), x: z.number(), y: z.number(), w: z.number(), vis: z.number().optional() }))
+    .optional(),
+  /** The Figma box the frames sit in, [width, height] (default 1024 x 400). */
+  box: z.tuple([z.number(), z.number()]).optional(),
   alt: z.string().default(''),
   label: z.string().optional(),
   caption: z.string().optional(),

@@ -105,51 +105,49 @@
   grid-row: span 2;
 }
 
-/* Figma "Playground Card" (4176:22746): Neutral/0, a 1px Alpha/Border/Outline edge, radius 8,
-   padding 16; the Media box (Stone/50, 1px Stone/150 inside, radius 2) fills the width, then the
-   Meta/Large caption, Neutral/700, centred, 16 below. Hover: Elevation 1 only. */
+/* Figma "Playground Row" tiles (4178:23975): #F6F6F1, a 1px #F0EDE5 inside edge, radius 24,
+   padding 40 (phones 16 / 16 / 40 / 16). No caption and no inner frame: the Preview slot fills the
+   tile and clips, so a piece can sit anywhere in it. Until a piece exists, a placeholder box
+   (#EFEFE6, the same edge, radius 12) sits centred at the piece's shape. Hover: Elevation 1. */
 .play-tile {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   min-width: 0;
   min-height: 0;
-  padding: 16px;
-  border: 1px solid var(--border-outline, rgba(227, 227, 227, 0.4));
-  border-radius: 8px;
-  background: var(--color-neutral-0);
+  padding: 40px;
+  border: 1px solid #f0ede5;
+  border-radius: 24px;
+  background: #f6f6f1;
   color: inherit;
   font: inherit;
-  text-align: center;
   cursor: zoom-in;
+  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   transition: box-shadow 0.3s ease;
 }
 
 .play-tile__stage {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: grid;
   place-items: center;
   container-type: size;
-  overflow: hidden;
-  border: 1px solid var(--color-stone-150);
-  border-radius: 2px;
-  background: var(--color-stone-50);
 }
 
-/* Fitted inside the stage at its own shape (--aspect), never cropped. */
+/* Fitted inside the slot at its own shape (--aspect), never cropped. */
 .play-tile__preview {
   position: relative;
   display: block;
   overflow: hidden;
   width: min(100cqw, 100cqh * var(--aspect));
   aspect-ratio: var(--aspect);
-  background: var(--color-stone-100);
 }
 
 .play-tile__preview.is-placeholder {
-  border: 1px solid var(--color-stone-150);
+  border: 1px solid #f0ede5;
+  border-radius: 12px;
+  background: #efefe6;
 }
 
 .play-tile__preview img {
@@ -160,8 +158,7 @@
   pointer-events: none;
 }
 
-/* Clips recorded with no background (the phone and its shadow only) sit straight on the tile, so
-   they match it at rest and on hover, and drop the card shadow when expanded. */
+/* Clips recorded with no background (the phone and its shadow only) sit straight on the tile. */
 .play-tile__preview.is-transparent,
 .play-tile__preview.is-transparent .study-media {
   background: transparent;
@@ -171,13 +168,84 @@
   box-shadow: none;
 }
 
-.play-tile__caption {
-  display: block;
+/* A piece that fills the whole slot (the badges) rather than sitting centred at a shape. */
+.play-tile__preview.is-fill {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  overflow: visible;
+}
+
+/* Medal badges (Figma 4179:24004, tile 1 of the Two row): three 256 badges, 280 apart in a 522 wide
+   slot, so each is 49% of the slot and the step is 53.6%. Two runs of three on one track drift left
+   to right and loop seamlessly (the track moves by one run). Each badge turns like a coin: a full
+   turn around its vertical axis with perspective, staggered so they never flip together. */
+.play-badges {
+  position: absolute;
+  /* The slot doesn't clip in Figma; the tile does. Run out to the tile's edge (its padding). */
+  inset: 0 -40px;
+  display: flex;
+  align-items: center;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-align: center;
-  color: var(--color-neutral-700);
+  perspective: 900px;
+}
+
+.play-badges__track {
+  display: flex;
+  gap: 4.6cqw;
+  translate: -9.8cqw 0;
+  animation: play-badges-drift 14s linear infinite;
+}
+
+.play-badge {
+  flex: none;
+  width: 49cqw;
+  aspect-ratio: 1;
+  perspective: 700px;
+}
+
+.play-badge__coin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: play-badge-flip 4.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  animation-delay: calc(var(--i) * -1.4s);
+}
+
+.play-badge__coin svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 14px rgba(12, 12, 5, 0.12));
+}
+
+@keyframes play-badges-drift {
+  from {
+    transform: translateX(-160.8cqw); /* one run: 3 x (49 + 4.6) */
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Rest, then one quick full turn (the depth reads as a coin flipping), then rest. */
+@keyframes play-badge-flip {
+  0%,
+  55% {
+    transform: rotateY(0deg);
+  }
+  85%,
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-badges__track,
+  .play-badge__coin {
+    animation: none;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -207,7 +275,15 @@
   }
 
   .play-row--bento {
-    aspect-ratio: 358 / 416;
+    aspect-ratio: 358 / 326;
+  }
+
+  .play-tile {
+    padding: 16px 16px 40px;
+  }
+
+  .play-badges {
+    inset: 0 -16px;
   }
 
   /* Three: a sideways swipe strip that peeks past the edge. */

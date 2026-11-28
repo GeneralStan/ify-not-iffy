@@ -289,7 +289,8 @@ function Scene({ theme }: { theme: 'light' | 'dark' }) {
         inset: 0,
         width: W,
         height: H,
-        background: theme === 'light' ? 'var(--surface-neutral-bg-subtle)' : 'var(--surface-neutral-bg-alt)',
+        // BG default: white in light mode, black in dark mode.
+        background: 'var(--surface-neutral-bg-default)',
         fontFamily: 'var(--inter-family)',
         pointerEvents: 'none',
         overflow: 'hidden',

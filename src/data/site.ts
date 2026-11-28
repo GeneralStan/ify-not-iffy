@@ -4,7 +4,7 @@ import { withBase } from '../lib/url';
 export const contact = {
   mail: 'mailto:stanleyulasika@gmail.com',
   linkedin: 'https://www.linkedin.com/in/ifeanyiulasika',
-  resume: withBase('/resume/ifeanyi-ulasika-resume.pdf'),
+  resume: withBase('/resume/Ifeanyi_Ulasika_Resume.pdf'),
 };
 
 /**

@@ -87,10 +87,11 @@
   place-items: center;
 }
 
-/* Phones: the 1024x400 ratio is too thin at 358 wide, so the hero box is 3:2. */
+/* Phones: the hero box is 4:3. The browser window keeps desktop's share of side space and is
+   cropped at the bottom (docs/case-study-structure.md, "Browser frames"). */
 @media (max-width: 767px) {
   .case-hero__media .study-media.study-media--hero {
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 4 / 3;
   }
 }
 
@@ -311,6 +312,13 @@
     padding: 24px;
   }
 
+  .case-statement__text {
+    /* Figma Mobile H2 (24/28, -0.36): the How Might We line steps down a level on phones. */
+    font-size: var(--type-h2-size);
+    line-height: var(--type-h2-line-height);
+    letter-spacing: var(--type-h2-tracking);
+  }
+
   .case-statement__art {
     width: 112px;
     height: 112px;
@@ -389,6 +397,12 @@
 }
 
 .case-visual figcaption {
+  text-align: center;
+  color: var(--color-stone-700); /* Body/Caption, Stone/700 (Figma Inner Page captions) */
+}
+
+/* Before / After labels under a pair: Body/Default, Stone/900, centred. */
+.case-pair .case-visual figcaption {
   color: var(--color-stone-900);
 }
 
@@ -407,14 +421,28 @@
   }
 
   .case-pair .study-media.study-media--slot {
-    aspect-ratio: 462 / 400;
+    aspect-ratio: 502 / 400;
   }
 }
 
-/* Playground demo recordings keep the clip's 16:10 shape at every width (1024 x 640 on desktop).
-   The compare keeps the Figma box's 1024 x 400 at every width so the components stay legible. */
+/* Phones. Framed screens sit in a 4:3 box (the slot default above); whole boxes exported from Figma
+   (components, notification panels, journey maps) keep their desktop shape so they scale as one
+   picture instead of floating in an empty box. */
+@media (max-width: 767px) {
+  .case-visual--wide .study-media.study-media--slot.study-media--image:not(.study-media--framed) {
+    aspect-ratio: 1024 / 400;
+  }
+
+  .case-pair .study-media.study-media--slot.study-media--image:not(.study-media--framed) {
+    aspect-ratio: 502 / 400;
+  }
+}
+
+/* Playground demo recordings: the whole browser window (944 wide, its 3% top bar over the 16:10
+   clip) with 40 around it, so 1024 x 700, at every width. The compare keeps the Figma box's
+   1024 x 400 at every width so the components stay legible. */
 .case-visual .study-media.study-media--slot.study-media--demo {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1024 / 700;
 }
 
 .case-visual .study-media.study-media--slot.study-media--compare,

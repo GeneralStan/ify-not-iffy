@@ -1,0 +1,17 @@
+import { openRec, load } from './rec.mjs';
+const r = await openRec('trips');
+const { page } = r;
+const dlg = () => page.locator('[role=dialog]').last();
+await load(page);
+await r.wait(1200);
+await r.mark();
+await r.wait(500);
+await r.click(page.getByRole('button', { name: /^Dispatched/ }).first(), { post: 1700 });
+const row = page.locator('[role=row]').filter({ hasText: 'b6tfy' }).first();
+await r.hover(row, 900, { dx: 0.55 });
+await r.hover(row.getByText('TRP-184').first(), 1000);
+await r.click(null, { post: 2300 });
+await r.hover(dlg().getByRole('button', { name: 'Expand Trip Map' }).first(), 700);
+await r.click(null, { post: 2600 });
+await r.to(820, 430, 1100); await r.wait(1500);
+console.log(await r.done(600));

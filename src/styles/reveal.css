@@ -223,3 +223,33 @@
     transition: none;
   }
 }
+
+/* ===== Media reveal (src/scripts/media-reveal.ts) =====
+   Inside a [data-media-reveal] box, the snippets rise 24px and fade in together when the box first
+   scrolls into view: 900ms, enter ease for the rise, fade ease for opacity (same as the text
+   reveals). `translate` rather than `transform`, so snippets that already use transform (the
+   centred phone video in a work card) keep it. The box clips, so they arrive inside their frame. */
+.reveal-ready [data-media-reveal]:not(.is-in) :is(
+    .study-media__framebox > .browser-frame,
+    .study-media > img:not(.study-media__still),
+    .study-media > video,
+    .study-media > .study-media__stage,
+    .study-media > astro-island,
+    .play-tile__preview
+  ) {
+  opacity: 0;
+  translate: 0 24px;
+}
+
+.reveal-ready [data-media-reveal].is-in :is(
+    .study-media__framebox > .browser-frame,
+    .study-media > img:not(.study-media__still),
+    .study-media > video,
+    .study-media > .study-media__stage,
+    .study-media > astro-island,
+    .play-tile__preview
+  ) {
+  transition:
+    opacity var(--motion-duration-reveal) var(--motion-ease-fade),
+    translate var(--motion-duration-reveal) var(--motion-ease-enter);
+}
