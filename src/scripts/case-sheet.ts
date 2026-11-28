@@ -249,6 +249,19 @@ function fly(from: DOMRect, to: DOMRect, fromRadius: string, toRadius: string, c
     borderRadius: radius,
   });
   const outer = node.animate([frame(from, fromRadius), frame(to, toRadius)], timing);
+  // A card whose still differs from its hero (M-Pesa: the phones sit differently in the 572 and
+  // 1024 boxes) fades into the hero image as it flies, so it lands exactly on the real hero.
+  const heroSrc = card.dataset.hero;
+  if (heroSrc) {
+    const hero = document.createElement('img');
+    hero.className = 'case-ghost__hero';
+    hero.src = heroSrc;
+    hero.alt = '';
+    // As the hero box shows it: whole on desktop, cropped to the card's shape on phones.
+    hero.style.objectFit = phone.matches ? 'cover' : 'contain';
+    node.append(hero);
+    hero.animate([{ opacity: opening ? 0 : 1 }, { opacity: opening ? 1 : 0 }], timing);
+  }
   media.animate(
     [
       { transform: `translate(-50%, -50%) scale(${scaleAt(from)})` },

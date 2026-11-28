@@ -14,7 +14,7 @@ const projects = [
   {
     slug: 'leta-design-system',
     tags: ['Leta Technologies', 'Web', 'B2B'],
-    title: 'Rebuilding Leta’s dispatch dashboard as a working prototype ops teams could test before launch.',
+    title: 'Building Leta’s design system and interface for better usability and faster delivery times',
     video: {
       src: '/work/leta-design-system/preview.mp4',
       webm: '/work/leta-design-system/preview.webm',
@@ -25,23 +25,26 @@ const projects = [
   {
     slug: 'leta-mpesa',
     tags: ['Leta Technologies', 'Mobile'],
-    title: 'Bringing Leta deliveries inside M-PESA and cutting time to first value by 69%.',
+    title: 'Boosting conversion by simplifying delivery booking and payment in the Leta Express M-Pesa mini-app',
+    // Figma Case Study Card 4094:776 (Images slot) and the drawer hero (4307:55907).
+    image: '/work/leta-mpesa/card.webp',
+    hero: '/work/leta-mpesa/hero.webp',
   },
   {
     slug: 'leta-driver-app',
     tags: ['Leta Technologies', 'Mobile', 'B2B'],
     title: 'Redesigning the Driver App to decrease order fulfilment time and boost driver retention.',
+    // Figma 4094:777, State=Coming Soon: the slot at 60% (baked onto Neutral/0) and the badge.
+    image: '/work/leta-driver-app/card.webp',
+    comingSoon: true,
   },
   {
     slug: 'crunchr',
     tags: ['Crunchr', 'Mobile', 'B2C'],
     title: 'Enabling users to purchase everyday essentials within 30 minutes.',
-    video: {
-      src: '/work/crunchr-iphone.mp4',
-      webm: '/work/crunchr-iphone.webm',
-      poster: '/work/crunchr-iphone-poster.webp',
-      screen: false,
-    },
+    // Figma 4094:778, State=Coming Soon (the iPhone video stays on the case study page).
+    image: '/work/crunchr/card.webp',
+    comingSoon: true,
   },
 ].map((project, index) => ({ ...project, n: index + 1 })) as Array<{
   slug: string;
@@ -49,6 +52,12 @@ const projects = [
   title: string;
   n: number;
   video?: { src: string; webm: string; poster: string; screen: boolean };
+  /** A still exported from the Figma card's Images slot (572x400 at 2x). */
+  image?: string;
+  /** The drawer hero's image, for the card-to-hero glide to fade into. */
+  hero?: string;
+  /** State=Coming Soon: dimmed preview, the Coming Soon badge, and the card doesn't open. */
+  comingSoon?: boolean;
 }>;
 
 const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p.n % 2 === 0)];
@@ -67,18 +76,28 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
       {
         columns.map((column, c) => (
           <div class={`card-column card-column--${c + 1}`}>
-            {column.map((project) => (
-              <a
-                class="project-card"
-                href={withBase(`/work/${project.slug}/`)}
-                data-astro-reload
-                data-case-sheet
+            {column.map((project) => {
+              // Coming Soon cards don't open, so they render as a plain block instead of a link.
+              const Card = project.comingSoon ? 'div' : 'a';
+              return (
+              <Card
+                class:list={['project-card', project.comingSoon && 'project-card--soon']}
+                href={project.comingSoon ? undefined : withBase(`/work/${project.slug}/`)}
+                data-astro-reload={project.comingSoon ? undefined : ''}
+                data-case-sheet={project.comingSoon ? undefined : ''}
                 data-reveal="scale"
-                data-tooltip="View details"
+                data-tooltip={project.comingSoon ? undefined : 'View details'}
                 style={`--order: ${project.n}; --reveal-delay: ${c * 110}ms`}
               >
-                <div class:list={['project-card__media', project.video && !project.video.screen && 'project-card__media--phone']} data-skeleton>
-                  {project.video ? (
+                <div
+                  class:list={['project-card__media', project.video && !project.video.screen && 'project-card__media--phone', project.image && 'project-card__media--image']}
+                  data-skeleton
+                  data-hero={project.hero ? withBase(project.hero) : undefined}
+                >
+                  {project.comingSoon && <span class="project-card__badge text-meta">Coming Soon</span>}
+                  {project.image ? (
+                    <img class="project-card__image" src={withBase(project.image)} alt="" />
+                  ) : project.video ? (
                     <StudyMedia
                       kind="video"
                       frame="card"
@@ -103,8 +122,9 @@ const columns = [projects.filter((p) => p.n % 2 === 1), projects.filter((p) => p
                   </p>
                   <h3 class="project-card__title text-body-lg">{project.title}</h3>
                 </div>
-              </a>
-            ))}
+              </Card>
+              );
+            })}
           </div>
         ))
       }

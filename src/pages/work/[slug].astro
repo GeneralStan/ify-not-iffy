@@ -4,14 +4,19 @@ import CaseStudy from '../../layouts/CaseStudy.astro';
 
 export async function getStaticPaths() {
   const studies = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
-  return studies.map((study, index) => ({
-    params: { slug: study.id },
-    props: {
-      study,
-      prev: studies[index - 1] ?? null,
-      next: studies[index + 1] ?? null,
-    },
-  }));
+  // Previous / Next only link written case studies; a Coming Soon one gets no links of its own.
+  const published = studies.filter((s) => !s.data.comingSoon);
+  return studies.map((study) => {
+    const index = published.indexOf(study);
+    return {
+      params: { slug: study.id },
+      props: {
+        study,
+        prev: index > 0 ? published[index - 1] : null,
+        next: index >= 0 ? (published[index + 1] ?? null) : null,
+      },
+    };
+  });
 }
 
 const { study, prev, next } = Astro.props;

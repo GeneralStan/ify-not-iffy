@@ -5,6 +5,7 @@ title: Rebuilding design system components and new features with AI to improve u
 name: Leta Driver App
 summary: Rebuilding design system components and new features with AI to improve usability and delivery times.
 order: 3
+comingSoon: true
 tags:
   - Leta Technologies
   - Mobile
@@ -21,14 +22,11 @@ metrics:
     label: Order Fulfilment
   - value: 100+
     label: Components
-# Screen recording from my-portfolio-materials/Case study 1 preview.MOV (1440 wide, no sound).
+# Figma Case Study Card 4094:777 slot, laid out at 1024x400 ("Driver App — hero (site)" 4340:57838).
 hero:
-  kind: video
-  src: /work/leta-design-system/preview.mp4
-  webm: /work/leta-design-system/preview.webm
-  poster: /work/leta-design-system/preview-poster.jpg
-  screen: true
-  alt: Selecting an order in the redesigned Deliveries table, which brings up the bulk action bar.
+  kind: image
+  src: /work/leta-driver-app/hero.webp
+  alt: Two screens of the Leta Driver App, the map with broadcast orders nearby and the Go Online screen.
 overview:
   body: Leta's software helps delivery businesses run their orders. Dispatchers assign each order to a driver and track it until drop-off. Their everyday tasks took too many steps, and testing fixes in Figma was slow. I rebuilt the design system in code with Claude Code, wrote six specs, and built a working prototype dispatchers have tested.
   visuals:

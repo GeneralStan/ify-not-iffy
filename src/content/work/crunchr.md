@@ -5,6 +5,7 @@ title: Rebuilding design system components and new features with AI to improve u
 name: Crunchr
 summary: Rebuilding design system components and new features with AI to improve usability and delivery times.
 order: 4
+comingSoon: true
 tags:
   - Crunchr
   - Mobile

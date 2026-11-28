@@ -1,7 +1,7 @@
 ---
 # Copy and images from the Figma wireframe "Inner Page" (4192:24706, Nov 26, 2026; first built from
 # 4110:3586). Images are the wireframe's image boxes exported whole at 2x (public/work/leta-design-system/).
-title: Rebuilding design system components and new features with AI to improve usability and delivery times.
+title: Building Leta’s design system and interface for better usability and faster delivery times
 name: Leta design system
 summary: Leta design system, six specs, three Claude Code skills, and a playground prototype. Order creation took 3m 22s against a 2-minute target.
 order: 1

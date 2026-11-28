@@ -1,7 +1,7 @@
 ---
 # Same copy and images as the Leta case study (Figma "Inner Page" 4192:24706), shown here until this
 # case study's own copy is written.
-title: Rebuilding design system components and new features with AI to improve usability and delivery times.
+title: Boosting conversion by simplifying delivery booking and payment in the Leta Express M-Pesa mini-app
 name: Leta M-Pesa Mini App
 summary: Rebuilding design system components and new features with AI to improve usability and delivery times.
 order: 2
@@ -20,14 +20,11 @@ metrics:
     label: Order Fulfilment
   - value: 100+
     label: Components
-# Screen recording from my-portfolio-materials/Case study 1 preview.MOV (1440 wide, no sound).
+# Figma M-Pesa draft hero 4307:55907.
 hero:
-  kind: video
-  src: /work/leta-design-system/preview.mp4
-  webm: /work/leta-design-system/preview.webm
-  poster: /work/leta-design-system/preview-poster.jpg
-  screen: true
-  alt: Selecting an order in the redesigned Deliveries table, which brings up the bulk action bar.
+  kind: image
+  src: /work/leta-mpesa/hero.webp
+  alt: Two screens of the Leta mini app in M-PESA for Business, the Home page with operating hours and a delivery in transit.
 overview:
   body: Leta's software helps delivery businesses run their orders. Dispatchers assign each order to a driver and track it until drop-off. Their everyday tasks took too many steps, and testing fixes in Figma was slow. I rebuilt the design system in code with Claude Code, wrote six specs, and built a working prototype dispatchers have tested.
   visuals:

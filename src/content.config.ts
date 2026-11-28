@@ -65,6 +65,9 @@ const work = defineCollection({
     /** Work card and meta description. */
     summary: z.string(),
     order: z.number(),
+    /** Not written yet: the work card shows Coming Soon and doesn't open, and other case studies'
+        Previous / Next links skip it. */
+    comingSoon: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
     facts: z.object({
       role: z.string(),
