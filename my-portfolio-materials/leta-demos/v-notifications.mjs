@@ -10,8 +10,14 @@ await r.hover(bell, 1100);
 await r.click(bell, { post: 1400 });
 const scroller = page.locator('.scroll-isolated.scroll-slim').first();
 await r.hover(scroller, 500, { dy: 0.4 });
-await r.wheel(420, 24, 55); await r.wait(900);
-await r.wheel(-420, 16, 45); await r.wait(600);
+// One smooth in-page scroll to the end of the Open tab and back (stepped wheel ticks looked jerky).
+const glide = async (to) => {
+  await scroller.evaluate((el, y) => el.scrollTo({ top: y === 'end' ? el.scrollHeight : 0, behavior: 'smooth' }), to);
+  await r.wait(1400);
+};
+await r.to(1100, 560, 500);
+await glide('end'); await r.wait(500);
+await glide('top'); await r.wait(300);
 await r.click(page.getByRole('tab', { name: 'Resolved' }).or(page.getByRole('button', { name: 'Resolved', exact: true })).first(), { post: 1500 });
 await r.click(page.getByRole('tab', { name: 'Open' }).or(page.getByRole('button', { name: 'Open', exact: true })).first(), { post: 1100 });
 await r.click(page.getByRole('button', { name: /All notifications/ }), { post: 700 });

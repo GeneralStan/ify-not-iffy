@@ -109,7 +109,10 @@ const mediaPoster = poster ? withBase(poster) : undefined;
   {
     framedVideo && mediaSrc && (
       <div class="study-media__framebox">
-        <BrowserFrame style={place(videoSpot)}>
+        <BrowserFrame
+          class={frame === 'hero' && !demo ? 'browser-frame--hero' : undefined}
+          style={frame === 'hero' && !demo ? undefined : place(videoSpot)}
+        >
           <img class="study-media__still" src={mediaPoster} alt={alt} />
           <video
             class="study-media__video"
@@ -327,6 +330,24 @@ const mediaPoster = poster ? withBase(poster) : undefined;
     max-height: none;
     transform: none;
     object-fit: fill;
+  }
+
+  /* Drawer hero window (Figma 4192:24709): 774 wide in the 1024 x 400 box, centred, 95 down.
+     Phones: the work card's composition (Case Study Card 4094:775: 523 wide in a 572 x 400 box,
+     24.5 from the left, 94 down), so the hero looks exactly like the card it opened from. The glide
+     in case-sheet.ts uses the same numbers. */
+  .study-media__framebox :global(.browser-frame--hero) {
+    left: 12.207%;
+    top: 9.277cqw;
+    width: 75.586%;
+  }
+
+  @media (max-width: 767px) {
+    .study-media__framebox :global(.browser-frame--hero) {
+      left: 4.283%;
+      top: 16.434cqw;
+      width: 91.434%;
+    }
   }
 
   .study-media--framed .study-media__framebox :global(.study-media__still) {

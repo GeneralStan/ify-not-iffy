@@ -87,11 +87,11 @@
   place-items: center;
 }
 
-/* Phones: the hero box is 4:3. The browser window keeps desktop's share of side space and is
-   cropped at the bottom (docs/case-study-structure.md, "Browser frames"). */
+/* Phones: the hero box takes the work card's shape (572 x 400) and its window sits where the
+   card's does (StudyMedia), so the hero matches the card it opened from. */
 @media (max-width: 767px) {
   .case-hero__media .study-media.study-media--hero {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 572 / 400;
   }
 }
 
@@ -923,11 +923,13 @@ html.has-case-sheet :is(.hero, main, .site-footer) *::after {
 }
 
 .case-said__quote {
+  /* Figma Feedback (4192:24967): the quote fills its card, left-aligned. */
   margin: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 373px;
+  text-align: left;
 }
 
 .case-said__text {

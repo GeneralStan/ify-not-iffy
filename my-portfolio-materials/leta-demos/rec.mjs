@@ -116,7 +116,10 @@ export async function openRec(name, { path: route = '/orders', clock = false, vh
       });
       lines.push(`file '${frames[frames.length - 1].f}'`);
       fs.writeFileSync(`${dir}/list.txt`, lines.join('\n'));
-      return { frames: frames.length, seconds: (endT - frames[0].t).toFixed(1), dir };
+      // Longest gap between frames: a stutter shows up as a long gap. Re-record above ~80ms.
+      let gap = 0;
+      for (let i = 1; i < frames.length; i++) gap = Math.max(gap, frames[i].t - frames[i - 1].t);
+      return { frames: frames.length, seconds: (endT - frames[0].t).toFixed(1), longestGapMs: Math.round(gap * 1000), dir };
     },
   };
   return r;

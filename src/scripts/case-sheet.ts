@@ -148,8 +148,91 @@ function makeGhost(card: HTMLElement, at: DOMRect, radius: string) {
   return { node, media, box };
 }
 
+/* Where the browser window sits in its box, as shares of the box width (x, y, w). These match
+   StudyMedia.astro: the work card (Case Study Card 4094:775) and the drawer hero (Figma 4192:24709);
+   on phones the hero uses the card's composition. */
+const CARD_WINDOW = { x: 24.5 / 572, y: 94 / 572, w: 523 / 572 };
+const HERO_WINDOW_DESKTOP = { x: 125 / 1024, y: 95 / 1024, w: 774 / 1024 };
+const phone = window.matchMedia('(max-width: 767px)');
+const heroWindow = () => (phone.matches ? CARD_WINDOW : HERO_WINDOW_DESKTOP);
+// Inside the box's 1px border, as the CSS places it (shares of the box's inner width).
+const windowIn = (r: DOMRect, g: { x: number; y: number; w: number }) => {
+  const inner = r.width - 2;
+  return { left: 1 + inner * g.x, top: 1 + inner * g.y, width: inner * g.w };
+};
+
+/**
+ * Fly a card whose media is a browser window: the box (Stone/100) morphs from one rect to the other
+ * while a copy of the window moves from its spot in the first box to its spot in the second, so it
+ * lands exactly where the hero's own window is (no jump when the real hero takes over). The window
+ * is sized in container units, so its bar and screen scale with its width.
+ */
+function flyWindow(
+  from: DOMRect,
+  to: DOMRect,
+  fromRadius: string,
+  toRadius: string,
+  card: HTMLElement,
+  win: HTMLElement,
+  opening: boolean,
+) {
+  const node = document.createElement('div');
+  node.className = 'case-ghost case-ghost--window';
+  node.setAttribute('aria-hidden', 'true');
+  const copy = win.cloneNode(true) as HTMLElement;
+  // A copied <video> starts blank: paint the card's current frame into a canvas instead.
+  const video = win.querySelector('video');
+  const copyVideo = copy.querySelector('video');
+  if (video && copyVideo) {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 1440;
+    canvas.height = video.videoHeight || 810;
+    try {
+      if (video.readyState >= 2) canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    } catch {
+      /* cross-origin or not ready: the poster below shows instead */
+    }
+    Object.assign(canvas.style, { display: 'block', width: '100%', height: 'auto' });
+    if (video.readyState < 2 && video.poster) canvas.style.background = `center / cover url("${video.poster}")`;
+    copyVideo.replaceWith(canvas);
+  }
+  copy.querySelector('.study-media__still')?.remove();
+  copy.style.position = 'absolute';
+  node.append(copy);
+  document.body.append(node);
+
+  const fromWin = windowIn(from, opening ? CARD_WINDOW : heroWindow());
+  const toWin = windowIn(to, opening ? heroWindow() : CARD_WINDOW);
+  const onDesktop = desktop.matches;
+  const timing: KeyframeAnimationOptions = {
+    duration: onDesktop && opening ? GLIDE_MS_DESKTOP : PANEL_MS,
+    easing: onDesktop && opening ? GLIDE_EASE_DESKTOP : PANEL_EASE,
+    fill: 'forwards',
+  };
+  const box = (r: DOMRect, radius: string) => ({
+    left: `${r.left}px`,
+    top: `${r.top}px`,
+    width: `${r.width}px`,
+    height: `${r.height}px`,
+    borderRadius: radius,
+  });
+  const place = (w: { left: number; top: number; width: number }) => ({
+    left: `${w.left}px`,
+    top: `${w.top}px`,
+    width: `${w.width}px`,
+  });
+  Object.assign(node.style, box(from, fromRadius));
+  Object.assign(copy.style, place(fromWin));
+  const outer = node.animate([box(from, fromRadius), box(to, toRadius)], timing);
+  copy.animate([place(fromWin), place(toWin)], timing);
+  const limit = new Promise((resolve) => window.setTimeout(resolve, Number(timing.duration) + 120));
+  return { node, outer, landed: Promise.race([outer.finished.catch(() => undefined), limit]) };
+}
+
 /** Fly a copy of the card's media from one box to another. */
 function fly(from: DOMRect, to: DOMRect, fromRadius: string, toRadius: string, card: HTMLElement, opening: boolean) {
+  const win = card.querySelector<HTMLElement>('.browser-frame');
+  if (win) return flyWindow(from, to, fromRadius, toRadius, card, win, opening);
   const { node, media, box } = makeGhost(card, from, fromRadius);
   const scaleAt = (r: DOMRect) => Math.min(r.width / box.width, r.height / box.height);
   const onDesktop = desktop.matches;

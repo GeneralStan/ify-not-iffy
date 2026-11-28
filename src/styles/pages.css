@@ -237,8 +237,8 @@
   }
 }
 
-/* Rest, then one quick full turn, then rest. The turn runs the same way the badges travel
-   (the front face rolls to the right), like a coin rolling rightward. */
+/* Rest, then one quick full turn, then rest (owner-approved direction, Nov 28 2026). The back
+   face carries no number. */
 @keyframes play-badge-flip {
   0%,
   55% {
@@ -246,7 +246,7 @@
   }
   85%,
   100% {
-    transform: rotateY(-360deg);
+    transform: rotateY(360deg);
   }
 }
 

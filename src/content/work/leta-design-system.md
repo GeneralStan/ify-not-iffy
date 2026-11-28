@@ -95,9 +95,10 @@ sections:
             alt: Hovering the Delayed and At Risk icons in the Deliveries table, then opening each order to see its delay banner.
             caption: Identifying delayed orders
           - kind: image
-            src: /work/leta-design-system/time-targets.webp
+            src: /work/leta-design-system/shot-time-targets-1.webp
             frames:
-              - { src: /work/leta-design-system/shot-time-targets.webp, x: 201, y: 20, w: 623 }
+              - { src: /work/leta-design-system/shot-time-targets-1.webp, x: 40, y: 61, w: 456 }
+              - { src: /work/leta-design-system/shot-time-targets-2.webp, x: 528, y: 61, w: 456 }
             alt: Time Targets settings, with a target for each delivery stage.
             caption: Configuring time targets
       - title: Notifications to stay ahead
@@ -122,14 +123,6 @@ sections:
             webm: /work/leta-design-system/demo-broadcast.webm
             poster: /work/leta-design-system/demo-broadcast.jpg
             alt: Filtering to broadcasted orders, opening one, and following its broadcast logs, driver groups and notified drivers until a driver accepts.
-          - kind: image
-            src: /work/leta-design-system/broadcast-states.webp
-            frames:
-              - { src: /work/leta-design-system/shot-broadcast-1.webp, x: 23, y: 103, w: 310 }
-              - { src: /work/leta-design-system/shot-broadcast-2.webp, x: 357, y: 103, w: 310 }
-              - { src: /work/leta-design-system/shot-broadcast-3.webp, x: 691, y: 103, w: 310 }
-            alt: Three order drawers showing different broadcast states.
-            caption: Snapshots of the various order broadcast states
   - title: Faster workflows
     steps:
       - title: Acting from the table
@@ -202,7 +195,7 @@ sections:
 results:
   title: Feedback
   quotes:
-    - text: I now understand what's happening with an order in chronological order. Broadcasting details are much clearer as well.
+    - text: I now understand what's happening with an order in chronological order. The broadcasting logs & details are much clearer as well.
     - text: I spend most of the day in front of the screen, managing orders and drivers. So dark mode makes it easier for me to work.
 takeaways:
   - title: Fast prototyping can't replace early collaboration
@@ -210,6 +203,4 @@ takeaways:
       Once I could build screens in hours instead of days, I started polishing flows solo before weekly reviews. Without early input, engineering would catch a technical limit or an unscoped workflow in the room, forcing me to rebuild, like the orders table I redid several times. Building had gotten cheap, yet a B2B product like this still has to be worked out with the people who know how deliveries run and how the system works underneath.
 
       To bring the engineers and product owners closer to the project, I deployed and shared the interactive prototype and opened the repository for engineers to fork and test in their own sandboxes.
-  - title: Building fast showed me how much I was working alone
-    body: Dispatchers needed a full view of operations. They had to quickly identify depots with unassigned orders and whether those orders were slightly delayed, or critically delayed. They also needed to view the drop-off locations of unassigned orders to determine where deliveries needed to happen. Finally, they required access to live delivery metrics on the map without interrupting the view.
 ---
