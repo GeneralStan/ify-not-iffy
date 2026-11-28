@@ -180,8 +180,8 @@ const ICONS: Record<string, string[]> = {
               </div>
               {data.problem.findings.length > 0 && (
                 <div class="case-findings">
-                  <h3 class="case-findings__title text-h2">What we uncovered</h3>
-                  <ul class="findings">
+                  {/* No "What we uncovered" subheading (removed Nov 28, 2026): the section title and icons carry it. */}
+                  <ul class="findings" aria-label="What we uncovered">
                     {data.problem.findings.map((finding) => (
                       <li class="finding">
                         {finding.icon && (

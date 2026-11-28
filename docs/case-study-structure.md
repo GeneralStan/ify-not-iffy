@@ -28,7 +28,7 @@ Write for two readers at once:
 ### 3. Defining the problem
 
 - Short intro: one or two sentences on why it mattered.
-- "What we uncovered": exactly three findings, each with an icon, a short title and two or three sentences. They must not overlap. Each names its source plainly (e.g. "Source: timed usability sessions").
+- "What we uncovered" (no visible subheading; the findings sit straight under "Defining the problem"): exactly three findings, each with an icon, a short title and two or three sentences. They must not overlap. Each names its source plainly (e.g. "Source: timed usability sessions").
 - Problem statement card: one "How might we…" question, wide enough that every themed section answers part of it.
 - Supporting research visuals with captions: journey maps, usability results, card sorts, surveys, field notes. Research visuals live here, never in a section of their own.
 
